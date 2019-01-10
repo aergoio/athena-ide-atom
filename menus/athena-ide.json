@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle athena-ide",
+        "command": "athena-ide:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "athena-ide",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "athena-ide:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

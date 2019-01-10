@@ -1,0 +1,20 @@
+{
+  "name": "athena-ide-atom",
+  "main": "./lib/athena-ide",
+  "version": "0.0.1",
+  "description": "A package for writing smart contract in aergo using atom ide",
+  "keywords": [
+    "aergo",
+    "smart contract",
+    "lua"
+  ],
+  "activationCommands": {
+    "atom-workspace": "athena-ide:toggle"
+  },
+  "repository": "https://github.com/aergo/athena-ide-atom",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {}
+}
