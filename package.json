@@ -1,14 +1,21 @@
 {
   "name": "athena-ide-atom",
-  "main": "./lib/main",
+  "main": "./src/main",
   "version": "0.0.1",
   "description": "A package for writing smart contract in aergo using atom ide",
+  "scripts": {
+    "lint": "eslint --fix ./src"
+  },
+  "repository": "https://github.com/aergoio/athena-ide-atom",
   "keywords": [
     "aergo",
     "smart contract",
     "lua"
   ],
-  "repository": "https://github.com/aergo/athena-ide-atom",
+  "bugs": {
+    "url": "https://github.com/aergoio/athena-ide-atom/issues"
+  },
+  "homepage": "https://github.com/aergoio/athena-ide-atom#readme",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
@@ -19,6 +26,10 @@
         "2.0.0": "getProvider"
       }
     }
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-config-google": "^0.11.0"
   },
   "dependencies": {
     "luaparse": "^0.2.1"
