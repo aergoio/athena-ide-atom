@@ -1,39 +1,74 @@
 'use babel';
 
-import LuaScope from './lua-scope';
+import LuaScopeComposite from './lua-scope-composite';
 import {Visitor} from '../type';
+
+const FUNCTION_DECLARATION = 'FunctionDeclaration';
+const IDENTIFIER = 'Identifier';
 
 export default class LuaScopeTreeGenerator extends Visitor {
 
-  scope = null;
+  scopeComposite = null;
 
-  initScope(start, end) {
-    this.scope = new LuaScope(start, end);
-  }
-
-  getScopeTree() {
-    return this.scope;
+  reset() {
+    this.scopeComposite = null;
   }
 
   getSuggestions(prefix, index) {
-    const suggestions = [{text: 'complete', replacementPrefix: 'com'}];
+    const suggestions = [];
+    this.findSuggestions(this.scopeComposite, prefix, index, suggestions);
     return suggestions;
   }
 
+  findSuggestions(scopeComposite, prefix, index, suggestions) {
+    console.log(scopeComposite, index);
+    if (scopeComposite.isInScope(index)) {
+      scopeComposite.definitions.forEach((definition) => {
+        if (definition.name.indexOf(prefix) === 0) {
+          suggestions.push(this.makeNewSuggestion(definition));
+        }
+      });
+      scopeComposite.children.forEach(child => this.findSuggestions(child, prefix, index, suggestions));
+    }
+  }
+
+  makeNewSuggestion(definition, prefix) {
+    return {text: definition.name, replacementPrefix: prefix};
+  }
+
   onCreateNode(node) {
-    console.log("LuaRecommander : onCreateNode")
+    console.log("LuaScopeTreeGenerator : onCreateNode", node);
+    switch(node.type) {
+      case FUNCTION_DECLARATION:
+        this.scopeComposite.addDefinition(FUNCTION_DECLARATION, node.identifier.name);
+        break;
+      default:
+        // do nothing
+        break;
+    }
   }
 
-  onCreateScope() {
-    console.log("LuaRecommander : onCreateScope")
+  onCreateScope(scope) {
+    console.log("LuaScopeTreeGenerator : onCreateScope", scope);
+    if (null === this.scopeComposite) {
+      this.scopeComposite = new LuaScopeComposite(null);
+    } else {
+      const child = new LuaScopeComposite(this.scopeComposite);
+      this.scopeComposite.addChild(child);
+      this.scopeComposite = child;
+    }
+    this.scopeComposite.setStart(scope.index);
   }
 
-  onDestroyScope() {
-    console.log("LuaRecommander : onDestroyScope")
+  onDestroyScope(scope) {
+    console.log("LuaScopeTreeGenerator : onDestroyScope", scope);
+    this.scopeComposite.setEnd(scope.index);
+    this.scopeComposite = this.scopeComposite.getParent();
   }
 
-  onLocalDeclaration(scopeName) {
-    console.log("LuaRecommander : onLocalDeclaration")
+  onLocalDeclaration(identifierName) {
+    console.log("LuaScopeTreeGenerator : onLocalDeclaration", identifierName);
+    this.scopeComposite.addDefinition(IDENTIFIER, identifierName);
   }
 
 };

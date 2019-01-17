@@ -2,12 +2,14 @@
 
 export default class Visitor {
 
+  reset() {}
+
   onCreateNode(node) {}
 
-  onCreateScope() {}
+  onCreateScope(scope) {}
 
-  onDestroyScope() {}
+  onDestroyScope(scope) {}
 
-  onLocalDeclaration(scopeName) {}
+  onLocalDeclaration(identifierName) {}
 
 }

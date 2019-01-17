@@ -15,6 +15,7 @@ export default class LuaParser extends Parser {
   parse(source) {
     try {
       const visitors = this.visitors;
+      visitors.forEach(visitor => visitor.reset());
       return this.delegate.parse(source, {
         wait: false,
         comments: false,
@@ -22,22 +23,16 @@ export default class LuaParser extends Parser {
         ranges: true,
         locations: true,
         onCreateNode (node) {
-          console.log("onCreateNode");
-          console.log(node);
           visitors.forEach(visitor => visitor.onCreateNode(node));
         },
-        onCreateScope () {
-          console.log("onCreateScope");
-          visitors.forEach(visitor => visitor.onCreateScope());
+        onCreateScope (scope) {
+          visitors.forEach(visitor => visitor.onCreateScope(scope));
         },
-        onDestroyScope () {
-          console.log("onDestroyScope");
-          visitors.forEach(visitor => visitor.onDestroyScope());
+        onDestroyScope (scope) {
+          visitors.forEach(visitor => visitor.onDestroyScope(scope));
         },
-        onLocalDeclaration (scopeName) {
-          console.log("onLocalDeclaration");
-          console.log(scopeName);
-          visitors.forEach(visitor => visitor.onLocalDeclaration());
+        onLocalDeclaration (identifierName) {
+          visitors.forEach(visitor => visitor.onLocalDeclaration(identifierName));
         },
         luaVersion: luaVersion
       });
