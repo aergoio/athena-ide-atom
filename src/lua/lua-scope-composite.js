@@ -9,6 +9,10 @@ export default class LuaScopeComposite {
     this.children = [];
   }
 
+  isRoot() {
+    return null == this.parent;
+  }
+
   getParent() {
     return null === this.parent ? this : this.parent;
   }

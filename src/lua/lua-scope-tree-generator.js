@@ -62,7 +62,8 @@ export default class LuaScopeTreeGenerator extends Visitor {
 
   onDestroyScope(scope) {
     console.log("LuaScopeTreeGenerator : onDestroyScope", scope);
-    this.scopeComposite.setEnd(scope.index);
+    const scopeEndIndex = this.scopeComposite.isRoot() ? Infinity : scope.index;
+    this.scopeComposite.setEnd(scopeEndIndex);
     this.scopeComposite = this.scopeComposite.getParent();
   }
 
