@@ -29,9 +29,9 @@ export default class LuaScopeComposite {
     this.range.end = end;
   }
 
-  addDefinition(type, name) {
-    console.log("name: " + name + ", type: " + type);
-    this.definitions.push({name: name, type: type});
+  addDefinition(definition) {
+    console.log("definition: ", definition);
+    this.definitions.push(definition);
   }
 
   addChild(child) {
