@@ -32,6 +32,6 @@
     "eslint-config-google": "^0.11.0"
   },
   "dependencies": {
-    "luaparse": "^0.2.1"
+    "@aergoio/luaparse": "git://github.com:aergoio/luaparse.git#master"
   }
 }

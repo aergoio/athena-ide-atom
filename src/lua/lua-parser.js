@@ -1,6 +1,6 @@
 'use babel'
 
-import luaparse from 'luaparse';
+import luaparse from '@aergoio/luaparse';
 import {Parser} from '../type';
 
 const luaVersion = '5.1';
