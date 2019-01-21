@@ -2,30 +2,30 @@
 
 export default class LuaSuggester {
 
-  constructor(scopeComposite) {
-    this.scopeComposite = scopeComposite;
+  constructor(symbolTable) {
+    this.symbolTable = symbolTable;
   }
 
   getSuggestions(prefix, index) {
     const suggestions = [];
-    this.findSuggestions(this.scopeComposite, prefix, index, suggestions);
+    this.findSuggestions(this.symbolTable, prefix, index, suggestions);
     return suggestions;
   }
 
-  findSuggestions(scopeComposite, prefix, index, suggestions) {
-    console.log(scopeComposite, index);
-    if (scopeComposite.isInScope(index)) {
-      scopeComposite.definitions.forEach((definition) => {
-        if (definition.index < index && definition.name.indexOf(prefix) === 0) {
-          suggestions.push(this.makeNewSuggestion(definition));
+  findSuggestions(symbolTable, prefix, index, suggestions) {
+    console.log(symbolTable, index);
+    if (symbolTable.isInScope(index)) {
+      symbolTable.entries.forEach((entry) => {
+        if (entry.index < index && entry.name.indexOf(prefix) === 0) {
+          suggestions.push(this.makeNewSuggestion(entry));
         }
       });
-      scopeComposite.children.forEach(child => this.findSuggestions(child, prefix, index, suggestions));
+      symbolTable.children.forEach(child => this.findSuggestions(child, prefix, index, suggestions));
     }
   }
 
-  makeNewSuggestion(definition, prefix) {
-    return {text: definition.name, replacementPrefix: prefix};
+  makeNewSuggestion(entry, prefix) {
+    return {text: entry.name, replacementPrefix: prefix};
   }
 
 }

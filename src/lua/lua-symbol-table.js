@@ -1,10 +1,24 @@
 'use babel';
 
-export default class LuaScopeComposite {
+class LuaSymbolTableEntry {
+
+  constructor(index, name, type) {
+    this.index = index;
+    this.name = name;
+    this.type = type;
+  }
+
+}
+
+export default class LuaSymbolTable {
+
+  static newSymbolTable() {
+    return new LuaSymbolTable(null);
+  }
 
   constructor(parent) {
     this.range = {start: NaN, end: NaN};
-    this.definitions = [];
+    this.entries = [];
     this.parent = parent;
     this.children = [];
   }
@@ -14,7 +28,7 @@ export default class LuaScopeComposite {
   }
 
   getParent() {
-    return null === this.parent ? this : this.parent;
+    return null == this.parent ? this : this.parent;
   }
 
   isInScope(index) {
@@ -29,9 +43,10 @@ export default class LuaScopeComposite {
     this.range.end = end;
   }
 
-  addDefinition(definition) {
-    console.log("definition: ", definition);
-    this.definitions.push(definition);
+  addEntry(index, name, type) {
+    const entry = new LuaSymbolTableEntry(index, name, type);
+    console.log("new entry: ", entry);
+    this.entries.push(entry);
   }
 
   addChild(child) {
