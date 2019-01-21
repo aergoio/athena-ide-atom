@@ -42,7 +42,7 @@ export default class LuaScopeTreeGenerator extends Visitor {
         return  acc.name + ", " + curr.name;
       }
       return curr.name;
-    }) + ")";
+    }, "") + ")";
     const index = this.parseStartIndex(node);
     const type = FUNCTION_DECLARATION;
     this.scopeComposite.addDefinition(this.makeDefinition(name, index, type));
