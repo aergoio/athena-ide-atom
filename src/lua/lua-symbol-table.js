@@ -37,9 +37,9 @@ export default class LuaSymbolTable {
     this.range.end = end;
   }
 
-  addEntry(name, index, type) {
+  addEntry(name, index, type, kind) {
     if (!this.entries.hasOwnProperty(name)) {
-      const entry = {index: index, type: type};
+      const entry = {index: index, type: type, kind: kind};
       console.log("new entry: ", name + ", " + entry);
       this.entries[name] = entry
     }

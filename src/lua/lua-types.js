@@ -26,6 +26,23 @@ export const ATHENA_LUA_LITERALS = [
 ];
 
 // athena symbol types
+export const ATHENA_LUA_VARIABLE = "variable";
 export const ATHENA_LUA_FUNCTION = "function";
 export const ATHENA_LUA_TABLE = "table";
 export const ATHENA_LUA_UNKNOWN = "unknown";
+
+
+// resolver functions
+export function resolveType(luaparseType) {
+  if (null == luaparseType) {
+    return ATHENA_LUA_UNKNOWN;
+  }
+  const literalIndex = LUAPARSE_LITERALS.indexOf(luaparseType);
+  if (-1 !== literalIndex) {
+    return ATHENA_LUA_LITERALS[literalIndex];
+  }
+  if (LUAPARSE_FUNCTION_DECLARATION === luaparseType) {
+    return ATHENA_LUA_FUNCTION;
+  }
+  return ATHENA_LUA_UNKNOWN;
+}

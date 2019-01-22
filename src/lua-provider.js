@@ -32,7 +32,7 @@ export default class LuaProvider {
                         return  {
                           snippet: suggestion.name,
                           replacementPrefix: prefix,
-                          type: adaptor.adaptToAtomType(suggestion.type),
+                          type: adaptor.adaptToAtomType(suggestion.kind),
                           rightLabel: suggestion.type
                         };
                       });

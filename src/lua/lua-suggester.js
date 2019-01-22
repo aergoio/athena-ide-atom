@@ -18,15 +18,15 @@ export default class LuaSuggester {
       Object.keys(symbolTable.entries).forEach((name) => {
         const entry = symbolTable.entries[name];
         if (entry.index < index && name.indexOf(prefix) === 0) {
-          suggestions.push(this.makeNewSuggestion(name, entry, prefix));
+          suggestions.push(this.makeNewSuggestion(name, entry));
         }
       });
       symbolTable.children.forEach(child => this.findSuggestions(child, prefix, index, suggestions));
     }
   }
 
-  makeNewSuggestion(name, entry, prefix) {
-    return {name: name, type: entry.type};
+  makeNewSuggestion(name, entry) {
+    return {name: name, type: entry.type, kind: entry.kind};
   }
 
 }
