@@ -23,15 +23,19 @@ export default class LuaParser extends Parser {
         ranges: true,
         locations: true,
         onCreateNode (node) {
+          console.log("onCreateNode", node);
           visitors.forEach(visitor => visitor.onCreateNode(node));
         },
         onCreateScope (scope) {
+          console.log("onCreateScope", scope);
           visitors.forEach(visitor => visitor.onCreateScope(scope));
         },
         onDestroyScope (scope) {
+          console.log("onDestroyScope", scope);
           visitors.forEach(visitor => visitor.onDestroyScope(scope));
         },
         onLocalDeclaration (identifierName) {
+          console.log("onLocalDeclaration", identifierName);
           visitors.forEach(visitor => visitor.onLocalDeclaration(identifierName));
         },
         luaVersion: luaVersion

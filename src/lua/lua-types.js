@@ -2,27 +2,30 @@
 
 // luaparse literal types
 export const LUAPARSE_LITERALS = [
-  'StringLiteral',
-  'NumericLiteral',
-  'BooleanLiteral',
-  'NilLiteral',
-  'VarargLiteral'
+  "StringLiteral",
+  "NumericLiteral",
+  "BooleanLiteral",
+  "NilLiteral",
+  "VarargLiteral"
 ];
 
 // luaparse node types
-export const LUAPARSE_FUNCTION_DECLARATION = 'FunctionDeclaration';
-export const LUAPARSE_ASSIGNMENT_STATEMENT = 'AssignmentStatement';
-export const LUAPARSE_LOCAL_STATEMENT = 'LocalStatement';
-export const LUAPARSE_IDENTIFIER = 'Identifier';
+export const LUAPARSE_TABLE_CONSTRUCTOR_EXPRESSION = "TableConstructorExpression";
+export const LUAPARSE_TABLE_MEMBER_EXPRESSION = "MemberExpression";
+export const LUAPARSE_TABLE_INDEX_EXPRESSION = "IndexExpression";
+export const LUAPARSE_FUNCTION_DECLARATION = "FunctionDeclaration";
+export const LUAPARSE_ASSIGNMENT_STATEMENT = "AssignmentStatement";
+export const LUAPARSE_LOCAL_STATEMENT = "LocalStatement";
+export const LUAPARSE_IDENTIFIER = "Identifier";
 
 
 // athena lua types
 export const ATHENA_LUA_LITERALS = [
-  'string',
-  'numeric',
-  'boolean',
-  'nil',
-  'vararg'
+  "string",
+  "numeric",
+  "boolean",
+  "nil",
+  "vararg"
 ];
 
 // athena symbol types
@@ -40,9 +43,11 @@ export function resolveType(luaparseType) {
   const literalIndex = LUAPARSE_LITERALS.indexOf(luaparseType);
   if (-1 !== literalIndex) {
     return ATHENA_LUA_LITERALS[literalIndex];
-  }
-  if (LUAPARSE_FUNCTION_DECLARATION === luaparseType) {
+  } else if (LUAPARSE_FUNCTION_DECLARATION === luaparseType) {
     return ATHENA_LUA_FUNCTION;
+  } else  if (LUAPARSE_TABLE_CONSTRUCTOR_EXPRESSION === luaparseType) {
+    return ATHENA_LUA_TABLE;
+  } else {
+    return ATHENA_LUA_UNKNOWN;
   }
-  return ATHENA_LUA_UNKNOWN;
 }
