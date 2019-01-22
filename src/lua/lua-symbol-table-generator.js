@@ -9,6 +9,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
   symbolTable = null;
 
   getGenerated() {
+    // if parsing error, symbol table isn't referencing root table
+    while (!this.symbolTable.isRoot()) {
+      this.symbolTable = this.symbolTable.getParent();
+    }
     return this.symbolTable;
   }
 
@@ -18,12 +22,9 @@ export default class LuaSymbolTableGenerator extends Visitor {
 
   onCreateNode(node) {
     switch(node.type) {
-      case types.LUAPARSE_FUNCTION_DECLARATION:
-        this.parseFunctionDeclaration(node);
-        break;
       case types.LUAPARSE_ASSIGNMENT_STATEMENT:
       case types.LUAPARSE_LOCAL_STATEMENT:
-        this.parseVariableAssignment(node);
+        this._parseVariableAssignment(node);
         break;
       default:
         // do nothing
@@ -31,36 +32,24 @@ export default class LuaSymbolTableGenerator extends Visitor {
     }
   }
 
-  parseFunctionDeclaration(node) {
-    // ignore anonymous function
-    if (null == node.identifier) {
-      return;
-    }
-    // only parse assignment to identifier
-    if (types.LUAPARSE_IDENTIFIER !== node.identifier.type) {
-      return;
-    }
-    this.addFunctionDeclaration(node.identifier.name, node.parameters, this.parseStartIndex(node));
-  }
-
-  parseVariableAssignment(node) {
+  _parseVariableAssignment(node) {
     // only parse assignment to identifier
     if (types.LUAPARSE_IDENTIFIER !== node.variables[0].type) {
       return;
     }
     const name = node.variables[0].name;
-    const index = this.parseStartIndex(node);
+    const index = this._parseStartIndex(node);
     const type = node.init.length === 0 ? types.ATHENA_LUA_UNKNOWN
                                         : types.resolveType(node.init[0].type);
     const kind = types.ATHENA_LUA_VARIABLE;
     if (types.ATHENA_LUA_FUNCTION === type) {
-      this.addFunctionDeclaration(name, node.init[0].parameters, index);
+      this._addFunctionDeclaration(this.symbolTable, name, node.init[0].parameters, index);
     } else {
       this.symbolTable.addEntry(name, index, type, kind);
     }
   }
 
-  addFunctionDeclaration(name, parameters, index) {
+  _addFunctionDeclaration(symbolTable, name, parameters, index) {
     const nameWithArgs = name + " (" + parameters.reduce((acc, curr, index) => {
       if (0 !== index) {
         return  acc + ", " + curr.name;
@@ -69,19 +58,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
     }, "") + ")";
     const type = types.ATHENA_LUA_FUNCTION;
     const kind = types.ATHENA_LUA_FUNCTION;
-    this.symbolTable.addEntry(nameWithArgs, index, type, kind);
-
-    // function arguments should be in function scope
-    parameters.forEach(parameter => {
-      const name = parameter.name;
-      const index = this.parseStartIndex(parameter);
-      const type = types.ATHENA_LUA_UNKNOWN;
-      const kind = types.ATHENA_LUA_VARIABLE;
-      this.symbolTable.getLastChild().addEntry(name, index, type, kind);
-    });
+    symbolTable.getParent().addEntry(nameWithArgs, index, type, kind);
   }
 
-  parseStartIndex(rangeHolder) {
+  _parseStartIndex(rangeHolder) {
     return rangeHolder.range[0];
   }
 
@@ -104,6 +84,31 @@ export default class LuaSymbolTableGenerator extends Visitor {
 
   onLocalDeclaration(identifierName) {
     // do nothing
+  }
+
+  onFunctionSignature(signature) {
+    this._parseFunctionSignature(signature);
+  }
+
+  _parseFunctionSignature(signature) {
+    const parameters = signature.parameters;
+    const index = this._parseStartIndex(signature)
+    // in case of named function
+    if (null != signature.identifier) {
+      const name = signature.identifier.name;
+      this._addFunctionDeclaration(this.symbolTable.getParent(), name, parameters, index);
+    }
+    this._addFunctionParameters(this.symbolTable, parameters);
+  }
+
+  _addFunctionParameters(symbolTable, parameters) {
+    parameters.forEach(parameter => {
+      const name = parameter.name;
+      const index = this._parseStartIndex(parameter);
+      const type = types.ATHENA_LUA_UNKNOWN;
+      const kind = types.ATHENA_LUA_VARIABLE;
+      symbolTable.addEntry(name, index, type, kind);
+    });
   }
 
 };

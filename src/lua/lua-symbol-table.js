@@ -7,7 +7,7 @@ export default class LuaSymbolTable {
   }
 
   constructor(parent) {
-    this.range = {start: NaN, end: NaN};
+    this.range = {start: NaN, end: Infinity};
     this.entries = {};
     this.parent = parent;
     this.children = [];
@@ -40,7 +40,7 @@ export default class LuaSymbolTable {
   addEntry(name, index, type, kind) {
     if (!this.entries.hasOwnProperty(name)) {
       const entry = {index: index, type: type, kind: kind};
-      console.log("new entry: ", name + ", " + entry);
+      console.log("new entry: " + name + ", " + entry);
       this.entries[name] = entry
     }
   }

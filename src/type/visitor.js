@@ -12,4 +12,6 @@ export default class Visitor {
 
   onLocalDeclaration(identifierName) {}
 
+  onFunctionSignature(signature) {}
+
 }

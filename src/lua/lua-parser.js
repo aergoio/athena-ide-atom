@@ -38,6 +38,10 @@ export default class LuaParser extends Parser {
           console.log("onLocalDeclaration", identifierName);
           visitors.forEach(visitor => visitor.onLocalDeclaration(identifierName));
         },
+        onFunctionSignature (signature) {
+          console.log("onFunctionSignature", signature);
+          visitors.forEach(visitor => visitor.onFunctionSignature(signature));
+        },
         luaVersion: luaVersion
       });
     } catch (err) {
