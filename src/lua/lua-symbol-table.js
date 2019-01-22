@@ -1,15 +1,5 @@
 'use babel';
 
-class LuaSymbolTableEntry {
-
-  constructor(index, name, type) {
-    this.index = index;
-    this.name = name;
-    this.type = type;
-  }
-
-}
-
 export default class LuaSymbolTable {
 
   static newSymbolTable() {
@@ -18,7 +8,7 @@ export default class LuaSymbolTable {
 
   constructor(parent) {
     this.range = {start: NaN, end: NaN};
-    this.entries = [];
+    this.entries = {};
     this.parent = parent;
     this.children = [];
   }
@@ -29,6 +19,10 @@ export default class LuaSymbolTable {
 
   getParent() {
     return null == this.parent ? this : this.parent;
+  }
+
+  getLastChild() {
+    return 0 === this.children.length ? null : this.children[this.children.length - 1];
   }
 
   isInScope(index) {
@@ -43,10 +37,12 @@ export default class LuaSymbolTable {
     this.range.end = end;
   }
 
-  addEntry(index, name, type) {
-    const entry = new LuaSymbolTableEntry(index, name, type);
-    console.log("new entry: ", entry);
-    this.entries.push(entry);
+  addEntry(name, index, type) {
+    if (!this.entries.hasOwnProperty(name)) {
+      const entry = {index: index, type: type};
+      console.log("new entry: ", name + ", " + entry);
+      this.entries[name] = entry
+    }
   }
 
   addChild(child) {

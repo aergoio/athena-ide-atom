@@ -2,12 +2,7 @@
 
 import LuaSymbolTable from './lua-symbol-table';
 import {Visitor} from '../type';
-
-// luaparse node type
-const FUNCTION_DECLARATION = 'FunctionDeclaration';
-const LOCAL_STATEMENT = 'LocalStatement';
-
-const IDENTIFIER = 'Identifier';
+import * as types from './lua-types';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
@@ -24,11 +19,12 @@ export default class LuaSymbolTableGenerator extends Visitor {
   onCreateNode(node) {
     console.log("LuaSymbolTreeGenerator : onCreateNode", node);
     switch(node.type) {
-      case FUNCTION_DECLARATION:
+      case types.FUNCTION_DECLARATION:
         this.parseFunctionDeclaration(node);
         break;
-      case LOCAL_STATEMENT:
-        this.parseLocalStatement(node);
+      case types.ASSIGNMENT_STATEMENT:
+      case types.LOCAL_STATEMENT:
+        this.parseVariableAssignment(node);
         break;
       default:
         // do nothing
@@ -37,30 +33,41 @@ export default class LuaSymbolTableGenerator extends Visitor {
   }
 
   parseFunctionDeclaration(node) {
-    const name = node.identifier.name + " (" + node.parameters.reduce((acc, curr, index) => {
+    // ignore anonymous function
+    if (null == node.identifier) {
+      return;
+    }
+    this.addFunctionDeclaration(node.identifier.name, node.parameters, this.parseStartIndex(node));
+  }
+
+  parseVariableAssignment(node) {
+    const name = node.variables[0].name;
+    const index = this.parseStartIndex(node);
+    if (types.FUNCTION_DECLARATION === node.init[0].type) {
+      this.addFunctionDeclaration(name, node.init[0].parameters, index);
+    } else {
+      const type = 0 !== node.init.length ? node.init[0].type : "Unknown";
+      this.symbolTable.addEntry(name, index, type);
+    }
+  }
+
+  addFunctionDeclaration(name, parameters, index) {
+    const nameWithArgs = name + " (" + parameters.reduce((acc, curr, index) => {
       if (0 !== index) {
-        return  acc.name + ", " + curr.name;
+        return  acc + ", " + curr.name;
       }
       return curr.name;
     }, "") + ")";
-    const index = this.parseStartIndex(node);
-    const type = FUNCTION_DECLARATION;
-    this.symbolTable.addEntry(index, name, type);
+    const type = types.FUNCTION_DECLARATION;
+    this.symbolTable.addEntry(nameWithArgs, index, type);
 
-    node.parameters.forEach(parameter => {
+    // function arguments should be in function scope
+    parameters.forEach(parameter => {
       const name = parameter.name;
       const index = this.parseStartIndex(parameter);
       const type = "Unknown";
-      this.symbolTable.addEntry(index, name, type);
+      this.symbolTable.getLastChild().addEntry(name, index, type);
     });
-    return ;
-  }
-
-  parseLocalStatement(node) {
-    const name = node.variables[0].name;
-    const index = this.parseStartIndex(node);
-    const type = 0 !== node.init.length ? node.init[0].type : "Unknown";
-    this.symbolTable.addEntry(index, name, type);
   }
 
   parseStartIndex(rangeHolder) {
