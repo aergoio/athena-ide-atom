@@ -6,7 +6,10 @@ import * as types from './lua-types';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
-  symbolTable = null;
+  constructor() {
+    super();
+    this.symbolTable = null;
+  }
 
   getGenerated() {
     // if parsing error, symbol table isn't referencing root table
