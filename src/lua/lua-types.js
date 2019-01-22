@@ -9,8 +9,15 @@ export const LUAPARSE_LITERALS = [
   'VarargLiteral'
 ];
 
-// literal types to display
-export const DISPLAY_LITERALS = [
+// luaparse node types
+export const LUAPARSE_FUNCTION_DECLARATION = 'FunctionDeclaration';
+export const LUAPARSE_ASSIGNMENT_STATEMENT = 'AssignmentStatement';
+export const LUAPARSE_LOCAL_STATEMENT = 'LocalStatement';
+export const LUAPARSE_IDENTIFIER = 'Identifier';
+
+
+// athena lua types
+export const ATHENA_LUA_LITERALS = [
   'string',
   'numeric',
   'boolean',
@@ -18,8 +25,7 @@ export const DISPLAY_LITERALS = [
   'vararg'
 ];
 
-// luaparse node types
-export const FUNCTION_DECLARATION = 'FunctionDeclaration';
-export const ASSIGNMENT_STATEMENT = 'AssignmentStatement';
-export const LOCAL_STATEMENT = 'LocalStatement';
-export const IDENTIFIER = 'Identifier';
+// athena symbol types
+export const ATHENA_LUA_FUNCTION = "function";
+export const ATHENA_LUA_TABLE = "table";
+export const ATHENA_LUA_UNKNOWN = "unknown";

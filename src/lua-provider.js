@@ -1,6 +1,8 @@
 'use babel';
 
 import LuaManager from './lua';
+import * as adaptor from './type-adaptor';
+
 
 export default class LuaProvider {
   selector = '.source.lua';
@@ -24,6 +26,19 @@ export default class LuaProvider {
     }
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
     this.luaManager.updateAST(source);
-    return await this.luaManager.getSuggestions(prefix, prefixStartIndex);
+    return Promise.resolve(this.luaManager.getSuggestions(prefix, prefixStartIndex))
+                  .then(suggestions => {
+                      const atomSuggestions = suggestions.map(suggestion => {
+                        return  {
+                          snippet: suggestion.name,
+                          replacementPrefix: prefix,
+                          type: adaptor.adaptToAtomType(suggestion.type),
+                          rightLabel: suggestion.type
+                        };
+                      });
+                      console.log("Adapted suggestions", atomSuggestions);
+                    return atomSuggestions;
+                  });
   }
+
 };

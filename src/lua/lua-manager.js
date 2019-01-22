@@ -23,7 +23,7 @@ export default class LuaManager extends Manager {
 
   getSuggestions(prefix, index) {
     const suggestions = new LuaSuggester(this.symbolTable).getSuggestions(prefix, index);
-    console.log("suggestions for prefix: " + prefix + ", index: " + index);
+    console.log("Raw suggestions for prefix: " + prefix + ", index: " + index);
     console.log(suggestions);
     return suggestions;
   }

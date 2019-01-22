@@ -19,11 +19,11 @@ export default class LuaSymbolTableGenerator extends Visitor {
   onCreateNode(node) {
     console.log("LuaSymbolTreeGenerator : onCreateNode", node);
     switch(node.type) {
-      case types.FUNCTION_DECLARATION:
+      case types.LUAPARSE_FUNCTION_DECLARATION:
         this.parseFunctionDeclaration(node);
         break;
-      case types.ASSIGNMENT_STATEMENT:
-      case types.LOCAL_STATEMENT:
+      case types.LUAPARSE_ASSIGNMENT_STATEMENT:
+      case types.LUAPARSE_LOCAL_STATEMENT:
         this.parseVariableAssignment(node);
         break;
       default:
@@ -42,13 +42,28 @@ export default class LuaSymbolTableGenerator extends Visitor {
 
   parseVariableAssignment(node) {
     const name = node.variables[0].name;
+    const type = this.resolveAssignmentType(node.init);
     const index = this.parseStartIndex(node);
-    if (types.FUNCTION_DECLARATION === node.init[0].type) {
+    if (types.ATHENA_LUA_FUNCTION === type) {
       this.addFunctionDeclaration(name, node.init[0].parameters, index);
     } else {
-      const type = 0 !== node.init.length ? node.init[0].type : "Unknown";
       this.symbolTable.addEntry(name, index, type);
     }
+  }
+
+  resolveAssignmentType(init) {
+    if (null == init || 0 === init.length) {
+      return types.ATHENA_LUA_UNKNOWN;
+    }
+    const luaparseType = init[0].type;
+    const literalIndex = types.LUAPARSE_LITERALS.indexOf(luaparseType);
+    if (-1 !== literalIndex) {
+      return types.ATHENA_LUA_LITERALS[literalIndex];
+    }
+    if (types.LUAPARSE_FUNCTION_DECLARATION === luaparseType) {
+      return types.ATHENA_LUA_FUNCTION;
+    }
+    return types.ATHENA_LUA_UNKNOWN;
   }
 
   addFunctionDeclaration(name, parameters, index) {
@@ -58,14 +73,14 @@ export default class LuaSymbolTableGenerator extends Visitor {
       }
       return curr.name;
     }, "") + ")";
-    const type = types.FUNCTION_DECLARATION;
+    const type = types.ATHENA_LUA_FUNCTION;
     this.symbolTable.addEntry(nameWithArgs, index, type);
 
     // function arguments should be in function scope
     parameters.forEach(parameter => {
       const name = parameter.name;
       const index = this.parseStartIndex(parameter);
-      const type = "Unknown";
+      const type = types.ATHENA_LUA_UNKNOWN;
       this.symbolTable.getLastChild().addEntry(name, index, type);
     });
   }

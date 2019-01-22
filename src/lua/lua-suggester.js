@@ -26,7 +26,7 @@ export default class LuaSuggester {
   }
 
   makeNewSuggestion(name, entry, prefix) {
-    return {text: name, replacementPrefix: prefix};
+    return {name: name, type: entry.type};
   }
 
 }
