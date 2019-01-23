@@ -2,6 +2,7 @@
 
 import luaparse from '@aergoio/luaparse';
 import {Parser} from '../type';
+import logger from '../logger';
 
 const luaVersion = '5.1';
 
@@ -23,29 +24,35 @@ export default class LuaParser extends Parser {
         ranges: true,
         locations: true,
         onCreateNode (node) {
-          console.log("onCreateNode", node);
+          logger.debug("onCreateNode");
+          logger.debug(node);
           visitors.forEach(visitor => visitor.onCreateNode(node));
         },
         onCreateScope (scope) {
-          console.log("onCreateScope", scope);
+          logger.debug("onCreateScope");
+          logger.debug(scope);
           visitors.forEach(visitor => visitor.onCreateScope(scope));
         },
         onDestroyScope (scope) {
-          console.log("onDestroyScope", scope);
+          logger.debug("onDestroyScope");
+          logger.debug(scope);
           visitors.forEach(visitor => visitor.onDestroyScope(scope));
         },
         onLocalDeclaration (identifierName) {
-          console.log("onLocalDeclaration", identifierName);
+          logger.debug("onLocalDeclaration");
+          logger.debug(identifierName);
           visitors.forEach(visitor => visitor.onLocalDeclaration(identifierName));
         },
         onFunctionSignature (signature) {
-          console.log("onFunctionSignature", signature);
+          logger.debug("onFunctionSignature");
+          logger.debug(signature);
           visitors.forEach(visitor => visitor.onFunctionSignature(signature));
         },
         luaVersion: luaVersion
       });
     } catch (err) {
-      console.error(err);
+      logger.debug("parsing error");
+      console.debug(err);
     }
 
     return new Object();

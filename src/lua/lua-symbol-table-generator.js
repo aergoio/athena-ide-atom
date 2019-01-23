@@ -3,6 +3,7 @@
 import LuaSymbolTable from './lua-symbol-table';
 import {Visitor} from '../type';
 import * as types from './lua-types';
+import logger from '../logger';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
@@ -69,10 +70,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
   }
 
   onCreateScope(scope) {
-    const child = new LuaSymbolTable(this.symbolTable);
     if (null == this.symbolTable) {
       this.symbolTable = LuaSymbolTable.newSymbolTable();
     } else {
+      const child = new LuaSymbolTable(this.symbolTable);
       this.symbolTable.addChild(child);
       this.symbolTable = child;
     }

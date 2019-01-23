@@ -18,7 +18,6 @@ export default class LuaProvider {
     const prefixEndIndex = textBuffer.characterIndexForPosition(request.bufferPosition);
     const prefixStartIndex = prefixEndIndex - prefix.length;
     const lastSourceIndex = textBuffer.getMaxCharacterIndex();
-    console.log("prefix: " + prefix + ", start: " + prefixStartIndex + " , end: " + prefixEndIndex);
 
     const textInIndex = (startIndex, endIndex) => {
       const range = [textBuffer.positionForCharacterIndex(startIndex), textBuffer.positionForCharacterIndex(endIndex)];
@@ -36,7 +35,6 @@ export default class LuaProvider {
                           rightLabel: suggestion.type
                         };
                       });
-                      console.log("Adapted suggestions", atomSuggestions);
                     return atomSuggestions;
                   });
   }

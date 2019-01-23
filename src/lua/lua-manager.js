@@ -4,6 +4,7 @@ import LuaParser from './lua-parser';
 import LuaSymbolTableGenerator from './lua-symbol-table-generator';
 import LuaSuggester from './lua-suggester';
 import {Manager} from '../type';
+import logger from '../logger';
 
 export default class LuaManager extends Manager {
 
@@ -17,14 +18,18 @@ export default class LuaManager extends Manager {
   }
 
   updateAST(source) {
+    logger.debug("Update ast");
+    logger.debug(source);
     this.luaParser.parse(source);
     this.symbolTable = this.luaSymbolTableGenerator.getGenerated();
+    logger.info("Generated symbol table");
+    logger.info(this.symbolTable);
   }
 
   getSuggestions(prefix, index) {
     const suggestions = new LuaSuggester(this.symbolTable).getSuggestions(prefix, index);
-    console.log("Raw suggestions for prefix: " + prefix + ", index: " + index);
-    console.log(suggestions);
+    logger.info("Raw suggestions for prefix: " + prefix + ", index: " + index);
+    logger.info(suggestions);
     return suggestions;
   }
 

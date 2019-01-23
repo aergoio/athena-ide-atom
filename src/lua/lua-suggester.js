@@ -1,5 +1,7 @@
 'use babel'
 
+import logger from '../logger';
+
 export default class LuaSuggester {
 
   constructor(symbolTable) {
@@ -13,7 +15,8 @@ export default class LuaSuggester {
   }
 
   findSuggestions(symbolTable, prefix, index, suggestions) {
-    console.log(symbolTable, index);
+    logger.debug("visit table with index: " + index);
+    logger.debug(symbolTable);
     if (symbolTable.isInScope(index)) {
       Object.keys(symbolTable.entries).forEach((name) => {
         const entry = symbolTable.entries[name];
