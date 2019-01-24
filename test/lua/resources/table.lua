@@ -1,9 +1,13 @@
-local FieldTable = { field1 = "11", ["field2"] = "22", extra = "55" }
-FieldTable.field3 = "33"
-FieldTable["field4"] = "44"
+local FieldTable = { field1 = "11", ["field2"] = "22", [33] = "33", withoutInit}
+FieldTable.field4 = "44"
+FieldTable["field5"] = "55"
+FieldTable[66] = "66"
+FieldTable2 = { field1 = "11", ["field2"] = "22" }
+FieldTable3 = { }
 
--- FieldTable. -> field1, field2, field3, field4, extra
--- FieldTable.f -> field1, field2, field3, field4
+-- FieldTable. -> field1, field2, field4, field5, withoutInit
+-- FieldTable.f -> field1, field2, field4, field5
+-- FieldTable2.f -> field1, field2
 
 
 function mul (arg1, arg2)
@@ -26,9 +30,9 @@ function FuncTable.mod (arg1, arg2)
 end
 
 -- FuncTable. -> all 5 functions
--- FuncTable.s -> sum (arg1, arg2)
--- FuncTable.m -> min (arg2, arg2), mul (arg2, arg2), mod (arg1, arg2)
--- FuncTable.d -> div (arg2, arg2)
+-- FuncTable.s -> sum
+-- FuncTable.m -> min, mul, mod
+-- FuncTable.d -> div
 
 
 local NestedTable = { field1 = "11",
@@ -44,5 +48,5 @@ NestedTable.field2.subfield3 = "2_33"
 NestedTable.field2["subfield4"] = "2_44"
 
 -- NestedTable. -> field1, field2
--- NestedTable.field2. -> subfield1, subfield2, subfield4, subfield4, min (arg1, arg2)
--- NestedTable.field2.m -> min (arg1, arg2)
+-- NestedTable.field2. -> subfield1, subfield2, subfield4, subfield4, min
+-- NestedTable.field2.m -> min

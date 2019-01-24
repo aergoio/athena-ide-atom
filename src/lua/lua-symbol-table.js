@@ -21,10 +21,6 @@ export default class LuaSymbolTable {
     return null == this.parent ? this : this.parent;
   }
 
-  getLastChild() {
-    return 0 === this.children.length ? null : this.children[this.children.length - 1];
-  }
-
   isInScope(index) {
     return this.range.start <= index && index <= this.range.end;
   }
@@ -37,10 +33,10 @@ export default class LuaSymbolTable {
     this.range.end = end;
   }
 
-  addEntry(name, index, type, kind) {
-    if (!this.entries.hasOwnProperty(name)) {
+  addEntry(identifier, index, type, kind) {
+    if (!this.entries.hasOwnProperty(identifier)) {
       const entry = {index: index, type: type, kind: kind};
-      this.entries[name] = entry
+      this.entries[identifier] = entry
     }
   }
 

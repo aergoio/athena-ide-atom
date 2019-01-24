@@ -8,6 +8,8 @@ export function adaptToAtomType(symbolKind) {
     return atomTypes.ATOM_VARIABLE;
   } else if (luaTypes.ATHENA_LUA_FUNCTION === symbolKind) {
     return atomTypes.ATOM_FUNCTION;
+  } else if (luaTypes.ATHENA_LUA_TABLE_MEMBER === symbolKind) {
+    return atomTypes.ATOM_METHOD;
   } else {
     // todo : do something
     return symbolKind;

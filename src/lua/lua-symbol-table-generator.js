@@ -25,14 +25,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
   }
 
   onCreateNode(node) {
-    switch(node.type) {
-      case types.LUAPARSE_ASSIGNMENT_STATEMENT:
-      case types.LUAPARSE_LOCAL_STATEMENT:
-        this._parseVariableAssignment(node);
-        break;
-      default:
-        // do nothing
-        break;
+    const nodeType = node.type;
+    if (types.LUAPARSE_ASSIGNMENT_STATEMENT === nodeType ||
+        types.LUAPARSE_LOCAL_STATEMENT === nodeType) {
+          this._parseVariableAssignment(node);
     }
   }
 
@@ -41,30 +37,19 @@ export default class LuaSymbolTableGenerator extends Visitor {
     if (types.LUAPARSE_IDENTIFIER !== node.variables[0].type) {
       return;
     }
-    const name = node.variables[0].name;
+
+    const identifierName = node.variables[0].name;
     const index = this._parseStartIndex(node);
-    const type = node.init.length === 0 ? types.ATHENA_LUA_UNKNOWN
+    const initType = node.init.length === 0 ? types.ATHENA_LUA_UNKNOWN
                                         : types.resolveType(node.init[0].type);
     const kind = types.ATHENA_LUA_VARIABLE;
-    if (types.ATHENA_LUA_FUNCTION === type) {
-      this._addFunctionDeclaration(this.symbolTable, name, node.init[0].parameters, index);
+    if (types.ATHENA_LUA_FUNCTION === initType) {
+      const parameters = node.init[0].parameters;
+      this._addFunctionDeclaration(this.symbolTable, identifierName, parameters, index);
     } else {
-      this.symbolTable.addEntry(name, index, type, kind);
+      this.symbolTable.addEntry(identifierName, index, initType, kind);
     }
   }
-
-  _addFunctionDeclaration(symbolTable, name, parameters, index) {
-    const nameWithArgs = name + " (" + parameters.reduce((acc, curr, index) => {
-      if (0 !== index) {
-        return  acc + ", " + curr.name;
-      }
-      return curr.name;
-    }, "") + ")";
-    const type = types.ATHENA_LUA_FUNCTION;
-    const kind = types.ATHENA_LUA_FUNCTION;
-    symbolTable.getParent().addEntry(nameWithArgs, index, type, kind);
-  }
-
   _parseStartIndex(rangeHolder) {
     return rangeHolder.range[0];
   }
@@ -86,10 +71,6 @@ export default class LuaSymbolTableGenerator extends Visitor {
     this.symbolTable = this.symbolTable.getParent();
   }
 
-  onLocalDeclaration(identifierName) {
-    // do nothing
-  }
-
   onFunctionSignature(signature) {
     this._parseFunctionSignature(signature);
   }
@@ -97,12 +78,24 @@ export default class LuaSymbolTableGenerator extends Visitor {
   _parseFunctionSignature(signature) {
     const parameters = signature.parameters;
     const index = this._parseStartIndex(signature)
-    // in case of named function
-    if (null != signature.identifier) {
+    // only parse named function
+    if (null != signature.identifier && types.LUAPARSE_IDENTIFIER === signature.identifier.type) {
       const name = signature.identifier.name;
       this._addFunctionDeclaration(this.symbolTable.getParent(), name, parameters, index);
     }
     this._addFunctionParameters(this.symbolTable, parameters);
+  }
+
+  _addFunctionDeclaration(symbolTable, name, parameters, index) {
+    const nameWithArgs = name + " (" + parameters.reduce((acc, curr, index) => {
+      if (0 !== index) {
+        return  acc + ", " + curr.name;
+      }
+      return curr.name;
+    }, "") + ")";
+    const type = types.ATHENA_LUA_FUNCTION;
+    const kind = types.ATHENA_LUA_FUNCTION;
+    symbolTable.getParent().addEntry(nameWithArgs, index, type, kind);
   }
 
   _addFunctionParameters(symbolTable, parameters) {
