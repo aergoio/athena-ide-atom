@@ -1,9 +1,8 @@
 'use babel';
 
-import LuaManager from './lua';
+import LuaAnalyzer from './lua';
 import * as adaptor from './type-adaptor';
 import logger from './logger';
-
 
 export default class LuaProvider {
   selector = '.source.lua';
@@ -11,7 +10,7 @@ export default class LuaProvider {
   inclusionPriority = 1;
   excludeLowerPriority = true;
 
-  luaManager = new LuaManager();
+  luaAnalyzer = new LuaAnalyzer();
 
   getSuggestions = async function (request) {
     const textBuffer = request.editor.getBuffer();
@@ -58,9 +57,9 @@ export default class LuaProvider {
     const prefixEndIndex = originPrefixEndIndex;
     const lastSourceIndex = textBuffer.getMaxCharacterIndex();
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
-    this.luaManager.updateAST(source);
+    this.luaAnalyzer.updateAST(source);
 
-    return Promise.resolve(this.luaManager.getSuggestions(prefix, prefixStartIndex))
+    return Promise.resolve(this.luaAnalyzer.getSuggestions(prefix, prefixStartIndex))
                   .then(suggestions => {
                       const atomSuggestions = suggestions.map(suggestion => {
                         return  {

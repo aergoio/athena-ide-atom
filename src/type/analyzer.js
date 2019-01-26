@@ -1,6 +1,6 @@
 'use babel';
 
-export default class Manager {
+export default class Analyzer {
 
   updateAST(source) {}
 

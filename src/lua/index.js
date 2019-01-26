@@ -1,5 +1,5 @@
 'use babel'
 
-import LuaManager from './lua-manager';
+import LuaAnalyzer from './lua-analyzer';
 
-export default LuaManager;
+export default LuaAnalyzer;

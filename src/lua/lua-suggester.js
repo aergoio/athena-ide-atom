@@ -60,7 +60,8 @@ export default class LuaSuggester {
     if (null != currEntry) {
       Object.keys(currEntry).forEach((name) => {
         if (name.indexOf(lastPrefix) === 0) {
-          suggestions.push(this._makeNewSuggestion(name, {type: types.ATHENA_LUA_UNKNOWN, kind: types.ATHENA_LUA_TABLE_MEMBER}));
+          const entry = {type: types.ATHENA_LUA_TABLE_MEMBER, kind: types.ATHENA_LUA_TABLE_MEMBER};
+          suggestions.push(this._makeNewSuggestion(name, entry));
         }
       });
     }

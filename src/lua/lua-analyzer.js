@@ -4,10 +4,10 @@ import LuaParser from './lua-parser';
 import LuaSymbolTableGenerator from './lua-symbol-table-generator';
 import LuaTableFieldTreeGenerator from './lua-table-field-tree-generator';
 import LuaSuggester from './lua-suggester';
-import {Manager} from '../type';
+import {Analyzer} from '../type';
 import logger from '../logger';
 
-export default class LuaManager extends Manager {
+export default class LuaAnalyzer extends Analyzer {
 
   constructor() {
     super();

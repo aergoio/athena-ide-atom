@@ -10,11 +10,7 @@ import * as types from '../../src/lua/lua-types';
 describe("Autocomplete plain variable, function", () => {
 
   const filePath = __dirname + "/resources/variablefunction.lua";
-  let source;
-  fs.readFile(filePath, "utf8", (err, data) => {
-    assert.isNull(err, "Unable to read " + filePath);
-    source = data;
-  });
+  const source = fs.readFileSync(filePath, "utf8");
 
   describe("Suggestion in global", () => {
     it("after variable1, variable2, variable3", () => {

@@ -1,7 +1,7 @@
 'use babel';
 
-import Manager from './manager';
+import Analyzer from './analyzer';
 import Parser from './parser';
 import Visitor from './visitor';
 
-export {Manager, Parser, Visitor};
+export {Analyzer, Parser, Visitor};
