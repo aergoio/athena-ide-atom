@@ -2,8 +2,8 @@
 
 export default class Analyzer {
 
-  updateTableInfo(source) {}
+  analyze(source, fileName) {}
 
-  getSuggestions(prefix, index) {}
+  getSuggestions(prefix, index, fileName) {}
 
 }

@@ -16,10 +16,6 @@ export default class LuaTableFieldTreeGenerator extends Visitor {
     return this.tableFieldTree;
   }
 
-  reset() {
-    this.tableFieldTree = LuaTableFieldTree.newLuaTableFieldTree();
-  }
-
   onCreateNode(node) {
     switch (node.type) {
       // assignment for global, local statement for local variable

@@ -1,3 +1,5 @@
+import "./library.lua"
+
 variable1 = 1
 local variable2 = "2"
 local variable3
@@ -53,3 +55,6 @@ end
 
 -- v : variable1, variable2, variable3, variable5
 -- fun : func1 (arg1, arg2), func2(arg1, arg2), func3 ()
+
+
+-- l : libraryVariable, libraryFunc, libraryTable

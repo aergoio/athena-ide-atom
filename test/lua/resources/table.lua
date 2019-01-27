@@ -1,3 +1,5 @@
+import "./library.lua"
+
 local FieldTable = { field1 = "11", ["field2"] = "22", [33] = "33", withoutInit}
 FieldTable.field4 = "44"
 FieldTable["field5"] = "55"
@@ -50,3 +52,6 @@ NestedTable.field2["subfield4"] = "2_44"
 -- NestedTable. -> field1, field2
 -- NestedTable.field2. -> subfield1, subfield2, subfield4, subfield4, min
 -- NestedTable.field2.m -> min
+
+
+-- libraryTable. -> field1, field2
