@@ -2,17 +2,20 @@
 
 export default class Parser {
 
-  constructor() {
-    this.visitors = [];
+  parse(source, ...visitors) {
+    return this._fail("Define your parse function");
   }
 
-  addVisitor(visitor) {
-    this.visitors.push(visitor);
+  _success(ast) {
+    return this._makeResult(ast, {});
   }
 
-  parse(source) {
-    console.error("Define your parse function");
-    return new Object();
+  _fail(...errs) {
+    return this._makeResult({}, errs);
+  }
+
+  _makeResult(ast, err) {
+    return {ast: ast, err: err};
   }
 
 }

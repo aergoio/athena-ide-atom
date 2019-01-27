@@ -2,8 +2,6 @@
 
 export default class Visitor {
 
-  reset() {}
-
   onCreateNode(node) {}
 
   onCreateScope(scope) {}

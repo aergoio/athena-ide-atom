@@ -7,8 +7,9 @@ import logger from '../logger';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
-  constructor() {
+  constructor(fileName) {
     super();
+    this.fileName = fileName;
     this.symbolTable = null;
   }
 
@@ -18,10 +19,6 @@ export default class LuaSymbolTableGenerator extends Visitor {
       this.symbolTable = this.symbolTable.getParent();
     }
     return this.symbolTable;
-  }
-
-  reset() {
-    this.symbolTable = null;
   }
 
   onCreateNode(node) {
@@ -56,9 +53,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
 
   onCreateScope(scope) {
     if (null == this.symbolTable) {
-      this.symbolTable = LuaSymbolTable.newSymbolTable();
+      this.symbolTable = new LuaSymbolTable(this.fileName);
     } else {
-      const child = new LuaSymbolTable(this.symbolTable);
+      const child = new LuaSymbolTable(this.fileName);
+      child.setParent(this.symbolTable);
       this.symbolTable.addChild(child);
       this.symbolTable = child;
     }
@@ -68,7 +66,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
   onDestroyScope(scope) {
     const scopeEndIndex = this.symbolTable.isRoot() ? Infinity : scope.index;
     this.symbolTable.setEnd(scopeEndIndex);
-    this.symbolTable = this.symbolTable.getParent();
+    this.symbolTable = this._getParentOrItself(this.symbolTable);
   }
 
   onFunctionSignature(signature) {
@@ -81,7 +79,8 @@ export default class LuaSymbolTableGenerator extends Visitor {
     // only parse named function
     if (null != signature.identifier && types.LUAPARSE_IDENTIFIER === signature.identifier.type) {
       const name = signature.identifier.name;
-      this._addFunctionDeclaration(this.symbolTable.getParent(), name, parameters, index);
+      // add function symbol to the parent scope
+      this._addFunctionDeclaration(this._getParentOrItself(this.symbolTable), name, parameters, index);
     }
     this._addFunctionParameters(this.symbolTable, parameters);
   }
@@ -95,7 +94,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
     }, "") + ")";
     const type = types.ATHENA_LUA_FUNCTION;
     const kind = types.ATHENA_LUA_FUNCTION;
-    symbolTable.getParent().addEntry(nameWithArgs, index, type, kind);
+    symbolTable.addEntry(nameWithArgs, index, type, kind);
   }
 
   _addFunctionParameters(symbolTable, parameters) {
@@ -106,6 +105,10 @@ export default class LuaSymbolTableGenerator extends Visitor {
       const kind = types.ATHENA_LUA_VARIABLE;
       symbolTable.addEntry(name, index, type, kind);
     });
+  }
+
+  _getParentOrItself(symbolTable) {
+    return symbolTable.isRoot() ? symbolTable : symbolTable.getParent();
   }
 
 };

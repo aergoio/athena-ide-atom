@@ -2,7 +2,7 @@
 
 export default class Analyzer {
 
-  updateAST(source) {}
+  updateTableInfo(source) {}
 
   getSuggestions(prefix, index) {}
 

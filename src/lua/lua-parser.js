@@ -13,11 +13,9 @@ export default class LuaParser extends Parser {
     this.delegate = luaparse;
   }
 
-  parse(source) {
+  parse(source, ...visitors) {
     try {
-      const visitors = this.visitors;
-      visitors.forEach(visitor => visitor.reset());
-      return this.delegate.parse(source, {
+      const ast = this.delegate.parse(source, {
         wait: false,
         comments: false,
         scope: true,
@@ -50,12 +48,10 @@ export default class LuaParser extends Parser {
         },
         luaVersion: luaVersion
       });
+      return this._success(ast);
     } catch (err) {
-      logger.debug("parsing error");
-      console.debug(err);
+      return this._fail(err);
     }
-
-    return new Object();
   }
 
 }

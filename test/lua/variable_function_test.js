@@ -15,7 +15,7 @@ describe("Autocomplete plain variable, function", () => {
   describe("Suggestion in global", () => {
     it("after variable1, variable2, variable3", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const index = 53;
 
@@ -26,7 +26,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("after func1", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const index = 326;
 
@@ -41,7 +41,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("after func2", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const index = 657;
 
@@ -56,7 +56,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("after func3", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const index = 966;
 
@@ -77,7 +77,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope v_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("v", index);
       assert.equal(suggestions.length, 4);
@@ -86,7 +86,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope a_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("a", index);
       assert.equal(suggestions.length, 2);
@@ -95,7 +95,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope f_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("f", index);
       assert.equal(suggestions.length, 1);
@@ -110,7 +110,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope v_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("v", index);
       assert.equal(suggestions.length, 4);
@@ -119,7 +119,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope a_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("a", index);
       assert.equal(suggestions.length, 2);
@@ -128,7 +128,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope f_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("f", index);
       assert.equal(suggestions.length, 2);
@@ -143,7 +143,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope v_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("v", index);
       assert.equal(suggestions.length, 4);
@@ -152,7 +152,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope a_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("a", index);
       assert.equal(suggestions.length, 0);
@@ -161,7 +161,7 @@ describe("Autocomplete plain variable, function", () => {
 
     it("in function scope f_", () => {
       const luaManager = new LuaManager();
-      luaManager.updateAST(source);
+      luaManager.updateTableInfo(source);
 
       const suggestions = luaManager.getSuggestions("f", index);
       assert.equal(suggestions.length, 3);

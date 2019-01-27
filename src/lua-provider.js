@@ -57,7 +57,8 @@ export default class LuaProvider {
     const prefixEndIndex = originPrefixEndIndex;
     const lastSourceIndex = textBuffer.getMaxCharacterIndex();
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
-    this.luaAnalyzer.updateAST(source);
+    const fileName = textBuffer.getPath();
+    this.luaAnalyzer.updateTableInfo(source, fileName);
 
     return Promise.resolve(this.luaAnalyzer.getSuggestions(prefix, prefixStartIndex))
                   .then(suggestions => {

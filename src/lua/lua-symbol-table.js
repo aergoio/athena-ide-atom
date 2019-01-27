@@ -2,14 +2,11 @@
 
 export default class LuaSymbolTable {
 
-  static newSymbolTable() {
-    return new LuaSymbolTable(null);
-  }
-
-  constructor(parent) {
+  constructor(fileName) {
+    this.fileName = fileName;
     this.range = {start: NaN, end: Infinity};
     this.entries = {};
-    this.parent = parent;
+    this.parent = null;
     this.children = [];
   }
 
@@ -18,7 +15,7 @@ export default class LuaSymbolTable {
   }
 
   getParent() {
-    return null == this.parent ? this : this.parent;
+    return this.parent;
   }
 
   isInScope(index) {
@@ -38,6 +35,10 @@ export default class LuaSymbolTable {
       const entry = {index: index, type: type, kind: kind};
       this.entries[identifier] = entry
     }
+  }
+
+  setParent(parent) {
+    this.parent = parent;
   }
 
   addChild(child) {

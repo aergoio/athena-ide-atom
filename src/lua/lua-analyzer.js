@@ -13,22 +13,21 @@ export default class LuaAnalyzer extends Analyzer {
     super();
     this.symbolTable = null;
     this.tableFieldTree = null;
-
     this.luaParser = new LuaParser();
-    this.luaSymbolTableGenerator = new LuaSymbolTableGenerator();
-    this.luaTableFieldTreeGenerator = new LuaTableFieldTreeGenerator();
-
-    this.luaParser.addVisitor(this.luaSymbolTableGenerator);
-    this.luaParser.addVisitor(this.luaTableFieldTreeGenerator);
   }
 
-  updateAST(source) {
-    logger.debug("update ast");
+  updateTableInfo(source, fileName) {
+    logger.debug("Update ast");
     logger.debug(source);
-    this.luaParser.parse(source);
 
-    this.symbolTable = this.luaSymbolTableGenerator.getGenerated();
-    this.tableFieldTree = this.luaTableFieldTreeGenerator.getGenerated();
+    const symbolTableGenerator = new LuaSymbolTableGenerator(fileName);
+    const tableFieldTreeGenerator = new LuaTableFieldTreeGenerator();
+    const parseResult = this.luaParser.parse(source, symbolTableGenerator, tableFieldTreeGenerator);
+    logger.info("Parse result");
+    logger.info(parseResult);
+
+    this.symbolTable = symbolTableGenerator.getGenerated();
+    this.tableFieldTree = tableFieldTreeGenerator.getGenerated();
     logger.info("Generated symbol table");
     logger.info(this.symbolTable);
     logger.info("Generated table field tree");
