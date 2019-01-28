@@ -7,62 +7,90 @@ const assert = chai.assert;
 import LuaAnalyzer from '../../src/lua';
 import * as types from '../../src/lua/lua-types';
 
-describe("Autocomplete plain variable, function", () => {
+describe("Autocomplete for plain variable, function", () => {
 
   const filePath = __dirname + "/resources/variablefunction.lua";
   const source = fs.readFileSync(filePath, "utf8");
 
-  describe("Suggestion in global", () => {
-    it("after variable1, variable2, variable3", () => {
+  describe("Suggestion in global after variable1, variable2, variable3", () => {
+
+    const index = 77;
+
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
-
-      const index = 77;
 
       const suggestions = luaAnalyzer.getSuggestions("v", index, filePath);
       assert.equal(suggestions.length, 3);
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 3);
     });
 
-    it("after func1", () => {
+  });
+
+  describe("Suggestion in global after func1", () => {
+
+    const index = 350;
+
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
-
-      const index = 350;
 
       const variableSuggestions = luaAnalyzer.getSuggestions("v", index, filePath);
       assert.equal(variableSuggestions.length, 3);
       assert.equal(variableSuggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 3);
+    });
+
+    it("f", () => {
+      const luaAnalyzer = new LuaAnalyzer();
+      luaAnalyzer.analyze(source, filePath);
 
       const functionSuggestions = luaAnalyzer.getSuggestions("f", index, filePath);
       assert.equal(functionSuggestions.length, 1);
       assert.equal(functionSuggestions.filter(s => types.ATHENA_LUA_FUNCTION === s.kind).length, 1);
     });
 
-    it("after func2", () => {
+  });
+
+  describe("Suggestion in global after func2", () => {
+
+    const index = 681;
+
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
-
-      const index = 681;
 
       const variableSuggestions = luaAnalyzer.getSuggestions("v", index, filePath);
       assert.equal(variableSuggestions.length, 4);
       assert.equal(variableSuggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 4);
+    });
+
+    it("f", () => {
+      const luaAnalyzer = new LuaAnalyzer();
+      luaAnalyzer.analyze(source, filePath);
 
       const functionSuggestions = luaAnalyzer.getSuggestions("f", index, filePath);
       assert.equal(functionSuggestions.length, 2);
       assert.equal(functionSuggestions.filter(s => types.ATHENA_LUA_FUNCTION === s.kind).length, 2);
     });
 
-    it("after func3", () => {
+  });
+
+  describe("Suggestion in global after func3", () => {
+
+    const index = 991;
+
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
-
-      const index = 991;
 
       const variableSuggestions = luaAnalyzer.getSuggestions("v", index, filePath);
       assert.equal(variableSuggestions.length, 4);
       assert.equal(variableSuggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 4);
+    });
+
+    it("f", () => {
+      const luaAnalyzer = new LuaAnalyzer();
+      luaAnalyzer.analyze(source, filePath);
 
       const functionSuggestions = luaAnalyzer.getSuggestions("f", index, filePath);
       assert.equal(functionSuggestions.length, 3);
@@ -75,7 +103,7 @@ describe("Autocomplete plain variable, function", () => {
 
     const index = 170;
 
-    it("in function scope v_", () => {
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -84,7 +112,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 4);
     });
 
-    it("in function scope a_", () => {
+    it("a", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -93,7 +121,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 2);
     });
 
-    it("in function scope f_", () => {
+    it("f", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -108,7 +136,7 @@ describe("Autocomplete plain variable, function", () => {
 
     const index = 481;
 
-    it("in function scope v_", () => {
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -117,7 +145,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 4);
     });
 
-    it("in function scope a_", () => {
+    it("a", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -126,7 +154,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 2);
     });
 
-    it("in function scope f_", () => {
+    it("f", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -141,7 +169,7 @@ describe("Autocomplete plain variable, function", () => {
 
     const index = 798;
 
-    it("in function scope v_", () => {
+    it("v", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -150,7 +178,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 4);
     });
 
-    it("in function scope a_", () => {
+    it("a", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -159,7 +187,7 @@ describe("Autocomplete plain variable, function", () => {
       assert.equal(suggestions.filter(s => types.ATHENA_LUA_VARIABLE === s.kind).length, 0);
     });
 
-    it("in function scope f_", () => {
+    it("f", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
@@ -174,7 +202,7 @@ describe("Autocomplete plain variable, function", () => {
 
     const index = 1098;
 
-    it("in last line l_", () => {
+    it("l", () => {
       const luaAnalyzer = new LuaAnalyzer();
       luaAnalyzer.analyze(source, filePath);
 
