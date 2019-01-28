@@ -61,17 +61,7 @@ export default class LuaProvider {
     this.luaAnalyzer.analyze(source, fileName);
 
     return Promise.resolve(this.luaAnalyzer.getSuggestions(prefix, prefixStartIndex, fileName))
-                  .then(suggestions => {
-                      const atomSuggestions = suggestions.map(suggestion => {
-                        return  {
-                          text: suggestion.name,
-                          snippet: suggestion.name,
-                          type: adaptor.adaptToAtomType(suggestion.kind),
-                          rightLabel: suggestion.type
-                        };
-                      });
-                    return atomSuggestions;
-                  });
+                  .then(suggestions => suggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion)))
   }
 
 };

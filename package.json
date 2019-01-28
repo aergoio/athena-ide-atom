@@ -26,7 +26,15 @@
       "versions": {
         "2.0.0": "getProvider"
       }
+    },
+    "linter": {
+      "versions": {
+        "2.0.0": "getLinter"
+      }
     }
+  },
+  "atomPackageDependencies": {
+    "linter": ">=2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

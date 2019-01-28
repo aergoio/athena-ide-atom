@@ -1,5 +1,7 @@
 'use babel'
 
+import logger from "../logger";
+
 // luaparse literal types
 //   - StringLiteral    "Im String"
 //   - NumericLiteral   123 or 12.34
@@ -57,8 +59,12 @@ export const ATHENA_LUA_TABLE = "table";
 export const ATHENA_LUA_TABLE_MEMBER = "member";
 export const ATHENA_LUA_UNKNOWN = "unknown";
 
+// athena lint types
+export const ATHENA_LINT_TYPE_ERROR = "error";
+export const ATHENA_LINT_TYPE_WARN = "warn";
+export const ATHENA_LINT_TYPE_INFO = "info";
 
-// resolver functions
+// athena functions
 export function resolveType(luaparseType) {
   if (null == luaparseType) {
     return ATHENA_LUA_UNKNOWN;
@@ -75,5 +81,34 @@ export function resolveType(luaparseType) {
     return ATHENA_LUA_TABLE_MEMBER;
   } else {
     return ATHENA_LUA_UNKNOWN;
+  }
+}
+
+// athena analysis info object
+export class AnalysisInfo {
+  constructor(file, symbolTable, tableFieldTree, err) {
+    this.file = file;
+    this.symbolTable = symbolTable;
+    this.tableFieldTree = tableFieldTree;
+    this.err = err;
+  }
+}
+
+// athena suggestion object
+export class Suggestion {
+  constructor(name, type, kind) {
+    this.name = name;
+    this.type = type;
+    this.kind = kind;
+  }
+}
+
+// athena lint object
+export class Lint {
+  constructor(type, file, index, message) {
+    this.type = type;
+    this.file = file;
+    this.index = index;
+    this.message = message;
   }
 }

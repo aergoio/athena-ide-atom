@@ -73,7 +73,7 @@ export default class LuaImportResolver {
   _extractImportCanonicalPath(trimmedImportStatement, fileName) {
     const splited = trimmedImportStatement.trim().split(/\s+/);
     const importTarget = splited[1].substring(1, splited[1].length - 1);
-    logger.info("splited: " + splited);
+    logger.debug("splited: " + splited);
 
     let importPath = "";
     if (this._isRelativeImport(importTarget)) {
@@ -94,8 +94,8 @@ export default class LuaImportResolver {
     const aergoJsonPath = packagePath + "/aergo.json";
     const rawAergoJson = this._readFile(aergoJsonPath);
     const aergoJson = JSON.parse(rawAergoJson)
-    logger.info("package info: " + aergoJsonPath);
-    logger.info(aergoJson);
+    logger.debug("package info: " + aergoJsonPath);
+    logger.debug(aergoJson);
     return aergoJson;
   }
 

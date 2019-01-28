@@ -3,7 +3,8 @@
 import { CompositeDisposable } from 'atom';
 
 import AthenaIdeView from './view/athena-ide-view';
-import LuaProvider from './lua-provider';
+import LuaAutocompleteProvider from './lua-autocomplete-provider';
+import LuaLintProvider from './lua-lint-provider';
 
 export default {
 
@@ -51,7 +52,11 @@ export default {
   },
 
   getProvider () {
-    return new LuaProvider()
+    return new LuaAutocompleteProvider()
+  },
+
+  getLinter () {
+    return new LuaLintProvider()
   },
 
 };

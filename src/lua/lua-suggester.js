@@ -5,9 +5,8 @@ import logger from '../logger';
 
 export default class LuaSuggester {
 
-  constructor(symbolTables, tableFieldTrees) {
-    this.symbolTables = symbolTables;
-    this.tableFieldTrees = tableFieldTrees;
+  constructor(analyzeInfos) {
+    this.analyzeInfos = analyzeInfos;
   }
 
   getSuggestions(prefix, index, fileName) {
@@ -15,9 +14,11 @@ export default class LuaSuggester {
     logger.debug("prefix chain: " + prefixChain);
     let suggestions = [];
     if (1 === prefixChain.length) {
-      suggestions = this._findSuggestionFromSymbolTables(this.symbolTables, prefixChain[0], index, fileName);
+      const symbolTables = this.analyzeInfos.map(a => a.symbolTable);
+      suggestions = this._findSuggestionFromSymbolTables(symbolTables, prefixChain[0], index, fileName);
     } else {
-      suggestions = this._findSuggestionFromTableFields(this.tableFieldTrees, prefixChain);
+      const tableFieldTrees = this.analyzeInfos.map(a => a.tableFieldTree);
+      suggestions = this._findSuggestionFromTableFields(tableFieldTrees, prefixChain);
     }
     return suggestions;
   }
@@ -34,7 +35,7 @@ export default class LuaSuggester {
         Object.keys(symbolTable.entries).forEach((name) => {
           const entry = symbolTable.entries[name];
           if (name.indexOf(prefix) === 0) {
-            suggestions.push(this._makeNewSuggestion(name, entry));
+            suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
           }
         });
       }
@@ -48,7 +49,7 @@ export default class LuaSuggester {
       Object.keys(symbolTable.entries).forEach((name) => {
         const entry = symbolTable.entries[name];
         if (entry.index < index && name.indexOf(prefix) === 0) {
-          suggestions.push(this._makeNewSuggestion(name, entry));
+          suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
         }
       });
       symbolTable.children.forEach(child => {
@@ -80,16 +81,12 @@ export default class LuaSuggester {
         Object.keys(currEntry).forEach((name) => {
           if (name.indexOf(lastPrefix) === 0) {
             const entry = {type: types.ATHENA_LUA_TABLE_MEMBER, kind: types.ATHENA_LUA_TABLE_MEMBER};
-            suggestions.push(this._makeNewSuggestion(name, entry));
+            suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
           }
         });
       }
     });
     return suggestions;
-  }
-
-  _makeNewSuggestion(name, entry) {
-    return {name: name, type: entry.type, kind: entry.kind};
   }
 
 }
