@@ -2,10 +2,18 @@
 
 export default class LuaSymbolTable {
 
-  constructor(fileName) {
+  static create(fileName) {
+    return new LuaSymbolTable(fileName, null);
+  }
+
+  static create(fileName, entries) {
+    return new LuaSymbolTable(fileName, entries);
+  }
+
+  constructor(fileName, entries) {
     this.fileName = fileName;
-    this.range = {start: NaN, end: Infinity};
-    this.entries = {};
+    this.range = {start: 0, end: Infinity};
+    this.entries = null == entries ? {} : entries;
     this.parent = null;
     this.children = [];
   }

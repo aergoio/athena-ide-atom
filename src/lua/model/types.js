@@ -16,6 +16,7 @@ export const LUA_TYPE_LITERALS = [
 export const LUA_TYPE_FUNCTION = "function";
 export const LUA_TYPE_TABLE = "table";
 export const LUA_TYPE_TABLE_MEMBER = "member";
+export const LUA_TYPE_SYSTEM = "system"; // aergo system
 export const LUA_TYPE_UNKNOWN = "unknown";
 
 // lua symbol kinds
@@ -23,6 +24,7 @@ export const LUA_KIND_VARIABLE = "variable";
 export const LUA_KIND_FUNCTION = "function";
 export const LUA_KIND_TABLE = "table";
 export const LUA_KIND_TABLE_MEMBER = "member";
+export const LUA_KIND_SYSTEM = "system"; // aergo system
 export const LUA_KIND_UNKNOWN = "unknown";
 
 // lua lint types

@@ -10,7 +10,7 @@ export default class LuaTableFieldTreeGenerator extends Visitor {
 
   constructor() {
     super();
-    this.tableFieldTree = LuaTableFieldTree.newLuaTableFieldTree();
+    this.tableFieldTree = LuaTableFieldTree.create();
   }
 
   getGenerated() {

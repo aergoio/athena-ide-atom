@@ -12,6 +12,8 @@ export function adaptSuggestionToAtom(suggestion) {
     atomSymbolKind = atomTypes.ATOM_SUGGESTION_FUNCTION;
   } else if (luaTypes.LUA_KIND_TABLE_MEMBER === athenaSymbolKind) {
     atomSymbolKind = atomTypes.ATOM_SUGGESTION_METHOD;
+  } else if (luaTypes.LUA_KIND_SYSTEM === athenaSymbolKind) {
+    atomSymbolKind = atomTypes.ATOM_SUGGESTION_VARIABLE;
   }
   return  {
     text: suggestion.name,

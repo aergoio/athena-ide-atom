@@ -1,9 +1,17 @@
 'use babel'
 
-import {LuaSuggestion, luaTypes} from '../model';
+import {LuaSuggestion, LuaSymbolTable, LuaTableFieldTree, luaTypes} from '../model';
 import logger from '../../logger';
 
+const AERGO_SUGGESTION = 'aergo_suggestion.json';
+
 export default class LuaSuggester {
+
+  constructor() {
+    const aergoSuggestion = require(__dirname + '/res/' + AERGO_SUGGESTION);
+    this.aergoSymbolTable = LuaSymbolTable.create("aergo", aergoSuggestion.symbol);
+    this.aergoTableFieldTree = LuaTableFieldTree.create(aergoSuggestion.table);
+  }
 
   getSuggestions(analyzeInfos, prefix, index, fileName) {
     logger.debug("suggestions with");
@@ -13,9 +21,11 @@ export default class LuaSuggester {
     let suggestions = [];
     if (1 === prefixChain.length) {
       const symbolTables = analyzeInfos.map(a => a.symbolTable);
+      symbolTables.unshift(this.aergoSymbolTable);
       suggestions = this._findSuggestionFromSymbolTables(symbolTables, prefixChain[0], index, fileName);
     } else {
       const tableFieldTrees = analyzeInfos.map(a => a.tableFieldTree);
+      tableFieldTrees.unshift(this.aergoTableFieldTree);
       suggestions = this._findSuggestionFromTableFields(tableFieldTrees, prefixChain);
     }
     return suggestions;

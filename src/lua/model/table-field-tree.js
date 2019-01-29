@@ -2,12 +2,16 @@
 
 export default class LuaTableFieldTree {
 
-  static newLuaTableFieldTree() {
-    return new LuaTableFieldTree();
+  static create() {
+    return new LuaTableFieldTree(null);
   }
 
-  constructor() {
-    this.entries = {};
+  static create(entries) {
+    return new LuaTableFieldTree(entries);
+  }
+
+  constructor(entries) {
+    this.entries = null == entries ? {} : entries;
   }
 
   getEntries() {
