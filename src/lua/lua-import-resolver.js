@@ -7,6 +7,7 @@ import fs from 'fs';
 import LuaAnalysisGenerator from './lua-analysis-generator';
 
 import logger from '../logger';
+import { start } from 'repl';
 
 export default class LuaImportResolver {
 
@@ -16,6 +17,21 @@ export default class LuaImportResolver {
   }
 
   extractImportStatements(source) {
+    const importStatements = [];
+    let startIndex = 0;
+    while (startIndex < source.length) {
+      const nextLineInfo = this._nextLine(source, startIndex);
+      const nextLine = nextLineInfo.line;
+      startIndex = nextLineInfo.endIndex + 1;
+      if (!this._isImportStatement(nextLine)) {
+        break;
+      }
+      importStatements.push(this._trimImportStatement(nextLine));
+    }
+    return importStatements;
+  }
+
+  extractImportStatementsRecursively(source) {
     const importStatements = [];
     let startIndex = 0;
     while (startIndex < source.length) {
@@ -49,11 +65,11 @@ export default class LuaImportResolver {
     return "import "  + "\"" + importTarget + "\"";
   }
 
-  getAnalysisInfosOf(rawImportStatement, fileName) {
-    const trimmed = this._trimImportStatement(rawImportStatement);
-    const source = this.getSourceOf(trimmed, fileName);
+  getAnalysisInfosOf(importStatement, baseFile) {
+    const trimmed = this._trimImportStatement(importStatement);
+    const source = this.getSourceOf(trimmed, baseFile);
     if (this._isRelativeImport(trimmed)) {
-      const importCanonicalPath = this._extractImportCanonicalPath(trimmed, fileName);
+      const importCanonicalPath = this._extractImportCanonicalPath(trimmed, baseFile);
       return this.analysisGenerator.generate(source, importCanonicalPath);
     } else { // package import
       if (!this.importToAnalysisInfo.has(trimmed)) {
@@ -64,13 +80,26 @@ export default class LuaImportResolver {
     }
   }
 
-  getSourceOf(rawImportStatement, fileName) {
-    const trimmed = this._trimImportStatement(rawImportStatement);
-    const importCanonicalPath = this._extractImportCanonicalPath(trimmed, fileName);
+  getSourceOf(importStatement, baseFile) {
+    const trimmed = this._trimImportStatement(importStatement);
+    const importCanonicalPath = this._extractImportCanonicalPath(trimmed, baseFile);
     return this._readFile(importCanonicalPath);
   }
 
-  _extractImportCanonicalPath(trimmedImportStatement, fileName) {
+  getImportTrimmed(source) {
+    let startIndex = 0;
+    while (startIndex < source.length) {
+      const nextLineInfo = this._nextLine(source, startIndex);
+      const nextLine = nextLineInfo.line;
+      startIndex = nextLineInfo.endIndex + 1;
+      if (!this._isImportStatement(nextLine)) {
+        break;
+      }
+    }
+    return source.substring(startIndex);
+  }
+
+  _extractImportCanonicalPath(trimmedImportStatement, baseFile) {
     const splited = trimmedImportStatement.trim().split(/\s+/);
     const importTarget = splited[1].substring(1, splited[1].length - 1);
     logger.debug("splited: " + splited);
@@ -81,7 +110,7 @@ export default class LuaImportResolver {
       const aergoJson = this._getPackageInfo(importPath);
       importPath = importPath + "/" + aergoJson.target;
     } else { // package import
-      importPath = path.resolve(path.dirname(fileName), importTarget);
+      importPath = path.resolve(path.dirname(baseFile), importTarget);
     }
     return importPath;
   }

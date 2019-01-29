@@ -1,5 +1,5 @@
 {
-  "atom-workspace": {
-    "ctrl-alt-o": "athena-ide:toggle"
+  "atom-text-editor": {
+    "f7": "athena-ide:compile"
   }
 }
