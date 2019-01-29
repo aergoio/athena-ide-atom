@@ -53,7 +53,7 @@ export default class LuaComplier {
   }
 
   _resolveCompilerPath() {
-    return __dirname + "/resources/" + COMPIlER_PROGRAM;
+    return __dirname + "/res/" + COMPIlER_PROGRAM;
   }
 
   _success(message) {
