@@ -1,9 +1,10 @@
 'use babel';
 
-import LuaSymbolTable from './lua-symbol-table';
-import {Visitor} from '../type';
-import * as types from './lua-types';
-import logger from '../logger';
+import {LuaSymbolTable, luaTypes} from '../model';
+
+import Visitor from './visitor';
+import * as luaparseType from './luaparse-types';
+import logger from '../../logger';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
@@ -23,24 +24,24 @@ export default class LuaSymbolTableGenerator extends Visitor {
 
   onCreateNode(node) {
     const nodeType = node.type;
-    if (types.LUAPARSE_ASSIGNMENT_STATEMENT === nodeType ||
-        types.LUAPARSE_LOCAL_STATEMENT === nodeType) {
+    if (luaparseType.LUAPARSE_ASSIGNMENT_STATEMENT === nodeType ||
+        luaparseType.LUAPARSE_LOCAL_STATEMENT === nodeType) {
           this._parseVariableAssignment(node);
     }
   }
 
   _parseVariableAssignment(node) {
     // only parse assignment to identifier
-    if (types.LUAPARSE_IDENTIFIER !== node.variables[0].type) {
+    if (luaparseType.LUAPARSE_IDENTIFIER !== node.variables[0].type) {
       return;
     }
 
     const identifierName = node.variables[0].name;
     const index = this._parseStartIndex(node);
-    const initType = node.init.length === 0 ? types.ATHENA_LUA_UNKNOWN
-                                        : types.resolveType(node.init[0].type);
-    const kind = types.ATHENA_LUA_VARIABLE;
-    if (types.ATHENA_LUA_FUNCTION === initType) {
+    const initType = node.init.length === 0 ? luaTypes.LUA_TYPE_UNKNOWN
+                                        : luaparseType.resolveType(node.init[0].type);
+    const kind = luaTypes.LUA_KIND_VARIABLE;
+    if (luaTypes.LUA_TYPE_FUNCTION === initType) {
       const parameters = node.init[0].parameters;
       this._addFunctionDeclaration(this.symbolTable, identifierName, parameters, index);
     } else {
@@ -77,7 +78,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
     const parameters = signature.parameters;
     const index = this._parseStartIndex(signature)
     // only parse named function
-    if (null != signature.identifier && types.LUAPARSE_IDENTIFIER === signature.identifier.type) {
+    if (null != signature.identifier && luaparseType.LUAPARSE_IDENTIFIER === signature.identifier.type) {
       const name = signature.identifier.name;
       // add function symbol to the parent scope
       this._addFunctionDeclaration(this._getParentOrItself(this.symbolTable), name, parameters, index);
@@ -92,8 +93,8 @@ export default class LuaSymbolTableGenerator extends Visitor {
       }
       return curr.name;
     }, "") + ")";
-    const type = types.ATHENA_LUA_FUNCTION;
-    const kind = types.ATHENA_LUA_FUNCTION;
+    const type = luaTypes.LUA_TYPE_FUNCTION;
+    const kind = luaTypes.LUA_KIND_FUNCTION;
     symbolTable.addEntry(nameWithArgs, index, type, kind);
   }
 
@@ -101,8 +102,8 @@ export default class LuaSymbolTableGenerator extends Visitor {
     parameters.forEach(parameter => {
       const name = parameter.name;
       const index = this._parseStartIndex(parameter);
-      const type = types.ATHENA_LUA_UNKNOWN;
-      const kind = types.ATHENA_LUA_VARIABLE;
+      const type = luaTypes.LUA_TYPE_UNKNOWN;
+      const kind = luaTypes.LUA_KIND_VARIABLE;
       symbolTable.addEntry(name, index, type, kind);
     });
   }

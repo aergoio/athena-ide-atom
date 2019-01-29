@@ -1,10 +1,11 @@
 'use babel'
 
-import {AnalysisInfo} from './lua-types';
-import LuaParser from './lua-parser';
-import LuaSymbolTableGenerator from './lua-symbol-table-generator';
-import LuaTableFieldTreeGenerator from './lua-table-field-tree-generator';
-import logger from '../logger';
+import {LuaAnalysisInfo} from '../model';
+import logger from '../../logger';
+
+import LuaParser from './parser';
+import LuaSymbolTableGenerator from './symbol-table-generator';
+import LuaTableFieldTreeGenerator from './table-field-tree-generator';
 
 export default class LuaAnalysisGenerator {
 
@@ -19,8 +20,8 @@ export default class LuaAnalysisGenerator {
     const file = fileName;
     const symbolTables = symbolTableGenerator.getGenerated();
     const tableFieldTrees = tableFieldTreeGenerator.getGenerated();
-    const err = parseResult.err.length > 0 ? parseResult.err[0] : null;
-    return new AnalysisInfo(file, symbolTables, tableFieldTrees, err);
+    const err = parseResult.err;
+    return new LuaAnalysisInfo(file, symbolTables, tableFieldTrees, err);
   }
 
 }

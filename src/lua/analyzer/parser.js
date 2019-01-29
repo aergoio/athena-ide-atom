@@ -1,15 +1,13 @@
 'use babel'
 
 import luaparse from '@aergoio/luaparse';
-import {Parser} from '../type';
-import logger from '../logger';
+import logger from '../../logger';
 
-const luaVersion = '5.1';
+const LUA_VERSION = '5.1';
 
-export default class LuaParser extends Parser {
+export default class LuaParser {
 
   constructor() {
-    super();
     this.delegate = luaparse;
   }
 
@@ -46,12 +44,16 @@ export default class LuaParser extends Parser {
           logger.debug(signature);
           visitors.forEach(visitor => visitor.onFunctionSignature(signature));
         },
-        luaVersion: luaVersion
+        luaVersion: LUA_VERSION
       });
-      return this._success(ast);
+      return this._makeResult(ast, null);
     } catch (err) {
-      return this._fail(err);
+      return this._makeResult(null, err);
     }
+  }
+
+  _makeResult(ast, err) {
+    return {ast: ast, err: err}
   }
 
 }

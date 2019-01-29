@@ -4,8 +4,7 @@ import fs from 'fs';
 chai.use(chaiAsPromised);
 const assert = chai.assert;
 
-import LuaAnalyzer from '../../src/lua';
-import * as types from '../../src/lua/lua-types';
+import LuaAnalyzer, {luaTypes} from '../../src/lua';
 
 describe("Autocomplete for table", () => {
 
@@ -22,7 +21,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FieldTable.", index, filePath);
       assert.equal(suggestions.length, 5);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 5);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
     });
 
     it("FieldTable.f", () => {
@@ -31,7 +30,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FieldTable.f", index, filePath);
       assert.equal(suggestions.length, 4);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 4);
     });
 
     it("FieldTable2.f", () => {
@@ -40,7 +39,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FieldTable2.f", index, filePath);
       assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
     });
 
   });
@@ -55,7 +54,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FuncTable.", index, filePath);
       assert.equal(suggestions.length, 5);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 5);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
     });
 
     it("FuncTable.s", () => {
@@ -64,7 +63,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FuncTable.s", index, filePath);
       assert.equal(suggestions.length, 1);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 1);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER == s.kind).length, 1);
     });
 
     it("FuncTable.m", () => {
@@ -73,7 +72,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FuncTable.m", index, filePath);
       assert.equal(suggestions.length, 3);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 3);
     });
 
     it("FuncTable.d", () => {
@@ -82,7 +81,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("FuncTable.d", index, filePath);
       assert.equal(suggestions.length, 1);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 1);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 1);
     });
 
   });
@@ -97,7 +96,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("NestedTable.", index, filePath);
       assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
     });
 
     // TODO : not yet implemented
@@ -114,7 +113,7 @@ describe("Autocomplete for table", () => {
 
       const suggestions = luaAnalyzer.getSuggestions("libraryTable.", index, filePath);
       assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => types.ATHENA_LUA_TABLE_MEMBER === s.kind).length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
     });
 
   });

@@ -1,23 +1,21 @@
 'use babel'
 
-import * as types from './lua-types';
-import logger from '../logger';
+import {LuaSuggestion, luaTypes} from '../model';
+import logger from '../../logger';
 
 export default class LuaSuggester {
 
-  constructor(analyzeInfos) {
-    this.analyzeInfos = analyzeInfos;
-  }
-
-  getSuggestions(prefix, index, fileName) {
+  getSuggestions(analyzeInfos, prefix, index, fileName) {
+    logger.debug("suggestions with");
+    logger.debug(analyzeInfos);
     const prefixChain = prefix.split(".");
     logger.debug("prefix chain: " + prefixChain);
     let suggestions = [];
     if (1 === prefixChain.length) {
-      const symbolTables = this.analyzeInfos.map(a => a.symbolTable);
+      const symbolTables = analyzeInfos.map(a => a.symbolTable);
       suggestions = this._findSuggestionFromSymbolTables(symbolTables, prefixChain[0], index, fileName);
     } else {
-      const tableFieldTrees = this.analyzeInfos.map(a => a.tableFieldTree);
+      const tableFieldTrees = analyzeInfos.map(a => a.tableFieldTree);
       suggestions = this._findSuggestionFromTableFields(tableFieldTrees, prefixChain);
     }
     return suggestions;
@@ -35,7 +33,7 @@ export default class LuaSuggester {
         Object.keys(symbolTable.entries).forEach((name) => {
           const entry = symbolTable.entries[name];
           if (name.indexOf(prefix) === 0) {
-            suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
+            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
           }
         });
       }
@@ -49,7 +47,7 @@ export default class LuaSuggester {
       Object.keys(symbolTable.entries).forEach((name) => {
         const entry = symbolTable.entries[name];
         if (entry.index < index && name.indexOf(prefix) === 0) {
-          suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
+          suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
         }
       });
       symbolTable.children.forEach(child => {
@@ -80,8 +78,8 @@ export default class LuaSuggester {
         const lastPrefix = prefixChain[prefixChain.length - 1];
         Object.keys(currEntry).forEach((name) => {
           if (name.indexOf(lastPrefix) === 0) {
-            const entry = {type: types.ATHENA_LUA_TABLE_MEMBER, kind: types.ATHENA_LUA_TABLE_MEMBER};
-            suggestions.push(new types.Suggestion(name, entry.type, entry.kind));
+            const entry = {type: luaTypes.LUA_TYPE_TABLE_MEMBER, kind: luaTypes.LUA_KIND_TABLE_MEMBER};
+            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
           }
         });
       }

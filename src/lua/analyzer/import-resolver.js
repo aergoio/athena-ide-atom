@@ -4,10 +4,9 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 
-import LuaAnalysisGenerator from './lua-analysis-generator';
+import logger from '../../logger';
 
-import logger from '../logger';
-import { start } from 'repl';
+import LuaAnalysisGenerator from './analysis-generator';
 
 export default class LuaImportResolver {
 
@@ -17,21 +16,6 @@ export default class LuaImportResolver {
   }
 
   extractImportStatements(source) {
-    const importStatements = [];
-    let startIndex = 0;
-    while (startIndex < source.length) {
-      const nextLineInfo = this._nextLine(source, startIndex);
-      const nextLine = nextLineInfo.line;
-      startIndex = nextLineInfo.endIndex + 1;
-      if (!this._isImportStatement(nextLine)) {
-        break;
-      }
-      importStatements.push(this._trimImportStatement(nextLine));
-    }
-    return importStatements;
-  }
-
-  extractImportStatementsRecursively(source) {
     const importStatements = [];
     let startIndex = 0;
     while (startIndex < source.length) {

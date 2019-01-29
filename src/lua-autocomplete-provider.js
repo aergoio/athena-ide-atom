@@ -1,10 +1,11 @@
 'use babel';
 
 import LuaAnalyzer from './lua';
+import {luaTypes} from './lua';
 import * as adaptor from './type-adaptor';
 import logger from './logger';
 
-export default class LuaProvider {
+export default class LuaAutocompleteProvider {
   selector = '.source.lua';
   disableForSelector = '.source.lua .comment';
   inclusionPriority = 1;

@@ -1,6 +1,6 @@
 'use babel'
 
-import logger from "../logger";
+import {luaTypes} from '../model';
 
 // luaparse literal types
 //   - StringLiteral    "Im String"
@@ -42,73 +42,48 @@ export const LUAPARSE_LOCAL_STATEMENT = "LocalStatement";
 export const LUAPARSE_IDENTIFIER = "Identifier";
 
 
-
-// athena lua types
-export const ATHENA_LUA_LITERALS = [
-  "string",
-  "numeric",
-  "boolean",
-  "nil",
-  "vararg"
-];
-
-// athena symbol types and kinds
-export const ATHENA_LUA_VARIABLE = "variable";
-export const ATHENA_LUA_FUNCTION = "function";
-export const ATHENA_LUA_TABLE = "table";
-export const ATHENA_LUA_TABLE_MEMBER = "member";
-export const ATHENA_LUA_UNKNOWN = "unknown";
-
-// athena lint types
-export const ATHENA_LINT_TYPE_ERROR = "error";
-export const ATHENA_LINT_TYPE_WARN = "warn";
-export const ATHENA_LINT_TYPE_INFO = "info";
-
-// athena functions
+// luaparse type to domain type
 export function resolveType(luaparseType) {
   if (null == luaparseType) {
-    return ATHENA_LUA_UNKNOWN;
+    return luaTypes.LUA_TYPE_UNKNOWN;
   }
   const literalIndex = LUAPARSE_LITERALS.indexOf(luaparseType);
   if (-1 !== literalIndex) {
-    return ATHENA_LUA_LITERALS[literalIndex];
+    return luaTypes.LUA_TYPE_LITERALS[literalIndex];
   } else if (LUAPARSE_FUNCTION_DECLARATION === luaparseType) {
-    return ATHENA_LUA_FUNCTION;
+    return luaTypes.LUA_TYPE_FUNCTION;
   } else if (LUAPARSE_TABLE_CONSTRUCTOR_EXPRESSION === luaparseType) {
-    return ATHENA_LUA_TABLE;
+    return luaTypes.LUA_TYPE_TABLE;
   } else if (LUAPARSE_TABLE_MEMBER_EXPRESSION === luaparseType ||
              LUAPARSE_TABLE_INDEX_EXPRESSION === luaparseType) {
-    return ATHENA_LUA_TABLE_MEMBER;
+    return luaTypes.LUA_TYPE_TABLE_MEMBER;
   } else {
-    return ATHENA_LUA_UNKNOWN;
+    return luaTypes.LUA_TYPE_UNKNOWN;
   }
 }
 
-// athena analysis info object
-export class AnalysisInfo {
-  constructor(file, symbolTable, tableFieldTree, err) {
-    this.file = file;
-    this.symbolTable = symbolTable;
-    this.tableFieldTree = tableFieldTree;
-    this.err = err;
+// luaparse type to domain kind
+export function resolveKind(luaparseType) {
+  if (null == luaparseType) {
+    return luaTypes.LUA_KIND_UNKNOWN;
   }
-}
-
-// athena suggestion object
-export class Suggestion {
-  constructor(name, type, kind) {
-    this.name = name;
-    this.type = type;
-    this.kind = kind;
-  }
-}
-
-// athena lint object
-export class Lint {
-  constructor(type, file, index, message) {
-    this.type = type;
-    this.file = file;
-    this.index = index;
-    this.message = message;
+  const resolvedType = resolveType(luaparseType);
+  switch (resolvedType) {
+    case luaTypes.LUA_TYPE_STRING:
+    case luaTypes.LUA_TYPE_NUMERIC:
+    case luaTypes.LUA_TYPE_BOOLEAN:
+    case luaTypes.LUA_TYPE_NIL:
+    case luaTypes.LUA_TYPE_VARARG:
+      return luaTypes.LUA_KIND_VARIABLE;
+    case luaTypes.LUA_TYPE_FUNCTION:
+      return luaTypes.LUA_KIND_FUNCTION;
+    case luaTypes.LUA_TYPE_TABLE:
+      return luaTypes.LUA_KIND_TABLE;
+    case luaTypes.LUA_TYPE_TABLE_MEMBER:
+      return luaTypes.LUA_KIND_TABLE_MEMBER;
+    case luaTypes.LUA_TYPE_UNKNOWN:
+      return luaTypes.LUA_KIND_UNKNOWN;
+    default:
+      return luaTypes.LUA_KIND_UNKNOWN;
   }
 }
