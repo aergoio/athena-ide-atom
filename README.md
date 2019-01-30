@@ -18,7 +18,9 @@ A package for writing smart contract in aergo using atom
 
 ## Installation
 
-TODO
+```sh
+$ apm install athena-ide-atom
+```
 
 ## How to use
 
