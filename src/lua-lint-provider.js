@@ -5,14 +5,17 @@ import * as adaptor from './type-adaptor';
 import logger from './logger';
 
 export default class LuaLintProvider {
-  name = 'Lua linter';
-  scope = 'file'; // or 'project'
-  lintsOnChange = false;
-  grammarScopes = ['source.lua'];
 
-  luaAnalyzer = new LuaAnalyzer();
+  constructor() {
+    this.name = 'Lua linter';
+    this.scope = 'file'; // or 'project'
+    this.lintsOnChange = false;
+    this.grammarScopes = ['source.lua'];
 
-  lint = async function (textEditor) {
+    this.luaAnalyzer = new LuaAnalyzer();
+  }
+
+  lint(textEditor) {
     const textBuffer = textEditor.getBuffer();
     const source = textBuffer.getText();
     const fileName = textEditor.getPath();
@@ -24,7 +27,10 @@ export default class LuaLintProvider {
       const indexToLineEnding = textBuffer.lineLengthForRow(position.row) - position.column;
       return indexToPosition(index + indexToLineEnding);
     };
-    return lints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
+    const atomLints = lints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
+    logger.info("Atom lints");
+    logger.info(atomLints);
+    return atomLints;
   }
 
-};
+}

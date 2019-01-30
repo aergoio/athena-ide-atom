@@ -38,7 +38,13 @@ Install dependency
 $ npm install
 ```
 
-Run test
+Run lint
+
+```sh
+$ npm run lint
+```
+
+Run test (including lint)
 
 ```sh
 $ npm run test

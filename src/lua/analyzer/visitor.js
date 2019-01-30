@@ -1,5 +1,7 @@
 'use babel';
 
+/* eslint-disable */
+
 export default class Visitor {
 
   onCreateNode(node) {}

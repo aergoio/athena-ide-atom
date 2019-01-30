@@ -1,5 +1,7 @@
 'use babel';
 
+/* eslint-disable */
+
 import { CompositeDisposable } from 'atom';
 
 import CompileView from './view/compile-view';

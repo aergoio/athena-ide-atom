@@ -3,9 +3,9 @@
 const logOn = false;
 
 export default {
-  trace: logOn ? (m) => console.trace(m) : (m) => {},
-  debug: logOn ? (m) => console.debug(m) : (m) => {},
-  info: logOn ? (m) => console.info(m) : (m) => {},
-  warn: logOn ? (m) => console.warn(m) : (m) => {},
-  error: logOn ? (m) => console.error(m) : (m) => {},
+  trace: (m) => logOn ? console.trace(m) : {},
+  debug: (m) => logOn ? console.debug(m) : {},
+  info: (m) => logOn ? console.info(m) : {},
+  warn: (m) => logOn ? console.warn(m) : {},
+  error: (m) => logOn ? console.error(m) : {},
 };

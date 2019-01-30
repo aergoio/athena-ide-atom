@@ -2,10 +2,6 @@
 
 export default class LuaTableFieldTree {
 
-  static create() {
-    return new LuaTableFieldTree(null);
-  }
-
   static create(entries) {
     return new LuaTableFieldTree(entries);
   }

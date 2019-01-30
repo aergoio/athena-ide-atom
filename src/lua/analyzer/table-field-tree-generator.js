@@ -85,4 +85,4 @@ export default class LuaTableFieldTreeGenerator extends Visitor {
     });
   }
 
-};
+}

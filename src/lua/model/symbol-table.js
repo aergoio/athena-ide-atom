@@ -2,10 +2,6 @@
 
 export default class LuaSymbolTable {
 
-  static create(fileName) {
-    return new LuaSymbolTable(fileName, null);
-  }
-
   static create(fileName, entries) {
     return new LuaSymbolTable(fileName, entries);
   }

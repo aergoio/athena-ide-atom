@@ -19,6 +19,8 @@ export default class LuaSymbolTableGenerator extends Visitor {
     while (!this.symbolTable.isRoot()) {
       this.symbolTable = this.symbolTable.getParent();
     }
+    logger.debug("generated symbol table");
+    logger.debug(this.symbolTable);
     return this.symbolTable;
   }
 
@@ -112,4 +114,4 @@ export default class LuaSymbolTableGenerator extends Visitor {
     return symbolTable.isRoot() ? symbolTable : symbolTable.getParent();
   }
 
-};
+}

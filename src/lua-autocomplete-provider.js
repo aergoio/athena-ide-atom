@@ -1,19 +1,21 @@
 'use babel';
 
 import LuaAnalyzer from './lua';
-import {luaTypes} from './lua';
 import * as adaptor from './type-adaptor';
 import logger from './logger';
 
 export default class LuaAutocompleteProvider {
-  selector = '.source.lua';
-  disableForSelector = '.source.lua .comment';
-  inclusionPriority = 1;
-  excludeLowerPriority = true;
 
-  luaAnalyzer = new LuaAnalyzer();
+  constructor() {
+    this.selector = '.source.lua';
+    this.disableForSelector = '.source.lua .comment';
+    this.inclusionPriority = 1;
+    this.excludeLowerPriority = true;
 
-  getSuggestions = async function (request) {
+    this.luaAnalyzer = new LuaAnalyzer();
+  }
+
+  getSuggestions(request) {
     const textBuffer = request.editor.getBuffer();
     const cursorPosition = request.bufferPosition;
     const originPrefix = request.prefix;
@@ -65,4 +67,4 @@ export default class LuaAutocompleteProvider {
                   .then(suggestions => suggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion)))
   }
 
-};
+}

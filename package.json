@@ -5,7 +5,7 @@
   "description": "A package for writing smart contract in aergo using atom ide",
   "scripts": {
     "lint": "eslint --fix ./src",
-    "test": "mocha --exit --require @babel/register --recursive"
+    "test": "npm run lint && mocha --exit --require @babel/register --recursive"
   },
   "repository": "https://github.com/aergoio/athena-ide-atom",
   "keywords": [
@@ -43,7 +43,6 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^5.12.0",
-    "eslint-config-google": "^0.11.0",
     "mocha": "^5.2.0"
   },
   "dependencies": {
