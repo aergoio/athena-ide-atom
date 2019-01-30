@@ -75,10 +75,10 @@ export default class LuaImportResolver {
     while (startIndex < source.length) {
       const nextLineInfo = this._nextLine(source, startIndex);
       const nextLine = nextLineInfo.line;
-      startIndex = nextLineInfo.endIndex + 1;
       if (!this._isImportStatement(nextLine)) {
         break;
       }
+      startIndex = nextLineInfo.endIndex + 1;
     }
     return source.substring(startIndex);
   }

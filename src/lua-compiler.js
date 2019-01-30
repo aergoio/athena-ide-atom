@@ -42,6 +42,8 @@ export default class LuaComplier {
       const importSource = this.importResolver.getSourceOf(importStatement, baseFile);
       resolvedSource += this.importResolver.getImportTrimmed(importSource);
     });
+    logger.debug("import statements");
+    logger.debug(importStatements);
     resolvedSource += this.importResolver.getImportTrimmed(source);
     return resolvedSource;
   }

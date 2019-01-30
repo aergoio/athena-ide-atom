@@ -2,8 +2,8 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Toggle athena-ide",
-        "command": "athena-ide:toggle"
+        "label": "Compile smart contract",
+        "command": "athena-ide:compile"
       }
     ]
   },
@@ -12,11 +12,11 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "athena-ide",
+          "label": "Athena-ide",
           "submenu": [
             {
-              "label": "Toggle",
-              "command": "athena-ide:toggle"
+              "label": "Compile smart contract",
+              "command": "athena-ide:compile"
             }
           ]
         }
