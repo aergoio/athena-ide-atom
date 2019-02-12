@@ -51,3 +51,9 @@ Run test (including lint)
 ```sh
 $ npm run test
 ```
+
+Link to local atom package
+
+```sh
+$ apm link
+```

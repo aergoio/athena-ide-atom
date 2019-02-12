@@ -12,7 +12,7 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "Athena-ide",
+          "label": "Athena Ide",
           "submenu": [
             {
               "label": "Compile smart contract",
