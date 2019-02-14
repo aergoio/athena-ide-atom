@@ -4,5 +4,49 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
-.athena-ide {
+#athena-ide-console {
+  .view-scroller {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+  }
+  
+  .panel-body {
+    height: 100%;
+    background-color: @inset-panel-background-color;
+    cursor: text;
+    -webkit-user-select: text;
+
+    &.closed {
+      height: 0px !important;
+    }
+
+    pre {
+      &:empty {
+        padding: 0;
+      }
+      overflow: visible;
+    }
+
+    div {
+      margin: 0;
+
+      &.level-debug {
+        color: @text-color-subtle;
+      }
+
+      &.level-info {
+        color: @text-color;
+      }
+
+      &.level-warn {
+        color: @text-color-warning;
+      }
+
+      &.level-error {
+        color: @text-color-error;
+      }
+
+    }
+  }
 }

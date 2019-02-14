@@ -47,6 +47,6 @@
   },
   "dependencies": {
     "@aergoio/luaparse": "git://github.com:aergoio/luaparse.git#master",
-    "atom-message-panel": "^1.3.0"
+    "atom-space-pen-views": "^2.2.0"
   }
 }
