@@ -1,3 +1,9 @@
+## 0.1.2 - Console ui, Compiler, Bug patch
+
+* Add linux, window compiler
+* Add console ui
+* Bug fix and improvements
+
 ## 0.1.1 - Menu, Bug patch
 
 * Compile bug fix
