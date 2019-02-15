@@ -1,36 +1,41 @@
 'use babel';
 
-import LuaAnalyzer from './lua';
+import logger from '../logger';
 import * as adaptor from './type-adaptor';
-import logger from './logger';
 
-export default class LuaLintProvider {
+export default class LintProvider {
 
   constructor() {
     this.name = 'Lua linter';
     this.scope = 'file'; // or 'project'
     this.lintsOnChange = false;
     this.grammarScopes = ['source.lua'];
+  }
 
-    this.luaAnalyzer = new LuaAnalyzer();
+  bindServices(services) {
+    this.services = services;
   }
 
   lint(textEditor) {
     const textBuffer = textEditor.getBuffer();
     const source = textBuffer.getText();
-    const fileName = textEditor.getPath();
-    this.luaAnalyzer.analyze(source, fileName);
-    const lints = this.luaAnalyzer.getLints();
+    const filePath = textBuffer.getPath();
+    
     const indexToPosition = (index) => textBuffer.positionForCharacterIndex(index);
     const indexToLineEndingPotision = (index) => {
       const position = textBuffer.positionForCharacterIndex(index);
       const indexToLineEnding = textBuffer.lineLengthForRow(position.row) - position.column;
       return indexToPosition(index + indexToLineEnding);
     };
-    const atomLints = lints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
-    logger.info("Atom lints");
-    logger.info(atomLints);
-    return atomLints;
+
+    return this.services.lintService.lint(source, filePath).then((rawLints) => {
+      logger.debug("Raw lints");
+      logger.debug(rawLints);
+      const atomLints = rawLints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
+      logger.info("Atom lints");
+      logger.info(atomLints);
+      return atomLints;
+    });
   }
 
 }

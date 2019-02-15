@@ -1,19 +1,28 @@
 'use babel'
 
-import {LuaSuggestion, LuaSymbolTable, LuaTableFieldTree, luaTypes} from '../model';
 import logger from '../../logger';
+import {LuaSuggestion, LuaSymbolTable, LuaTableFieldTree, luaTypes} from '../model';
+import {LuaAnalyzer} from '../analyzer';
 
 const AERGO_SUGGESTION = 'aergo_suggestion.json';
 
 export default class LuaSuggester {
 
   constructor() {
+    this.analyzer = new LuaAnalyzer();
+
     const aergoSuggestion = require(__dirname + '/res/' + AERGO_SUGGESTION);
     this.aergoSymbolTable = LuaSymbolTable.create("aergo", aergoSuggestion.symbol);
     this.aergoTableFieldTree = LuaTableFieldTree.create(aergoSuggestion.table);
   }
 
-  getSuggestions(analyzeInfos, prefix, index, fileName) {
+  suggest(source, filePath, prefix, index) {
+    return this.analyzer.analyze(source, filePath).then((analysisInfos) =>
+      this._getSuggestions(analysisInfos, filePath, prefix, index)
+    );
+  }
+
+  _getSuggestions(analyzeInfos, filePath, prefix, index) {
     logger.debug("suggestions with");
     logger.debug(analyzeInfos);
     const prefixChain = prefix.split(".");
@@ -22,7 +31,7 @@ export default class LuaSuggester {
     if (1 === prefixChain.length) {
       const symbolTables = analyzeInfos.map(a => a.symbolTable);
       symbolTables.unshift(this.aergoSymbolTable);
-      suggestions = this._findSuggestionFromSymbolTables(symbolTables, prefixChain[0], index, fileName);
+      suggestions = this._findSuggestionFromSymbolTables(symbolTables, prefixChain[0], index, filePath);
     } else {
       const tableFieldTrees = analyzeInfos.map(a => a.tableFieldTree);
       tableFieldTrees.unshift(this.aergoTableFieldTree);

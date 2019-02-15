@@ -4,42 +4,37 @@ import fs from 'fs';
 chai.use(chaiAsPromised);
 const assert = chai.assert;
 
-import LuaAnalyzer, {luaTypes} from '../../src/lua';
+import {LuaSuggester, luaTypes} from '../../src/lua';
 
 describe("Autocomplete for table", () => {
 
   const filePath = __dirname + "/resources/table.lua";
   const source = fs.readFileSync(filePath, "utf8");
+  const luaSuggester = new LuaSuggester();
 
   describe("Suggestion for simple field", () => {
 
     const index = 250;
 
     it("FieldTable.", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FieldTable.", index, filePath);
-      assert.equal(suggestions.length, 5);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
+      luaSuggester.suggest(source, filePath, "FieldTable.", index).then(suggestions => {
+        assert.equal(suggestions.length, 5);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
+      });
     });
 
     it("FieldTable.f", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FieldTable.f", index, filePath);
-      assert.equal(suggestions.length, 4);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 4);
+      luaSuggester.suggest(source, filePath, "FieldTable.f", index).then(suggestions => {
+        assert.equal(suggestions.length, 4);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 4);
+      });
     });
 
     it("FieldTable2.f", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FieldTable2.f", index, filePath);
-      assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      luaSuggester.suggest(source, filePath, "FieldTable2.f", index).then(suggestions => {
+        assert.equal(suggestions.length, 2);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      });
     });
 
   });
@@ -49,39 +44,31 @@ describe("Autocomplete for table", () => {
     const index = 733;
 
     it("FuncTable.", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FuncTable.", index, filePath);
-      assert.equal(suggestions.length, 5);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
+      luaSuggester.suggest(source, filePath, "FuncTable.", index).then(suggestions => {
+        assert.equal(suggestions.length, 5);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 5);
+      });
     });
 
     it("FuncTable.s", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FuncTable.s", index, filePath);
-      assert.equal(suggestions.length, 1);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER == s.kind).length, 1);
+      luaSuggester.suggest(source, filePath, "FuncTable.s", index).then(suggestions => {
+        assert.equal(suggestions.length, 1);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER == s.kind).length, 1);
+      });
     });
 
     it("FuncTable.m", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FuncTable.m", index, filePath);
-      assert.equal(suggestions.length, 3);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 3);
+      luaSuggester.suggest(source, filePath, "FuncTable.m", index).then(suggestions => {
+        assert.equal(suggestions.length, 3);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 3);
+      });
     });
 
     it("FuncTable.d", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("FuncTable.d", index, filePath);
-      assert.equal(suggestions.length, 1);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 1);
+      luaSuggester.suggest(source, filePath, "FuncTable.d", index).then(suggestions => {
+        assert.equal(suggestions.length, 1);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 1);
+      });
     });
 
   });
@@ -91,12 +78,10 @@ describe("Autocomplete for table", () => {
     const index = 1093;
 
     it("NestedTable.", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("NestedTable.", index, filePath);
-      assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      luaSuggester.suggest(source, filePath, "NestedTable.", index).then(suggestions => {
+        assert.equal(suggestions.length, 2);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      });
     });
 
     // TODO : not yet implemented
@@ -108,12 +93,10 @@ describe("Autocomplete for table", () => {
     const index = 1093;
 
     it("libraryTable.", () => {
-      const luaAnalyzer = new LuaAnalyzer();
-      luaAnalyzer.analyze(source, filePath);
-
-      const suggestions = luaAnalyzer.getSuggestions("libraryTable.", index, filePath);
-      assert.equal(suggestions.length, 2);
-      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      luaSuggester.suggest(source, filePath, "libraryTable.", index).then(suggestions => {
+        assert.equal(suggestions.length, 2);
+        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_TABLE_MEMBER === s.kind).length, 2);
+      });
     });
 
   });

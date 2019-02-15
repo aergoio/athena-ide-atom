@@ -1,21 +1,25 @@
 'use babel';
 
-import LuaAnalyzer from './lua';
+import logger from '../logger';
 import * as adaptor from './type-adaptor';
-import logger from './logger';
 
-export default class LuaAutocompleteProvider {
+export default class AutoCompleteProvider {
 
   constructor() {
     this.selector = '.source.lua';
     this.disableForSelector = '.source.lua .comment';
     this.inclusionPriority = 1;
     this.excludeLowerPriority = true;
+  }
 
-    this.luaAnalyzer = new LuaAnalyzer();
+  bindServices(services) {
+    this.services = services;
   }
 
   getSuggestions(request) {
+    logger.debug("Resolve suggestions with");
+    logger.debug(request);
+
     const textBuffer = request.editor.getBuffer();
     const cursorPosition = request.bufferPosition;
     const originPrefix = request.prefix;
@@ -60,11 +64,16 @@ export default class LuaAutocompleteProvider {
     const prefixEndIndex = originPrefixEndIndex;
     const lastSourceIndex = textBuffer.getMaxCharacterIndex();
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
-    const fileName = textBuffer.getPath();
-    this.luaAnalyzer.analyze(source, fileName);
+    const filePath = textBuffer.getPath();
 
-    return Promise.resolve(this.luaAnalyzer.getSuggestions(prefix, prefixStartIndex, fileName))
-                  .then(suggestions => suggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion)))
+    return this.services.autoCompleteService.suggest(source, filePath, prefix, prefixStartIndex).then(rawSuggestions => {
+      logger.debug("Raw suggestions");
+      logger.debug(rawSuggestions);
+      const atomSuggestions = rawSuggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion));
+      logger.info("Atom suggestions");
+      logger.info(atomSuggestions);
+      return atomSuggestions;
+    });
   }
 
 }

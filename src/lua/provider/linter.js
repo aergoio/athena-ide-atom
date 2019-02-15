@@ -1,18 +1,28 @@
 'use babel'
 
-import {LuaLint, luaTypes} from '../model';
 import logger from '../../logger';
+import {LuaLint, luaTypes} from '../model';
+import {LuaAnalyzer} from '../analyzer';
 
 export default class LuaLinter {
 
-  getLints(analyzeInfos) {
-    logger.debug("lint with");
-    logger.debug(analyzeInfos);
-    const lints = [];
-    analyzeInfos.filter((a, i) => (analyzeInfos.length - 1) == i)
-                     .filter(a => null != a.err)
-                     .forEach(analysisInfo => lints.push(this._resolveParsingError(analysisInfo)));
-    return lints;
+  constructor() {
+    this.analyzer = new LuaAnalyzer();
+  }
+
+  lint(source, filePath) {
+    return this.analyzer.analyze(source, filePath).then((analysisInfos) =>
+      this._extractLints(analysisInfos)
+    );
+  }
+
+  _extractLints(analyzeInfos) {
+    logger.info("Extract lints from");
+    logger.info(analyzeInfos);
+
+    return analyzeInfos.filter((a, i) => (analyzeInfos.length - 1) == i)
+              .filter(a => null != a.err)
+              .map(a => this._resolveParsingError(a));
   }
 
   _resolveParsingError(analysisInfo) {
