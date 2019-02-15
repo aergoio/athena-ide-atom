@@ -17,8 +17,8 @@ export default class LuaLinter {
   }
 
   _extractLints(analyzeInfos) {
-    logger.info("Extract lints from");
-    logger.info(analyzeInfos);
+    logger.debug("Extract lints from");
+    logger.debug(analyzeInfos);
 
     return analyzeInfos.filter((a, i) => (analyzeInfos.length - 1) == i)
               .filter(a => null != a.err)

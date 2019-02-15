@@ -9,8 +9,10 @@ import {LuaImportResolver} from '../lua';
 import {EventType} from '../event';
 import logger from '../logger';
 
-const COMPIlER_PROGRAM = "aergoluac";
-const TEMP_FILE = "athena_ide_atom_temp.lua";
+const LUA_COMPILER_OSX = "aergoluac_osx";
+const LUA_COMPILER_LINUX = "aergoluac_linux";
+const LUA_COMPILER_WINDOW = "aergoluac_window";
+const LUA_TEMP_FILE = "athena_ide_atom_temp.lua";
 
 export default class CompileService {
 
@@ -66,13 +68,23 @@ export default class CompileService {
   }
 
   _saveToTemp(source) {
-    const absPath = os.tmpdir() + "/" + TEMP_FILE;
+    const absPath = os.tmpdir() + "/" + LUA_TEMP_FILE;
     fs.writeFileSync(absPath, source)
     return absPath;
   }
 
   _resolveCompilerPath() {
-    return __dirname + "/res/" + COMPIlER_PROGRAM;
+    let compiler = __dirname + "/res/";
+    if ('darwin' === os.platform()) {
+      compiler = compiler + LUA_COMPILER_OSX;
+    } else if ('linux' === os.platform()) {
+      compiler = compiler + LUA_COMPILER_LINUX;
+    } else if ('win32' === os.platform()) {
+      compiler = compiler + LUA_COMPILER_WINDOW;
+    } else {
+      throw "UnSupported os type";
+    }
+    return compiler;
   }
 
   _success(message) {
