@@ -6,7 +6,7 @@ import {CompositeDisposable} from 'atom';
 
 import {EventDispatcher} from './event';
 import {LintService, CompileService, AutoCompleteService} from './service';
-import {AutoCompleteProvider, LintProvider, ConsoleView} from './view';
+import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView} from './view';
 
 export default {
 
@@ -49,6 +49,7 @@ export default {
     this.autoCompleteProvider.bindServices(services);
     this.lintProvider.bindServices(services);
     return {
+      athenaIdeView: new AthenaIdeView(),
       consoleView: new ConsoleView()
     };
   },
@@ -59,6 +60,11 @@ export default {
       'athena-ide:compile': () => {
         const filePath = atom.workspace.getActiveTextEditor().getBuffer().getPath();
         this.services.compileService.compile(filePath);
+      }
+    }));
+    subscriptions.add(atom.commands.add('atom-workspace', {
+      'athena-ide-view:show': () => {
+        this.views.athenaIdeView.show();
       }
     }));
     return subscriptions;

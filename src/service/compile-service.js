@@ -89,15 +89,15 @@ export default class CompileService {
 
   _success(message) {
     return {
-      result: "success",
-      message: message
+      result: message,
+      err: null
     };
   }
 
   _fail(message) {
     return {
-      result: "fail",
-      message: message
+      result: null,
+      err: message
     };
   }
 }

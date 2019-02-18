@@ -4,6 +4,24 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+.react-tabs {
+  .react-tabs__tab-list {
+    padding-left: 0em;
+    padding-bottom: 0.4em;
+    border-bottom: 0.1em solid gray;
+  }
+
+  .react-tabs__tab {
+    list-style: none;
+    display: inline;
+    padding-left: 1.2em;
+  }
+
+  .react-tabs__tab--selected {
+    font-weight: 800;
+  }
+}
+
 #athena-ide-console {
   .view-scroller {
     height: 100%;
@@ -46,7 +64,6 @@
       &.level-error {
         color: @text-color-error;
       }
-
     }
   }
 }

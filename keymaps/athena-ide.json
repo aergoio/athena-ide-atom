@@ -1,5 +1,8 @@
 {
   "atom-text-editor": {
     "f7": "athena-ide:compile"
+  },
+  "atom-workspace": {
+    "ctrl-alt-e": "athena-ide-view:show"
   }
 }

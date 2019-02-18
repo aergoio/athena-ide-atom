@@ -14,22 +14,12 @@ export default class ConsoleView extends View {
     });
   }
 
-  show() {
-    atom.workspace.getBottomDock().show();
-    return atom.workspace.open(this, {activatePane: false});
-  }
-
-  distroy() {
-    // TODO : remove view from the bottom dock
-    this.clear();
-  }
-
   getTitle() {
     return 'Athena Ide Console';
   }
 
   getPath() {
-    return 'console-view';
+    return 'athena-ide-console-view';
   }
 
   getUri() {
@@ -40,14 +30,26 @@ export default class ConsoleView extends View {
     return 'bottom';
   }
 
+  show() {
+    atom.workspace.getBottomDock().show();
+    return atom.workspace.open(this, {activatePane: false});
+  }
+
+  distroy() {
+    // TODO remove element form dock
+    this.clear();
+  }
+
   log(message) {
-    const data = message.data.toString();
-    const level = message.level;
-    const dataWithTime = this._wrapTime(data);
-    this.output.append($$(function() {
-      this.div({class: `level-${level}`}, dataWithTime);
-    }));
-    this.body.scrollToBottom();
+    this.show().then(() => {
+      const data = message.data.toString();
+      const level = message.level;
+      const dataWithTime = this._wrapTime(data);
+      this.output.append($$(function() {
+        this.div({class: `level-${level}`}, dataWithTime);
+      }));
+      this.body.scrollToBottom();
+    });
   }
 
   _wrapTime(message) {

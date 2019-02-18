@@ -22,13 +22,11 @@ export default class EventDispatcher {
     this.views = views;
 
     this.eventEmitter.on(EventType.Compile, (payload) => {
-      this.views.consoleView.show().then((view) => {
-        if (payload.result === "success") {
-          view.log({data: payload.message, level: "info"});
-        } else {
-          view.log({data: payload.message, level: "error"});
-        }
-      });
+      if (null == payload.err) {
+        this.views.consoleView.log({data: payload.result, level: "info"});
+      } else {
+        this.views.consoleView.log({data: payload.err, level: "error"});
+      }
     });
   }
 
