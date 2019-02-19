@@ -23,10 +23,15 @@ export default class EventDispatcher {
 
     this.eventEmitter.on(EventType.Compile, (payload) => {
       if (null == payload.err) {
-        this.views.consoleView.log({data: payload.result, level: "info"});
+        this.views.consoleView.log({data: payload.toString(), level: "info"});
+        this.views.athenaIdeView.showCompileResult(payload);
       } else {
-        this.views.consoleView.log({data: payload.err, level: "error"});
+        this.views.consoleView.log({data: payload.toString(), level: "error"});
       }
+    });
+
+    this.eventEmitter.on(EventType.UpdateCompiledTarget, (payload) => {
+      this.views.athenaIdeView.selectCompiledTarget(payload);
     });
   }
 

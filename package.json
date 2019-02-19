@@ -52,6 +52,7 @@
     "atom-space-pen-views": "^2.2.0",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
+    "react-select": "^2.4.1",
     "react-tabs": "^3.0.0"
   }
 }
