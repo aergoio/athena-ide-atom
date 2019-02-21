@@ -17,9 +17,13 @@ export default class Description extends React.Component {
     super(props);
   }
 
+  _join() {
+    return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
+  }
+
   render() {
     return (
-      <div className={'inline-block' + ' ' + titleClass}>
+      <div className={this._join('inline-block', titleClass)}>
         {this.props.title}
       </div>
     );

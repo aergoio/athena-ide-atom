@@ -35,29 +35,37 @@
     margin: 0.5em;
   }
 
-  .component:first-child {
+  .components-row:first-child {
     padding-bottom: 10px;
+    justify-content: space-between;
   }
 
-  .component {
+  .components-row {
     padding: 5px 10px 5px 10px;
     display: flex;
   }
 
-  .component:last-child {
+  .components-row:last-child {
     padding-bottom: 10px;
+  }
+
+  .components-row-button {
+    justify-content: flex-end;
   }
 
   .component-title {
     justify-content: center;
-    justify-content: center;
     font-weight: 700;
+  }
+
+  .component-icon {
+    cursor: pointer;
   }
 
   .component-description {
     width: 6em;
-    height: 100%;
     padding: 0.3em 0em;
+    height: 100%;
     text-align: center;
   }
 
@@ -87,6 +95,9 @@
     }
   }
 
+  .component-inputbox {
+  }
+
   .component-textbox {
     width: 100%;
     white-space: pre-wrap;
@@ -94,15 +105,46 @@
     word-wrap: break-word;
     max-height: 13em;
     background-color: @input-background-color;
-    padding: 0.6em;
+    padding: 0.3em;
   }
 
   .component-textbox-abi {
-    max-height: 100em;
+    max-height: 30em;
   }
 
-  .component-buttons {
-    justify-content: flex-end;
+  .component-textbox-number {
+    text-align: right;
+  }
+
+  .component-btn-deploy {
+    width: 6em;
+    padding: 0.3em 0em;
+  }
+
+  .component-btn-execute {
+
+  }
+
+  .component-btn-query {
+
+  }
+
+  .popup-content {
+    background-color: white;
+
+    .component-title {
+      font-weight: 400;
+      text-align: center;
+      width: 100%;
+    }
+
+    .components-row-button {
+      justify-content: center;
+    }
+
+    .component-description {
+      width: 8em;
+    }
   }
 }
 

@@ -7,6 +7,8 @@ export default class Button extends React.Component {
 
   static get propTypes() { 
     return { 
+      class: PropTypes.class,
+      onClick: PropTypes.func,
       name: PropTypes.string
     }; 
   }
@@ -15,9 +17,15 @@ export default class Button extends React.Component {
     super(props);
   }
 
+  _join() {
+    return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
+  }
+
   render() {
     return (
-      <div className='btn'>{this.props.name}</div>
+      <div className={this._join('btn', 'inline-block', this.props.class)} onClick={this.props.onClick}>
+        {this.props.name}
+      </div>
     );
   }
 

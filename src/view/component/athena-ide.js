@@ -4,6 +4,7 @@ import React from 'react';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import PropTypes from 'prop-types';
 import CompileView from './compile-view';
+import RunView from './run-view';
 
 export default class AthenaIde extends React.Component {
 
@@ -29,7 +30,7 @@ export default class AthenaIde extends React.Component {
           <CompileView context={this.props.context}/>
         </TabPanel>
         <TabPanel>
-          <div>Run view is not yet implemented</div>
+          <RunView context={this.props.context}/>
         </TabPanel>
       </Tabs>
     );

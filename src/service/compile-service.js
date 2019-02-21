@@ -41,8 +41,21 @@ export default class CompileService {
     logger.debug("compile result");
     logger.debug(compileResult);
 
-    this.eventDispatcher.dispatch(EventType.Compile, compileResult);
+    if (null == compileResult.err) {
+      this.eventDispatcher.dispatch(EventType.NewCompileTarget, compileResult);
+      this.eventDispatcher.dispatch(EventType.AppendLog, { data: compileResult.toString(), level: "info" });
+    } else {
+      this.eventDispatcher.dispatch(EventType.AppendLog, { data: compileResult.toString(), level: "error" });
+    }
+
     return Promise.resolve(compileResult);
+  }
+
+  changeCompiledTarget(file) {
+    return Promise.resolve(() => {
+      this.eventDispatcher.dispatch(EventType.ChangeCompileTarget, file)
+      return file;
+    });
   }
 
   _resolveDependency(source, baseFile) {

@@ -21,17 +21,35 @@ export default class EventDispatcher {
     this.eventEmitter.eventNames().forEach(event => this.eventEmitter.removeAllListeners(event));
     this.views = views;
 
-    this.eventEmitter.on(EventType.Compile, (payload) => {
-      if (null == payload.err) {
-        this.views.consoleView.log({data: payload.toString(), level: "info"});
-        this.views.athenaIdeView.showCompileResult(payload);
-      } else {
-        this.views.consoleView.log({data: payload.toString(), level: "error"});
-      }
+    this.eventEmitter.on(EventType.AppendLog, (payload) => {
+      this.views.consoleView.log({data: payload.data, level: payload.level});
     });
 
-    this.eventEmitter.on(EventType.UpdateCompiledTarget, (payload) => {
-      this.views.athenaIdeView.selectCompiledTarget(payload);
+    this.eventEmitter.on(EventType.NewCompileTarget, (payload) => {
+      this.views.athenaIdeView.newCompileInfo(payload);
+    });
+    this.eventEmitter.on(EventType.ChangeCompileTarget, (payload) => {
+      this.views.athenaIdeView.selectFile(payload);
+    });
+
+    this.eventEmitter.on(EventType.NewNode, (payload) => {
+      this.views.athenaIdeView.selectNode(payload);
+    });
+    this.eventEmitter.on(EventType.ChangeNode, (payload) => {
+      this.views.athenaIdeView.selectNode(payload);
+    });
+
+    this.eventEmitter.on(EventType.NewAccount, (payload) => {
+      this.views.athenaIdeView.selectAccount(payload);
+    });
+    this.eventEmitter.on(EventType.ImportAccount, (payload) => {
+      this.views.athenaIdeView.selectAccount(payload);
+    });
+    this.eventEmitter.on(EventType.ExportAccount, (payload) => {
+      // do nothing
+    });
+    this.eventEmitter.on(EventType.ChangeAccount, (payload) => {
+      this.views.athenaIdeView.selectAccount(payload);
     });
   }
 

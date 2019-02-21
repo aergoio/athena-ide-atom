@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Select from 'react-select';
+import CreatableSelect from 'react-select/lib/Creatable';
 import PropTypes from 'prop-types';
 
 const selectBoxClass = 'component-selectbox';
@@ -13,14 +14,17 @@ export default class SelectBox extends React.Component {
       context: PropTypes.any,
       value: PropTypes.string,
       options: PropTypes.array,
-      onChange: PropTypes.func
+      onChange: PropTypes.func,
+      isCreatable: PropTypes.bool
     }; 
   }
 
   constructor(props) {
     super(props);
     this.state = { context: props.context };
-    this.onChange = props.onChange.bind(this);
+    if (props.onChange) {
+      this.onChange = props.onChange.bind(this);
+    }
   }
 
   _join() {
@@ -39,13 +43,15 @@ export default class SelectBox extends React.Component {
   }
 
   render() {
+    const ComponentTag = this.props.isCreatable ? CreatableSelect : Select;
     return (
-      <Select
-        className={this._join('inline-block', selectBoxClass)}
+      <ComponentTag
+        className={this._join('inline-block', 'native-key-bindings', selectBoxClass)}
         classNamePrefix={selectBoxClass}
-        onChange={this.onChange}
+        isSearchable={true}
         value={this._generateOption(this.props.value)}
         options={this._generateOptions(this.props.options)}
+        onChange={this.onChange}
       />
     );
   }

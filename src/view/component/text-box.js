@@ -19,7 +19,7 @@ export default class TextBox extends React.Component {
   }
 
   _join() {
-    return Array.from(arguments).join(' ');
+    return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
   }
 
   render() {

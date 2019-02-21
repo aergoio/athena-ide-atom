@@ -21,16 +21,16 @@ export default class CompileView extends React.Component {
     super(props);
   }
 
-  _onCompiledFileChange(selectedOption) {
-    this.props.context.services.updateService.updateCompiledTarget(selectedOption.value);
-  }
-
-  _parseFile(context) {
+  _parseCurrentFile(context) {
     return context.current.file;
   }
 
-  _parseCompiledFiles(context) {
+  _parseFiles(context) {
     return Array.from(context.store.file2CompiledResult.keys());
+  }
+
+  _onCompiledFileChange(selectedOption) {
+    this.props.context.services.compileService.changeCompiledTarget(selectedOption.value);
   }
 
   _parsePayload(context) {
@@ -49,23 +49,23 @@ export default class CompileView extends React.Component {
     return (
       <div className='view'>
         <div className='inset-panel components-holder'>
-          <div className='component'>
+          <div className='components-row'>
             <Title title='Compile Result'/>
           </div>
-          <div className='component'>
+          <div className='components-row'>
             <Description description="File" />
             <SelectBox
-              onChange={this._onCompiledFileChange}
-              value={this._parseFile(this.props.context)}
-              options={this._parseCompiledFiles(this.props.context)}
               context={this.props.context}
+              value={this._parseCurrentFile(this.props.context)}
+              options={this._parseFiles(this.props.context)}
+              onChange={this._onCompiledFileChange}
             />
           </div>
-          <div className='component'>
+          <div className='components-row'>
             <Description description="Payload" />
             <TextBox text={this._parsePayload(this.props.context)} />
           </div>
-          <div className='component'>
+          <div className='components-row'>
             <Description description="ABI" />
             <TextBox class='component-textbox-abi' text={this._parseAbi(this.props.context)} />
           </div>

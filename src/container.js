@@ -5,7 +5,7 @@
 import {CompositeDisposable} from 'atom';
 
 import {EventDispatcher} from './event';
-import {LintService, CompileService, AutoCompleteService, UpdateService} from './service';
+import {AutoCompleteService, LintService, CompileService, NodeService, AccountService} from './service';
 import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView} from './view';
 
 export default {
@@ -37,11 +37,13 @@ export default {
   },
 
   _buildServices(eventDispatcher) {
+    const nodeService = new NodeService(eventDispatcher);
     return {
       autoCompleteService: new AutoCompleteService(eventDispatcher),
       lintService: new LintService(eventDispatcher),
       compileService: new CompileService(eventDispatcher),
-      updateService: new UpdateService(eventDispatcher)
+      nodeService: nodeService,
+      accountService: new AccountService(eventDispatcher, nodeService)
     };
   },
 

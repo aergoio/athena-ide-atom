@@ -23,14 +23,19 @@ export default class AtheneIdeView {
     attribute.value = 'athena-ide-view-root';
     rootNode.setAttributeNode(attribute);
     rootNode.classList.add('athena-ide-view');
+    rootNode.setAttribute('tabindex', '-1');
     return rootNode;
   }
 
   _buildContext(services) {
+    // TODO : refactor those into model
     return {
       current: {
         file: "",
-        hostName: "",
+        node: {
+          url: "localhost:7845",
+          height: "unknown"
+        },
         account: {
           accountAddress: "",
           balance: "",
@@ -46,8 +51,8 @@ export default class AtheneIdeView {
       },
       store: {
         file2CompiledResult: new Map(),
-        hostNames: new Set(),
-        address2Identity: new Map(),
+        nodeUrls: new Set(["localhost:7845", "testnet.aergo.io:7845"]),
+        addresses: new Set(),
         contract2Abi: new Map()
       },
       services: services
@@ -85,14 +90,38 @@ export default class AtheneIdeView {
     // TODO : remove view from the bottom dock
   }
 
-  selectCompiledTarget(selectedFile) {
-    this.context.current.file = selectedFile;
+  newCompileInfo(compileResult) {
+    const file = compileResult.file;
+    this.context.store.file2CompiledResult.set(file, compileResult);
+    this.selectFile(file);
+  }
+
+  selectFile(file) {
+    this.context.current.file = file;
     this.show();
   }
 
-  showCompileResult(compileResult) {
-    this.context.current.file = compileResult.file;
-    this.context.store.file2CompiledResult.set(compileResult.file, compileResult);
+  selectNode(node) {
+    const url = node.url;
+    if (!this.context.store.nodeUrls.has(url)) {
+      this.context.store.nodeUrls.add(url);
+    }
+    this.context.current.node = node;
+    this.show();
+  }
+
+  selectAccount(account) {
+    const accountAddress = account.accountAddress;
+    const balance = account.balance;
+    const nonce = account.nonce;
+    if (!this.context.store.addresses.has(accountAddress)) {
+      this.context.store.addresses.add(accountAddress);
+    }
+    this.context.current.account = {
+      accountAddress: accountAddress,
+      balance: balance,
+      nonce: nonce
+    }
     this.show();
   }
 
