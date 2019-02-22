@@ -40,25 +40,27 @@ export default class ImportAccountButton extends React.Component {
     return (
       <Popup modal trigger={<Button name='Import' />}>
         {close =>
-          <div className='components-holder'>
-            <div className='components-row'>
-              <Title class='' title='Import account with encrypted private key' />
+          <atom-panel class='modal'>
+            <div className='components-holder'>
+              <div className='components-row'>
+                <Title class='' title='Import account with encrypted private key' />
+              </div>
+              <div className='components-row'>
+                <Description description='Private key' />
+                <InputBox onChange={(e) => this._updateEncryptedPrivateKey(e)} type='text'
+                    placeHolder='encrypted private key'/>
+              </div>
+              <div className='components-row'>
+                <Description description='Password' />
+                <InputBox onChange={(e) => this._updatePasswordToDecrypt(e)} type='text'
+                    placeHolder='password to decrypt encrypted private key'/>
+              </div>
+              <div className='components-row components-row-button'>
+                <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
+                <Button name='Cancel' onClick={close}/>
+              </div>
             </div>
-            <div className='components-row'>
-              <Description description='Private key' />
-              <InputBox onChange={(e) => this._updateEncryptedPrivateKey(e)} type='text'
-                  placeHolder='encrypted private key'/>
-            </div>
-            <div className='components-row'>
-              <Description description='Password' />
-              <InputBox onChange={(e) => this._updatePasswordToDecrypt(e)} type='text'
-                  placeHolder='password to decrypt encrypted private key'/>
-            </div>
-            <div className='components-row components-row-button'>
-              <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
-              <Button name='Cancel' onClick={close}/>
-            </div>
-          </div>
+          </atom-panel>
         }
       </Popup>
     );

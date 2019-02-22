@@ -39,20 +39,22 @@ export default class ExportAccountButton extends React.Component {
     return (
       <Popup modal trigger={<Button name='Export' />}>
         {close =>
-          <div className='components-holder'>
-            <div className='components-row'>
-              <Title class='' title='Enter password to decrypt private key' />
+          <atom-panel class='modal'>
+            <div className='components-holder'>
+              <div className='components-row'>
+                <Title class='' title='Enter password to decrypt private key' />
+              </div>
+              <div className='components-row'>
+                <Description description='Password' />
+                <InputBox onChange={(e) => this._updatePasswordToEncrypt(e)} type='text'
+                    placeHolder='password to encrypt private key'/>
+              </div>
+              <div className='components-row components-row-button'>
+                <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
+                <Button name='Cancel' onClick={close}/>
+              </div>
             </div>
-            <div className='components-row'>
-              <Description description='Password' />
-              <InputBox onChange={(e) => this._updatePasswordToEncrypt(e)} type='text'
-                  placeHolder='password to encrypt private key'/>
-            </div>
-            <div className='components-row components-row-button'>
-              <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
-              <Button name='Cancel' onClick={close}/>
-            </div>
-          </div>
+          </atom-panel>
         }
       </Popup>
     );

@@ -26,15 +26,17 @@ export default class NewAccountButton extends React.Component {
     return (
       <Popup modal trigger={<Button name='New' />}>
         {close =>
-          <div className='components-holder'>
-            <div className='components-row'>
-              <Title class='' title='Do you want to make a new account?' />
+          <atom-panel class='modal'>
+            <div className='components-holder'>
+              <div className='components-row'>
+                <Title class='' title='Do you want to make a new account?' />
+              </div>
+              <div className='components-row components-row-button'>
+                <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
+                <Button name='Cancel' onClick={close}/>
+              </div>
             </div>
-            <div className='components-row components-row-button'>
-              <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
-              <Button name='Cancel' onClick={close}/>
-            </div>
-          </div>
+          </atom-panel>
         }
       </Popup>
     );
