@@ -7,11 +7,11 @@ const testBoxClass = 'component-textbox';
 
 export default class TextBox extends React.Component {
 
-  static get propTypes() { 
-    return { 
+  static get propTypes() {
+    return {
       text: PropTypes.string,
       class: PropTypes.class
-    }; 
+    };
   }
 
   constructor(props) {

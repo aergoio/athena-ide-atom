@@ -3,19 +3,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Title from './title';
-import Description from './description';
-import SelectBox from './select-box';
-import TextBox from './text-box';
-import Button from './button';
-import SyncIcon from './sync-icon';
+import {Title, Description, SelectBox, TextBox, SyncIcon} from '../component';
+
 import NewAccountButton from './new-account-button';
 import ImportAccountButton from './import-account-button';
 import ExportAccountButton from './export-account-button';
 
-import logger from '../../logger';
+import logger from '../../../logger';
 
-export default class RunView extends React.Component {
+export default class RunPanel extends React.Component {
 
   static get propTypes() {
     return {
@@ -107,7 +103,7 @@ export default class RunView extends React.Component {
 
   render() {
     return (
-      <div className='view'>
+      <div className='athena-ide-panel'>
 
         <div className='inset-panel components-holder'>
           <div className='components-row'>
@@ -158,6 +154,7 @@ export default class RunView extends React.Component {
             <ExportAccountButton context={this.props.context} />
           </div>
         </div>
+
       </div>
     );
   }

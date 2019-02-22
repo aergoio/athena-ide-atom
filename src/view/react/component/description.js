@@ -7,10 +7,10 @@ const descriptionClass = 'component-description';
 
 export default class Description extends React.Component {
 
-  static get propTypes() { 
-    return { 
+  static get propTypes() {
+    return {
       description: PropTypes.string
-    }; 
+    };
   }
 
   constructor(props) {

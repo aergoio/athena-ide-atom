@@ -9,14 +9,14 @@ const selectBoxClass = 'component-selectbox';
 
 export default class SelectBox extends React.Component {
 
-  static get propTypes() { 
-    return { 
+  static get propTypes() {
+    return {
       context: PropTypes.any,
       value: PropTypes.string,
       options: PropTypes.array,
       onChange: PropTypes.func,
       isCreatable: PropTypes.bool
-    }; 
+    };
   }
 
   constructor(props) {

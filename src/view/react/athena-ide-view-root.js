@@ -3,15 +3,15 @@
 import React from 'react';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import PropTypes from 'prop-types';
-import CompileView from './compile-view';
-import RunView from './run-view';
 
-export default class AthenaIde extends React.Component {
+import {CompilePanel, RunPanel} from './panel';
 
-  static get propTypes() { 
-    return { 
+export default class AthenaIdeViewRoot extends React.Component {
+
+  static get propTypes() {
+    return {
       context: PropTypes.any
-    }; 
+    };
   }
 
   constructor(props) {
@@ -27,10 +27,10 @@ export default class AthenaIde extends React.Component {
           <Tab>Run</Tab>
         </TabList>
         <TabPanel>
-          <CompileView context={this.props.context}/>
+          <CompilePanel context={this.props.context}/>
         </TabPanel>
         <TabPanel>
-          <RunView context={this.props.context}/>
+          <RunPanel context={this.props.context}/>
         </TabPanel>
       </Tabs>
     );

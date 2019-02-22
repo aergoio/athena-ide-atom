@@ -4,7 +4,9 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AthenaIde from './component';
+
+import AthenaIdeViewRoot from './react';
+
 import logger from '../logger';
 
 export default class AtheneIdeView {
@@ -82,7 +84,10 @@ export default class AtheneIdeView {
   show() {
     atom.workspace.getRightDock().show();
     atom.workspace.open(this, {activatePane: false}).then(() => {
-      ReactDOM.render(<AthenaIde context={this.context}/>, document.getElementById('athena-ide-view-root'));
+      ReactDOM.render(
+        <AthenaIdeViewRoot context={this.context}/>,
+        document.getElementById('athena-ide-view-root')
+      );
     });
   }
 

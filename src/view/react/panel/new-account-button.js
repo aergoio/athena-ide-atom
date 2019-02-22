@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Popup from 'reactjs-popup';
-import Title from './title';
-import Button from './button';
 import PropTypes from 'prop-types';
+
+import {Title, Button} from '../component';
 
 export default class NewAccountButton extends React.Component {
 

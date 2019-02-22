@@ -3,18 +3,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Title from './title';
-import Description from './description';
-import SelectBox from './select-box';
-import TextBox from './text-box';
-import logger from '../../logger';
+import {Title, Description, SelectBox, TextBox} from '../component';
 
-export default class CompileView extends React.Component {
+import logger from '../../../logger';
 
-  static get propTypes() { 
-    return { 
+export default class CompilePanel extends React.Component {
+
+  static get propTypes() {
+    return {
       context: PropTypes.any
-    }; 
+    };
   }
 
   constructor(props) {
@@ -47,7 +45,7 @@ export default class CompileView extends React.Component {
 
   render() {
     return (
-      <div className='view'>
+      <div className='athena-ide-panel'>
         <div className='inset-panel components-holder'>
           <div className='components-row'>
             <Title title='Compile Result'/>

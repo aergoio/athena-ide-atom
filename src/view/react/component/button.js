@@ -5,12 +5,12 @@ import PropTypes from 'prop-types';
 
 export default class Button extends React.Component {
 
-  static get propTypes() { 
-    return { 
+  static get propTypes() {
+    return {
       class: PropTypes.class,
       onClick: PropTypes.func,
       name: PropTypes.string
-    }; 
+    };
   }
 
   constructor(props) {
