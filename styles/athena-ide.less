@@ -5,7 +5,10 @@
 @import "ui-variables";
 
 
-.athena-ide-view {
+#athena-ide-panel-root {
+  height: 100%;
+  overflow: scroll;
+
   .react-tabs {
     .react-tabs__tab-list {
       padding-left: 0em;
@@ -24,11 +27,6 @@
       background-color: #21252b;
       background-image: linear-gradient(#2c313a, #21252b);
     }
-  }
-
-  .athena-ide-panel {
-    height: 100vh;
-    overflow: scroll;
   }
 
   .components-holder {
@@ -75,6 +73,7 @@
     .component-selectbox__control {
       background-color: @input-background-color;
       min-height: 0em;
+      height: 100%;
 
       .component-selectbox__value-container {
         padding: 0em;
@@ -98,6 +97,10 @@
   .component-inputbox {
   }
 
+  .component-inputbox-number {
+    text-align: right;
+  }
+
   .component-textbox {
     width: 100%;
     white-space: pre-wrap;
@@ -116,17 +119,9 @@
     text-align: right;
   }
 
-  .component-btn-deploy {
+  .component-btn-runner {
     width: 6em;
-    padding: 0.3em 0em;
-  }
-
-  .component-btn-execute {
-
-  }
-
-  .component-btn-query {
-
+    text-align: center;
   }
 
   .popup-content {

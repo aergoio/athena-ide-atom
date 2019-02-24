@@ -52,7 +52,9 @@ export default class CompileService {
   }
 
   changeCompiledTarget(file) {
-    return Promise.resolve(() => {
+    logger.debug("Change compiled target");
+    logger.debug(file);
+    return new Promise(() => {
       this.eventDispatcher.dispatch(EventType.ChangeCompileTarget, file)
       return file;
     });

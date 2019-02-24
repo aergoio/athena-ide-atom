@@ -5,7 +5,10 @@
 import {CompositeDisposable} from 'atom';
 
 import {EventDispatcher} from './event';
-import {AutoCompleteService, LintService, CompileService, NodeService, AccountService} from './service';
+import {
+  AutoCompleteService, LintService,
+  CompileService, NodeService, AccountService, ContractService
+} from './service';
 import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView} from './view';
 
 export default {
@@ -38,12 +41,14 @@ export default {
 
   _buildServices(eventDispatcher) {
     const nodeService = new NodeService(eventDispatcher);
+    const accountService = new AccountService(nodeService, eventDispatcher);
     return {
       autoCompleteService: new AutoCompleteService(eventDispatcher),
       lintService: new LintService(eventDispatcher),
       compileService: new CompileService(eventDispatcher),
       nodeService: nodeService,
-      accountService: new AccountService(eventDispatcher, nodeService)
+      accountService: accountService,
+      contractService: new ContractService(nodeService, accountService, eventDispatcher)
     };
   },
 

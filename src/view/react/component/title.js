@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {join} from './utils';
+
 const titleClass = 'component-title';
 
 export default class Description extends React.Component {
@@ -17,13 +19,9 @@ export default class Description extends React.Component {
     super(props);
   }
 
-  _join() {
-    return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
-  }
-
   render() {
     return (
-      <div className={this._join('inline-block', titleClass)}>
+      <div className={join('inline-block', titleClass)}>
         {this.props.title}
       </div>
     );

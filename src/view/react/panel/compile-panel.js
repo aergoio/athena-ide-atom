@@ -17,6 +17,7 @@ export default class CompilePanel extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { context: props.context };
   }
 
   _parseCurrentFile(context) {
@@ -28,7 +29,9 @@ export default class CompilePanel extends React.Component {
   }
 
   _onCompiledFileChange(selectedOption) {
-    this.props.context.services.compileService.changeCompiledTarget(selectedOption.value);
+    logger.debug("compiled file change");
+    logger.debug(selectedOption);
+    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
   }
 
   _parsePayload(context) {
@@ -45,7 +48,7 @@ export default class CompilePanel extends React.Component {
 
   render() {
     return (
-      <div className='athena-ide-panel'>
+      <div className='athena-ide-tab-panel'>
         <div className='inset-panel components-holder'>
           <div className='components-row'>
             <Title title='Compile Result'/>
@@ -53,10 +56,9 @@ export default class CompilePanel extends React.Component {
           <div className='components-row'>
             <Description description="File" />
             <SelectBox
-              context={this.props.context}
               value={this._parseCurrentFile(this.props.context)}
               options={this._parseFiles(this.props.context)}
-              onChange={this._onCompiledFileChange}
+              onChange={(o) => this._onCompiledFileChange(o)}
             />
           </div>
           <div className='components-row'>

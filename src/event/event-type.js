@@ -9,7 +9,7 @@ export default {
   NewCompileTarget: "NewCompileTarget",
   ChangeCompileTarget: "ChangeCompileTarget",
 
-  NewNode: "NewNode", // not used
+  NewNode: "NewNode",
   ChangeNode: "ChangeNode",
 
   NewAccount: "NewAccount",

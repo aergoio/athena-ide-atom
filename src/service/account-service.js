@@ -7,15 +7,19 @@ import {
   decryptPrivateKey,
   encryptPrivateKey,
   encodePrivateKey,
+  signTransaction,
+  hashTransaction
 } from '@herajs/crypto';
+import _ from 'lodash';
+
 import {EventType} from '../event';
 import logger from '../logger';
 
 export default class AccountService {
 
-  constructor(eventDispatcher, nodeService) {
-    this.eventDispatcher = eventDispatcher;
+  constructor(nodeService, eventDispatcher) {
     this.nodeService = nodeService;
+    this.eventDispatcher = eventDispatcher;
     this.address2Identity = new Map();
   }
 
@@ -94,6 +98,27 @@ export default class AccountService {
     return this._wrapAccountState(accountAddress).then(account => {
       this.eventDispatcher.dispatch(EventType.ChangeAccount, account);
       return account;
+    });
+  }
+
+  sign(accountAddress, rawTransaction) {
+    logger.debug("sign request with");
+    logger.debug(accountAddress);
+    logger.debug(rawTransaction);
+    if (!this.address2Identity.has(accountAddress)) {
+      const message = "No identity found for " + accountAddress;
+      logger.debug(message);
+      return Promise.reject(message);
+    }
+
+    const signedTransaction = _.cloneDeep(rawTransaction)
+    const identity = this.address2Identity.get(accountAddress);
+    return signTransaction(rawTransaction, identity.keyPair).then(sign => {
+      signedTransaction.sign = sign;
+      return hashTransaction(signedTransaction, "base58");
+    }).then(hash => {
+      signedTransaction.hash = hash;
+      return signedTransaction;
     });
   }
 

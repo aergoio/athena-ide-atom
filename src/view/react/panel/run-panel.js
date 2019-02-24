@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {Title, Description, SelectBox, TextBox, SyncIcon} from '../component';
+import {Button, Title, Description, SelectBox, TextBox, SyncIcon, InputBox} from '../component';
 
 import NewAccountButton from './new-account-button';
 import ImportAccountButton from './import-account-button';
@@ -25,9 +25,9 @@ export default class RunPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newAccountVisible: false,
-      ImportAccountVisible: false,
-      ExportAccountVisible: false
+      context: props.context,
+      price: "",
+      limit: ""
     };
   }
 
@@ -86,7 +86,12 @@ export default class RunPanel extends React.Component {
   }
 
   _onDeployButtonClicked() {
-    logger.debug("deploy contract button clicked");
+    const accountAddress = this.props.context.current.account.accountAddress;
+    const price = this.state.price;
+    const limit = this.state.limit;
+    const currentFile = this.state.context.current.file;
+    const contractPayload = this.state.context.store.file2CompiledResult.get(currentFile).payload;
+    this.props.context.services.contractService.deploy(accountAddress, price, limit, contractPayload);
   }
 
   _parseCurrentFile(context) {
@@ -98,25 +103,24 @@ export default class RunPanel extends React.Component {
   }
 
   _onCompiledFileChange(selectedOption) {
-    this.props.context.services.compileService.changeCompiledTarget(selectedOption.value);
+    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
   }
 
   render() {
     return (
-      <div className='athena-ide-panel'>
+      <div className='athena-ide-tab-panel'>
 
         <div className='inset-panel components-holder'>
           <div className='components-row'>
             <Title title='Enviroment' />
-            <SyncIcon context={this.props.context} onClick={this._syncNodeStatus} />
+            <SyncIcon context={this.props.context} onClick={() => this._syncNodeStatus()} />
           </div>
           <div className='components-row'>
             <Description description='Node' />
             <SelectBox
-              context={this.props.context}
               value={this._parseCurrentNodeUrl(this.props.context)}
               options={this._parseNodeUrls(this.props.context)}
-              onChange={this._onNodeUrlChange}
+              onChange={(o) => this._onNodeUrlChange(o)}
               isCreatable
             />
           </div>
@@ -129,15 +133,14 @@ export default class RunPanel extends React.Component {
         <div className='inset-panel components-holder'>
           <div className='components-row'>
             <Title title='Account' />
-            <SyncIcon context={this.props.context} onClick={this._onSyncAddressStatus} />
+            <SyncIcon context={this.props.context} onClick={() => this._onSyncAddressStatus()} />
           </div>
           <div className='components-row'>
             <Description description='Address' />
             <SelectBox
-              context={this.props.context}
               value={this._parseAddress(this.props.context)}
               options={this._parseAddresses(this.props.context)}
-              onChange={this._onAddressChange}
+              onChange={(o) => this._onAddressChange(o)}
             />
           </div>
           <div className='components-row'>
@@ -152,6 +155,40 @@ export default class RunPanel extends React.Component {
             <NewAccountButton context={this.props.context} />
             <ImportAccountButton context={this.props.context} />
             <ExportAccountButton context={this.props.context} />
+          </div>
+        </div>
+
+        <div className='inset-panel components-holder'>
+          <div className='components-row'>
+            <Title title='Fee' />
+          </div>
+          <div className='components-row'>
+            <Description description='Price' />
+            <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10000 (unit : Aer)'
+                onChange={(e) => this.setState({ price: e.target.value}) }/>
+          </div>
+          <div className='components-row'>
+            <Description description='Limit' />
+            <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10'
+                onChange={(e) => this.setState({ limit: e.target.value}) }/>
+          </div>
+        </div>
+
+        <div className='inset-panel components-holder'>
+          <div className='components-row'>
+            <Title title='Deploy' />
+          </div>
+          <div className='components-row'>
+            <Button
+              name='Deploy'
+              class={['component-btn-runner', 'component-description', 'btn-success']}
+              onClick={() => this._onDeployButtonClicked()}
+            />
+            <SelectBox
+              value={this._parseCurrentFile(this.props.context)}
+              options={this._parseFiles(this.props.context)}
+              onChange={(o) => this._onCompiledFileChange(o)}
+            />
           </div>
         </div>
 

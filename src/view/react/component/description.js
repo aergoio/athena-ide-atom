@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {join} from './utils';
+
 const descriptionClass = 'component-description';
 
 export default class Description extends React.Component {
@@ -19,7 +21,7 @@ export default class Description extends React.Component {
 
   render() {
     return (
-      <div className={'inline-block highlight-info' + ' ' + descriptionClass}>
+      <div className={join('inline-block', 'highlight-info', descriptionClass)}>
         {this.props.description}
       </div>
     );

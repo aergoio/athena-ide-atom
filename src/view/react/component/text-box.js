@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {join} from './utils';
+
 const testBoxClass = 'component-textbox';
 
 export default class TextBox extends React.Component {
@@ -18,13 +20,9 @@ export default class TextBox extends React.Component {
     super(props);
   }
 
-  _join() {
-    return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
-  }
-
   render() {
     return (
-      <div className={this._join('inline-block', testBoxClass, this.props.class)}>
+      <div className={join('inline-block', testBoxClass, this.props.class)}>
         {this.props.text}
       </div>
     );

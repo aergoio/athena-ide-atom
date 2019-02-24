@@ -13,18 +13,15 @@ export default class AtheneIdeView {
 
   constructor(services) {
     this.element = document.createElement('atom-panel');
-    this.element.classList.add('athena-ide-panel');
     this.element.appendChild(this._buildRoot());
-
     this.context = this._buildContext(services);
   }
 
   _buildRoot() {
     let rootNode = document.createElement('div');
     let attribute = document.createAttribute('id');
-    attribute.value = 'athena-ide-view-root';
+    attribute.value = 'athena-ide-panel-root';
     rootNode.setAttributeNode(attribute);
-    rootNode.classList.add('athena-ide-view');
     rootNode.setAttribute('tabindex', '-1');
     return rootNode;
   }
@@ -86,7 +83,7 @@ export default class AtheneIdeView {
     atom.workspace.open(this, {activatePane: false}).then(() => {
       ReactDOM.render(
         <AthenaIdeViewRoot context={this.context}/>,
-        document.getElementById('athena-ide-view-root')
+        document.getElementById('athena-ide-panel-root')
       );
     });
   }
