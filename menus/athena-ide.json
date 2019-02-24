@@ -15,8 +15,12 @@
           "label": "Athena Ide",
           "submenu": [
             {
-              "label": "Compile smart contract",
+              "label": "Compile Smart Contract",
               "command": "athena-ide:compile"
+            },
+            {
+              "label": "Open Athena Ide Panel",
+              "command": "athena-ide-view:show"
             }
           ]
         }
