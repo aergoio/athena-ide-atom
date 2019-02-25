@@ -3,6 +3,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
+import logger from 'loglevel';
 
 import {Title, Description, InputBox, Button} from '../component';
 
@@ -30,6 +31,7 @@ export default class ImportAccountButton extends React.Component {
   _onConfirm() {
     const encryptedPrivateKey = this.state.encryptedPrivateKey;
     const passwordToDecrypt = this.state.passwordToDecrypt;
+    logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
     this.props.context.services.accountService.importAccount(encryptedPrivateKey, passwordToDecrypt);
   }
 

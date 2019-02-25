@@ -3,11 +3,12 @@
 import fs from 'fs';
 import os from 'os';
 import child_process from 'child_process';
+import logger from 'loglevel';
 
 import {LuaImportResolver} from '../lua';
 
 import {EventType} from '../event';
-import logger from '../logger';
+
 
 const LUA_COMPILER_OSX = "aergoluac_osx";
 const LUA_COMPILER_LINUX = "aergoluac_linux";
@@ -25,21 +26,18 @@ export default class CompileService {
   }
 
   compile(filePath) {
-    logger.debug("Resolve compile with");
-    logger.debug(filePath);
+    logger.debug("Resolve compile with", filePath);
 
     const source = this._readFile(filePath);
     const dependencyResolved = this._resolveDependency(source, filePath);
     const tempSourceFile = this._saveToTemp(dependencyResolved);
-    logger.debug("dependency resolved source");
+    logger.debug("Dependency resolved source");
     logger.debug(dependencyResolved);
-    logger.debug("saved to");
-    logger.debug(tempSourceFile);
+    logger.debug("Temp file saved to", tempSourceFile);
 
     const compileResult = this._compile(tempSourceFile);
     compileResult.file = filePath;
-    logger.debug("compile result");
-    logger.debug(compileResult);
+    logger.debug("Compile result", compileResult);
 
     if (null == compileResult.err) {
       this.eventDispatcher.dispatch(EventType.NewCompileTarget, compileResult);
@@ -52,8 +50,7 @@ export default class CompileService {
   }
 
   changeCompiledTarget(file) {
-    logger.debug("Change compiled target");
-    logger.debug(file);
+    logger.debug("Change compiled target to", file);
     return new Promise(() => {
       this.eventDispatcher.dispatch(EventType.ChangeCompileTarget, file)
       return file;
@@ -67,8 +64,7 @@ export default class CompileService {
       const importSource = this.importResolver.getSourceOf(importStatement, baseFile);
       resolvedSource += this.importResolver.getImportTrimmed(importSource);
     });
-    logger.debug("import statements");
-    logger.debug(importStatements);
+    logger.debug("Import statements", importStatements);
     resolvedSource += this.importResolver.getImportTrimmed(source);
     return resolvedSource;
   }
@@ -106,12 +102,10 @@ export default class CompileService {
     };
 
     const compiler = this._resolveCompilerPath();
-    logger.debug("compiler path");
-    logger.debug(compiler);
+    logger.debug("Compiler path:", compiler);
 
     const payloadResult = child_process.spawnSync(compiler, ["--payload", sourceFilePath]);
-    logger.debug("payload result");
-    logger.debug(payloadResult);
+    logger.debug("Payload result:", payloadResult);
     if (this._isSpanFail(payloadResult)) {
       compileResult.err = payloadResult.stderr.toString();
       return compileResult;
@@ -120,8 +114,7 @@ export default class CompileService {
     const abiTempFile = this._appendToTemp(LUA_ABI_TEMP_FILE);
     const bcTempFile = this._appendToTemp(LUA_BC_TEMP_FILE);
     const abiResult = child_process.spawnSync(compiler, ["--abi", abiTempFile, sourceFilePath, bcTempFile]);
-    logger.debug("abi result");
-    logger.debug(abiResult);
+    logger.debug("Abi result:", abiResult);
     if (this._isSpanFail(abiResult)) {
       compileResult.err = abiResult.stderr.toString();
       return compileResult;

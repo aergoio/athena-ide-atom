@@ -1,6 +1,6 @@
 'use babel'
 
-import logger from '../../logger';
+import logger from 'loglevel';
 import {LuaSuggestion, LuaSymbolTable, LuaTableFieldTree, luaTypes} from '../model';
 import {LuaAnalyzer} from '../analyzer';
 
@@ -17,16 +17,17 @@ export default class LuaSuggester {
   }
 
   suggest(source, filePath, prefix, index) {
+    logger.debug("Resolve suggestion with", filePath, prefix, index);
+    logger.debug(source);
     return this.analyzer.analyze(source, filePath).then((analysisInfos) =>
       this._getSuggestions(analysisInfos, filePath, prefix, index)
     );
   }
 
   _getSuggestions(analyzeInfos, filePath, prefix, index) {
-    logger.debug("suggestions with");
-    logger.debug(analyzeInfos);
+    logger.debug("Suggestions with", analyzeInfos);
     const prefixChain = prefix.split(".");
-    logger.debug("prefix chain: " + prefixChain);
+    logger.debug("Prefix chain", prefixChain);
     let suggestions = [];
     if (1 === prefixChain.length) {
       const symbolTables = analyzeInfos.map(a => a.symbolTable);
@@ -41,7 +42,7 @@ export default class LuaSuggester {
   }
 
   _findSuggestionFromSymbolTables(symbolTables, prefix, index, fileName) {
-    logger.debug("visit table with index: " + index);
+    logger.debug("Visit table with index", index);
     logger.debug(symbolTables);
     let suggestions = [];
     symbolTables.forEach(symbolTable => {

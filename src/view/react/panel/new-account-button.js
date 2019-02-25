@@ -3,6 +3,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
+import logger from 'loglevel';
 
 import {Title, Button} from '../component';
 
@@ -19,6 +20,7 @@ export default class NewAccountButton extends React.Component {
   }
 
   _onConfirm() {
+    logger.debug("New account confirm button clicked");
     this.props.context.services.accountService.newAccount();
   }
 

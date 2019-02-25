@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import {$$, View} from 'atom-space-pen-views';
+import logger from 'loglevel';
 
 export default class ConsoleView extends View {
 
@@ -42,6 +43,7 @@ export default class ConsoleView extends View {
 
   log(message) {
     this.show().then(() => {
+      logger.debug("Log message:", message);
       const data = message.data.toString();
       const level = message.level;
       const dataWithTime = this._wrapTime(data);

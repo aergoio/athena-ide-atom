@@ -1,7 +1,7 @@
 'use babel';
 
 import {LuaSuggester} from '../lua';
-import logger from '../logger';
+import logger from 'loglevel';
 
 export default class AutoCompleteService {
 
@@ -11,11 +11,7 @@ export default class AutoCompleteService {
   }
 
   suggest(source, filePath, prefix, index) {
-    logger.debug("Resolve suggestion with")
-    logger.debug(filePath);
-    logger.debug(source);
-    logger.debug(prefix);
-    logger.debug(index);
+    logger.debug("Resolve suggestion with", filePath, prefix, index);
     return this.luaSuggester.suggest(source, filePath, prefix, index);
   }
 

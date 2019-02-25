@@ -1,7 +1,7 @@
 'use babel';
 
 import {LuaLinter} from '../lua';
-import logger from '../logger';
+import logger from 'loglevel';
 
 export default class LintService {
 
@@ -11,9 +11,7 @@ export default class LintService {
   }
 
   lint(source, filePath) {
-    logger.debug("Resolve lint with")
-    logger.debug(filePath);
-    logger.debug(source);
+    logger.debug("Resolve lint with", filePath);
     return this.luaLinter.lint(source, filePath);
   }
 

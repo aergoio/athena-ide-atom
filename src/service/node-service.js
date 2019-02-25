@@ -1,8 +1,8 @@
 'use babel';
 
 import {AergoClient, GrpcProvider} from '@herajs/client';
+import logger from 'loglevel';
 import {EventType} from '../event';
-import logger from '../logger';
 
 export default class NodeService {
 
@@ -12,8 +12,7 @@ export default class NodeService {
   }
 
   newNode(newNodeUrl) {
-    logger.debug("new node");
-    logger.debug(newNodeUrl);
+    logger.debug("New node", newNodeUrl);
     this.client.setProvider(this._getProviderWithUrl(newNodeUrl));
     return this._getNodeState(newNodeUrl).then((node => {
       this.eventDispatcher.dispatch(EventType.NewNode, node);
@@ -23,8 +22,7 @@ export default class NodeService {
   }
 
   changeNode(nodeUrl) {
-    logger.debug("change node to");
-    logger.debug(nodeUrl);
+    logger.debug("Change node to", nodeUrl);
     this.client.setProvider(this._getProviderWithUrl(nodeUrl));
     return this._getNodeState(nodeUrl).then((node => {
       this.eventDispatcher.dispatch(EventType.ChangeNode, node);
@@ -38,11 +36,9 @@ export default class NodeService {
 
   _getNodeState(url) {
     return this.getClient().blockchain().then((nodeStatus) => {
-      logger.debug("quried node state");
-      logger.debug(nodeStatus);
+      logger.debug("Quried node state", nodeStatus);
       return { url: url, height: nodeStatus.bestHeight };
     }).catch((err) => {
-      logger.debug("quried node state err");
       logger.debug(err);
       return { url: url, height: "unknown" };
     });

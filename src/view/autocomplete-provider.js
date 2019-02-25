@@ -1,6 +1,6 @@
 'use babel';
 
-import logger from '../logger';
+import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
 
 const prefixParsingEnd = [";", "(", ")", "{", "}"];
@@ -19,8 +19,7 @@ export default class AutoCompleteProvider {
   }
 
   getSuggestions(request) {
-    logger.debug("Resolve suggestions with");
-    logger.debug(request);
+    logger.debug("Resolve suggestions with", request);
 
     // resolve origin prefix info in editor
     const textBuffer = request.editor.getBuffer();
@@ -28,20 +27,15 @@ export default class AutoCompleteProvider {
     const originPrefix = request.prefix;
     const originPrefixEndIndex = textBuffer.characterIndexForPosition(request.bufferPosition);
     const originPrefixStartIndex = originPrefixEndIndex - originPrefix.length;
-    logger.debug("origin prefix")
-    logger.debug(originPrefix);
-    logger.debug("start")
-    logger.debug(originPrefixStartIndex);
-    logger.debug("end")
-    logger.debug(originPrefixEndIndex );
+    logger.debug("Origin prefix:", originPrefix, "start index:",
+        originPrefixStartIndex, "end index:", originPrefixEndIndex);
 
     // parse prefix info in line
     const currentLineStartIndex = textBuffer.characterIndexForPosition({row: cursorPosition.row, column: 0});
     const originPrefixStart = originPrefixStartIndex - currentLineStartIndex;
     const currentLine = textBuffer.lineForRow(cursorPosition.row);
     const prefixInfo = this._resolvePrefix(originPrefix, originPrefixStart, currentLine);
-    logger.debug("parsed prefix")
-    logger.info(prefixInfo)
+    logger.debug("Parsed prefix:", prefixInfo);
 
     // resolve parsed prefix info in editor
     const textInIndex = (startIndex, endIndex) => {
@@ -55,11 +49,9 @@ export default class AutoCompleteProvider {
     const filePath = textBuffer.getPath();
 
     return this.services.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
-      logger.debug("Raw suggestions");
-      logger.debug(rawSuggestions);
+      logger.debug("Raw suggestions:", rawSuggestions);
       const atomSuggestions = rawSuggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion));
-      logger.info("Atom suggestions");
-      logger.info(atomSuggestions);
+      logger.info("Atom suggestions:", atomSuggestions);
       return atomSuggestions;
     });
   }
@@ -69,7 +61,7 @@ export default class AutoCompleteProvider {
     let buffer = originPrefix;
     let cannotFillBuffer = false;
     let index = originPrefixStart - 1;
-    logger.debug("member tracking from: " + index);
+    logger.debug("Member tracking from: ", index);
     while (index >= 0 && prefixParsingEnd.indexOf(line[index]) === -1) {
       if (line[index] === " ") {
         if (buffer.length > 0) {

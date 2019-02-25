@@ -3,6 +3,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
+import logger from 'loglevel';
 
 import {Title, Description, InputBox, Button} from '../component';
 
@@ -29,6 +30,7 @@ export default class ExportAccountButton extends React.Component {
   _onConfirm() {
     const accountAddress = this.state.context.current.account.accountAddress;
     const passwordToEncrypt = this.state.passwordToEncrypt;
+    logger.debug("Export account button clicked with", accountAddress);
     this.props.context.services.accountService.exportAccount(accountAddress, passwordToEncrypt);
   }
 

@@ -4,10 +4,9 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import logger from 'loglevel';
 
 import AthenaIdeViewRoot from './react';
-
-import logger from '../logger';
 
 export default class AtheneIdeView {
 
@@ -93,17 +92,20 @@ export default class AtheneIdeView {
   }
 
   newCompileInfo(compileResult) {
+    logger.debug("Update view with new compile result", compileResult);
     const file = compileResult.file;
     this.context.store.file2CompiledResult.set(file, compileResult);
     this.selectFile(file);
   }
 
   selectFile(file) {
+    logger.debug("Update view with selected file", file);
     this.context.current.file = file;
     this.show();
   }
 
   selectNode(node) {
+    logger.debug("Update view with selected node", node);
     const url = node.url;
     if (!this.context.store.nodeUrls.has(url)) {
       this.context.store.nodeUrls.add(url);
@@ -113,6 +115,7 @@ export default class AtheneIdeView {
   }
 
   selectAccount(account) {
+    logger.debug("Update view with selected account", account);
     const accountAddress = account.accountAddress;
     const balance = account.balance;
     const nonce = account.nonce;

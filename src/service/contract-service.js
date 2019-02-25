@@ -1,9 +1,9 @@
 'use babel';
 
 import {Contract} from '@herajs/client';
+import logger from 'loglevel';
 
 import {EventType} from '../event';
-import logger from '../logger';
 
 const pendingInterval = 3000;
 const successCreatedStatus = "CREATED";
@@ -18,18 +18,13 @@ export default class ContractService {
   }
 
   deploy(accountAddress, price, limit, contractPayload) {
-    logger.debug("deploy with");
-    logger.debug(accountAddress);
-    logger.debug(price);
-    logger.debug(limit);
-    logger.debug(contractPayload);
+    logger.debug("Deploy with", accountAddress, price, limit, contractPayload);
 
     const trimmedPayload = contractPayload.trim();
     const payload = Contract.fromCode(trimmedPayload).asPayload([10]);
     this._try(accountAddress, (nonce) => {
       return this._buildDeployTx(accountAddress, "", nonce, payload).then(signedTx => {
-        logger.debug("signed tx");
-        logger.debug(signedTx);
+        logger.debug("Signed tx", signedTx);
         this._logInfo("Deploying..");
         return this.nodeService.getClient().sendSignedTransaction(signedTx);
       });

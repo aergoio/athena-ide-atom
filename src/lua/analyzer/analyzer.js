@@ -1,5 +1,7 @@
 'use babel';
 
+import logger from 'loglevel';
+
 import LuaImportResolver from './import-resolver';
 import LuaAnalysisGenerator from './analysis-generator';
 
@@ -11,6 +13,8 @@ export default class LuaAnalyzer {
   }
 
   analyze(source, filePath) {
+    logger.debug("Analyze", filePath);
+    logger.debug(source);
     const analysisInfos = [];
     const importStatements = this.importResolver.extractImportStatements(source);
     importStatements.forEach(importStatement => {

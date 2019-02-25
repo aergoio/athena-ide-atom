@@ -1,6 +1,6 @@
 'use babel';
 
-import logger from '../logger';
+import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
 
 export default class LintProvider {
@@ -20,6 +20,7 @@ export default class LintProvider {
     const textBuffer = textEditor.getBuffer();
     const source = textBuffer.getText();
     const filePath = textBuffer.getPath();
+    logger.debug("Lint request with", filePath);
     
     const indexToPosition = (index) => textBuffer.positionForCharacterIndex(index);
     const indexToLineEndingPotision = (index) => {
@@ -29,11 +30,9 @@ export default class LintProvider {
     };
 
     return this.services.lintService.lint(source, filePath).then((rawLints) => {
-      logger.debug("Raw lints");
-      logger.debug(rawLints);
+      logger.debug("Raw lints:", rawLints);
       const atomLints = rawLints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
-      logger.info("Atom lints");
-      logger.info(atomLints);
+      logger.info("Atom lints:", atomLints);
       return atomLints;
     });
   }

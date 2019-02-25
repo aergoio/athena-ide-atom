@@ -11,9 +11,9 @@ import {
   hashTransaction
 } from '@herajs/crypto';
 import _ from 'lodash';
+import logger from 'loglevel';
 
 import {EventType} from '../event';
-import logger from '../logger';
 
 export default class AccountService {
 
@@ -25,8 +25,7 @@ export default class AccountService {
 
   newAccount() {
     const identity = createIdentity();
-    logger.debug("new account identity");
-    logger.debug(identity);
+    logger.debug("New account identity address:", identity.address);
     this._addIdentity(identity);
     return this._wrapAccountState(identity.address).then(account => {
       this.eventDispatcher.dispatch(EventType.NewAccount, account);
@@ -38,16 +37,13 @@ export default class AccountService {
   }
 
   importAccount(encryptedPrivateKey, password) {
-    logger.debug("import account with");
-    logger.debug(encryptedPrivateKey);
-    logger.debug(password);
+    logger.debug("Import account with", encryptedPrivateKey);
     try {
       const encryptedBytes = decodePrivateKey(encryptedPrivateKey);
       return decryptPrivateKey(encryptedBytes, password).then(decryptedBytes => {
-        return identifyFromPrivateKey(decryptedBytes)
+        identifyFromPrivateKey(decryptedBytes)
       }).then(identity => {
-        logger.debug("imported account identity");
-        logger.debug(identity);
+        logger.debug("Imported account identity address:", identity.address);
         this._addIdentity(identity);
         return this._wrapAccountState(identity.address);
       }).then(account => {
@@ -65,20 +61,14 @@ export default class AccountService {
  }
 
   exportAccount(accountAddress, password) {
-    logger.debug("export account with");
-    logger.debug(accountAddress);
-    logger.debug(password);
+    logger.debug("Export account of", accountAddress);
     if (!this.address2Identity.has(accountAddress)) {
       return Promise.resolve("");
     }
 
     return Promise.resolve(this.address2Identity.get(accountAddress))
               .then(identity => {
-                logger.debug("found identity");
-                logger.debug(identity);
                 const rawArray = new Uint8Array(identity.privateKey.toArray());
-                logger.debug("raw array");
-                logger.debug(rawArray);
                 return encryptPrivateKey(rawArray, password);
               }).then(encryptedBytes => {
                 const encodedEncryptedOne = encodePrivateKey(encryptedBytes);
@@ -93,8 +83,7 @@ export default class AccountService {
   }
 
   changeAccount(accountAddress) {
-    logger.debug("change account");
-    logger.debug(accountAddress);
+    logger.debug("Change account to", accountAddress);
     return this._wrapAccountState(accountAddress).then(account => {
       this.eventDispatcher.dispatch(EventType.ChangeAccount, account);
       return account;
@@ -102,9 +91,7 @@ export default class AccountService {
   }
 
   sign(accountAddress, rawTransaction) {
-    logger.debug("sign request with");
-    logger.debug(accountAddress);
-    logger.debug(rawTransaction);
+    logger.debug("Sign request with", accountAddress, rawTransaction);
     if (!this.address2Identity.has(accountAddress)) {
       const message = "No identity found for " + accountAddress;
       logger.debug(message);
@@ -123,8 +110,6 @@ export default class AccountService {
   }
 
   _addIdentity(identity) {
-    logger.debug("add new identity");
-    logger.debug(identity);
     this.address2Identity.set(identity.address, identity);
   }
 
@@ -134,11 +119,9 @@ export default class AccountService {
 
   _wrapAccountState(accountAddress) {
     return this.nodeService.getClient().getState(accountAddress).then(queriedState => {
-      logger.debug("quried account state");
-      logger.debug(queriedState);
+      logger.debug("Quried account state:", queriedState);
       return this._buildAccount(accountAddress, queriedState.balance.value.toString(), queriedState.nonce);
     }).catch(err => {
-      logger.debug("quried account state err");
       logger.debug(err);
       return this._buildAccount(accountAddress, "unknown", "unknown");
     });

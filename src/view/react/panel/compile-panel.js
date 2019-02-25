@@ -2,10 +2,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import logger from 'loglevel';
 
 import {Title, Description, SelectBox, TextBox} from '../component';
-
-import logger from '../../../logger';
 
 export default class CompilePanel extends React.Component {
 
@@ -20,30 +19,29 @@ export default class CompilePanel extends React.Component {
     this.state = { context: props.context };
   }
 
-  _parseCurrentFile(context) {
-    return context.current.file;
+  _parseCurrentFile() {
+    return this.state.context.current.file;
   }
 
-  _parseFiles(context) {
-    return Array.from(context.store.file2CompiledResult.keys());
+  _parseFiles() {
+    return Array.from(this.state.context.store.file2CompiledResult.keys());
   }
 
-  _onCompiledFileChange(selectedOption) {
-    logger.debug("compiled file change");
-    logger.debug(selectedOption);
-    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
-  }
-
-  _parsePayload(context) {
-    const file = context.current.file;
-    const file2CompiledResult = context.store.file2CompiledResult;
+  _parsePayload() {
+    const file = this.state.context.current.file;
+    const file2CompiledResult = this.state.context.store.file2CompiledResult;
     return file2CompiledResult.has(file) ? file2CompiledResult.get(file).payload : "";
   }
 
-  _parseAbi(context) {
-    const file = context.current.file;
-    const file2CompiledResult = context.store.file2CompiledResult;
+  _parseAbi() {
+    const file = this.state.context.current.file;
+    const file2CompiledResult = this.state.context.store.file2CompiledResult;
     return file2CompiledResult.has(file) ? file2CompiledResult.get(file).abi : "";
+  }
+
+  _onCompiledFileChange(selectedOption) {
+    logger.debug("Compiled file change", selectedOption);
+    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
   }
 
   render() {
@@ -56,18 +54,18 @@ export default class CompilePanel extends React.Component {
           <div className='components-row'>
             <Description description="File" />
             <SelectBox
-              value={this._parseCurrentFile(this.props.context)}
-              options={this._parseFiles(this.props.context)}
+              value={this._parseCurrentFile()}
+              options={this._parseFiles()}
               onChange={(o) => this._onCompiledFileChange(o)}
             />
           </div>
           <div className='components-row'>
             <Description description="Payload" />
-            <TextBox text={this._parsePayload(this.props.context)} />
+            <TextBox text={this._parsePayload()} />
           </div>
           <div className='components-row'>
             <Description description="ABI" />
-            <TextBox class='component-textbox-abi' text={this._parseAbi(this.props.context)} />
+            <TextBox class='component-textbox-abi' text={this._parseAbi()} />
           </div>
         </div>
       </div>

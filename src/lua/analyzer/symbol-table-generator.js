@@ -1,10 +1,11 @@
 'use babel';
 
+import logger from 'loglevel';
+
 import {LuaSymbolTable, luaTypes} from '../model';
 
 import Visitor from './visitor';
 import * as luaparseType from './luaparse-types';
-import logger from '../../logger';
 
 export default class LuaSymbolTableGenerator extends Visitor {
 
@@ -19,8 +20,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
     while (!this.symbolTable.isRoot()) {
       this.symbolTable = this.symbolTable.getParent();
     }
-    logger.debug("generated symbol table");
-    logger.debug(this.symbolTable);
+    logger.debug("Generated symbol table", this.symbolTable);
     return this.symbolTable;
   }
 

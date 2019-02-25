@@ -1,10 +1,11 @@
 'use babel';
 
+import logger from 'loglevel';
+
 import {LuaTableFieldTree} from '../model';
 
 import Visitor from './visitor';
 import * as luaparseType from './luaparse-types';
-import logger from '../../logger';
 
 export default class LuaTableFieldTreeGenerator extends Visitor {
 
@@ -80,7 +81,7 @@ export default class LuaTableFieldTreeGenerator extends Visitor {
       } else if (luaparseType.LUAPARSE_TABLE_VALUE === fieldType) {
         this.tableFieldTree.addEntry(tableName, field.value.name);
       } else {
-        logger.warn("Unexpected table field type: " + fieldType);
+        logger.warn("Unexpected table field type", fieldType);
       }
     });
   }

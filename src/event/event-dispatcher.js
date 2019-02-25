@@ -1,8 +1,8 @@
 'use babel';
 
-import logger from '../logger';
-
 import EventEmitter from 'events';
+import logger from 'loglevel';
+
 import EventType from './event-type';
 
 export default class EventDispatcher {
@@ -12,8 +12,7 @@ export default class EventDispatcher {
   }
 
   dispatch(eventType, payload) {
-    logger.debug("Dispatch event: " + eventType);
-    logger.debug(payload);
+    logger.debug("Dispatch event", eventType, payload);
     this.eventEmitter.emit(eventType, payload);
   }
 

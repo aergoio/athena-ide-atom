@@ -2,14 +2,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import logger from 'loglevel';
 
 import {Button, Title, Description, SelectBox, TextBox, SyncIcon, InputBox} from '../component';
 
 import NewAccountButton from './new-account-button';
 import ImportAccountButton from './import-account-button';
 import ExportAccountButton from './export-account-button';
-
-import logger from '../../../logger';
 
 export default class RunPanel extends React.Component {
 
@@ -31,78 +30,91 @@ export default class RunPanel extends React.Component {
     };
   }
 
-  _parseCurrentNodeUrl(context) {
-    return context.current.node.url;
+  _parseCurrentNodeUrl() {
+    return this.state.context.current.node.url;
   }
 
-  _parseNodeUrls(context) {
-    return Array.from(context.store.nodeUrls.keys());
+  _parseNodeUrls() {
+    return Array.from(this.state.context.store.nodeUrls.keys());
+  }
+
+  _parseNodeHeight() {
+    return this.state.context.current.node.height;
+  }
+
+  _parseAddress() {
+    return this.state.context.current.account.accountAddress;
+  }
+
+  _parseBalance() {
+    return this.state.context.current.account.balance;
+  }
+
+  _parseNonce() {
+    return this.state.context.current.account.nonce;
+  }
+
+  _parseAddresses() {
+    return Array.from(this.state.context.store.addresses.keys());
+  }
+
+  _parseCurrentFile() {
+    return this.state.context.current.file;
+  }
+
+  _parseFiles() {
+    return Array.from(this.state.context.store.file2CompiledResult.keys());
   }
 
   _syncNodeStatus() {
-    const nodeUrl = this.props.context.current.node.url;
-    this.props.context.services.nodeService.changeNode(nodeUrl).then(() => {
-      const accountAddress = this.props.context.current.account.accountAddress;
-      if ("" !== accountAddress) {
-        this.props.context.services.accountService.changeAccount(accountAddress)
-      }
-    });
+    const nodeUrl = this.state.context.current.node.url;
+    logger.debug("Sync node status request with", nodeUrl);
+    this._updateNodeAndAccountStatus(nodeUrl);
   }
 
   _onNodeUrlChange(selectedNodeUrl) {
-    this.props.context.services.nodeService.changeNode(selectedNodeUrl.value).then(() => {
-      const accountAddress = this.props.context.current.account.accountAddress;
-      this.props.context.services.accountService.changeAccount(accountAddress)
+    logger.debug("Node url change", selectedNodeUrl);
+    this._updateNodeAndAccountStatus(selectedNodeUrl.value);
+  }
+
+  _updateNodeAndAccountStatus(nodeUrl) {
+    logger.debug("Update node status of", nodeUrl);
+    this.state.context.services.nodeService.changeNode(nodeUrl).then(() => {
+      const accountAddress = this.state.context.current.account.accountAddress;
+      this._updateAccountStatus(accountAddress);
     });
   }
 
-  _parseNodeHeight(context) {
-    return context.current.node.height;
-  }
-
-  _parseAddress(context) {
-    return context.current.account.accountAddress;
-  }
-
-  _parseBalance(context) {
-    return context.current.account.balance;
-  }
-
-  _parseNonce(context) {
-    return context.current.account.nonce;
-  }
-
-  _parseAddresses(context) {
-    return Array.from(context.store.addresses.keys());
-  }
-
   _onSyncAddressStatus() {
-    const accountAddress = this.props.context.current.account.accountAddress;
-    this.props.context.services.accountService.changeAccount(accountAddress);
+    const accountAddress = this.state.context.current.account.accountAddress;
+    logger.debug("Sync account status request with", accountAddress);
+    this._updateAccountStatus(accountAddress);
   }
 
   _onAddressChange(selectedAddress) {
-    this.props.context.services.accountService.changeAccount(selectedAddress.value);
+    logger.debug("Account address change to", selectedAddress);
+    this._updateAccountStatus(selectedAddress.value);
+  }
+
+  _updateAccountStatus(accountAddress) {
+    if ("" !== accountAddress) {
+      logger.debug("Update account status", accountAddress);
+      this.state.context.services.accountService.changeAccount(accountAddress)
+    }
   }
 
   _onDeployButtonClicked() {
-    const accountAddress = this.props.context.current.account.accountAddress;
+    const accountAddress = this.state.context.current.account.accountAddress;
     const price = this.state.price;
     const limit = this.state.limit;
     const currentFile = this.state.context.current.file;
     const contractPayload = this.state.context.store.file2CompiledResult.get(currentFile).payload;
-    this.props.context.services.contractService.deploy(accountAddress, price, limit, contractPayload);
-  }
-
-  _parseCurrentFile(context) {
-    return context.current.file;
-  }
-
-  _parseFiles(context) {
-    return Array.from(context.store.file2CompiledResult.keys());
+    logger.debug("Deploy button clicked with", price, limit, currentFile, contractPayload);
+    this.state.context.services.contractService.deploy(accountAddress, price, limit, contractPayload);
   }
 
   _onCompiledFileChange(selectedOption) {
+    logger.debug("Compiled file change", selectedOption);
     this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
   }
 
@@ -126,7 +138,7 @@ export default class RunPanel extends React.Component {
           </div>
           <div className='components-row'>
             <Description description='Height' />
-            <TextBox class='component-textbox-number' text={this._parseNodeHeight(this.props.context)} />
+            <TextBox class='component-textbox-number' text={this._parseNodeHeight()} />
           </div>
         </div>
 
@@ -138,8 +150,8 @@ export default class RunPanel extends React.Component {
           <div className='components-row'>
             <Description description='Address' />
             <SelectBox
-              value={this._parseAddress(this.props.context)}
-              options={this._parseAddresses(this.props.context)}
+              value={this._parseAddress()}
+              options={this._parseAddresses()}
               onChange={(o) => this._onAddressChange(o)}
             />
           </div>
@@ -185,8 +197,8 @@ export default class RunPanel extends React.Component {
               onClick={() => this._onDeployButtonClicked()}
             />
             <SelectBox
-              value={this._parseCurrentFile(this.props.context)}
-              options={this._parseFiles(this.props.context)}
+              value={this._parseCurrentFile()}
+              options={this._parseFiles()}
               onChange={(o) => this._onCompiledFileChange(o)}
             />
           </div>
