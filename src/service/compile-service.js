@@ -9,7 +9,6 @@ import {LuaImportResolver} from '../lua';
 
 import {EventType} from '../event';
 
-
 const LUA_COMPILER_OSX = "aergoluac_osx";
 const LUA_COMPILER_LINUX = "aergoluac_linux";
 const LUA_COMPILER_WINDOW = "aergoluac_window";
@@ -41,9 +40,11 @@ export default class CompileService {
 
     if (null == compileResult.err) {
       this.eventDispatcher.dispatch(EventType.NewCompileTarget, compileResult);
-      this.eventDispatcher.dispatch(EventType.AppendLog, { data: compileResult.toString(), level: "info" });
+      this.eventDispatcher.dispatch(EventType.Log, { message: compileResult, level: "info" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Compiled successfully", level: "success" });
     } else {
-      this.eventDispatcher.dispatch(EventType.AppendLog, { data: compileResult.toString(), level: "error" });
+      this.eventDispatcher.dispatch(EventType.Log, { message: compileResult, level: "error" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Compile failed", level: "error" });
     }
 
     return Promise.resolve(compileResult);

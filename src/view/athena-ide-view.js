@@ -79,6 +79,7 @@ export default class AtheneIdeView {
 
   show() {
     atom.workspace.getRightDock().show();
+    logger.debug("Show ide view, context:", this.context);
     atom.workspace.open(this, {activatePane: false}).then(() => {
       ReactDOM.render(
         <AthenaIdeViewRoot context={this.context}/>,

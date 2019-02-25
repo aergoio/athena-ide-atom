@@ -20,8 +20,12 @@ export default class EventDispatcher {
     this.eventEmitter.eventNames().forEach(event => this.eventEmitter.removeAllListeners(event));
     this.views = views;
 
-    this.eventEmitter.on(EventType.AppendLog, (payload) => {
-      this.views.consoleView.log({data: payload.data, level: payload.level});
+    this.eventEmitter.on(EventType.Log, (payload) => {
+      this.views.consoleView.log({message: payload.message, level: payload.level});
+    });
+
+    this.eventEmitter.on(EventType.Notify, (payload) => {
+      this.views.notificationView.notify({message: payload.message, level: payload.level});
     });
 
     this.eventEmitter.on(EventType.NewCompileTarget, (payload) => {
@@ -49,6 +53,16 @@ export default class EventDispatcher {
     });
     this.eventEmitter.on(EventType.ChangeAccount, (payload) => {
       this.views.athenaIdeView.selectAccount(payload);
+    });
+
+    this.eventEmitter.on(EventType.Deploy, (payload) => {
+      // TODO
+    });
+    this.eventEmitter.on(EventType.Execute, (payload) => {
+      // TODO
+    });
+    this.eventEmitter.on(EventType.Query, (payload) => {
+      // TODO
     });
   }
 

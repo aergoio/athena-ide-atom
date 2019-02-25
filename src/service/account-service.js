@@ -14,6 +14,7 @@ import _ from 'lodash';
 import logger from 'loglevel';
 
 import {EventType} from '../event';
+import {isEmpty} from './utils';
 
 export default class AccountService {
 
@@ -27,63 +28,98 @@ export default class AccountService {
     const identity = createIdentity();
     logger.debug("New account identity address:", identity.address);
     this._addIdentity(identity);
+
     return this._wrapAccountState(identity.address).then(account => {
       this.eventDispatcher.dispatch(EventType.NewAccount, account);
-      this.eventDispatcher.dispatch(EventType.AppendLog, { data: account, level: "info" });
+      this.eventDispatcher.dispatch(EventType.Log, { message: account, level: "info" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Created account successfully", level: "success" });
       return account;
     }).catch(err => {
-      this.eventDispatcher.dispatch(EventType.AppendLog, { data: err, level: "error" });
+      this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Creating account failed", level: "error" });
     });
   }
 
   importAccount(encryptedPrivateKey, password) {
     logger.debug("Import account with", encryptedPrivateKey);
-    try {
-      const encryptedBytes = decodePrivateKey(encryptedPrivateKey);
-      return decryptPrivateKey(encryptedBytes, password).then(decryptedBytes => {
-        identifyFromPrivateKey(decryptedBytes)
-      }).then(identity => {
-        logger.debug("Imported account identity address:", identity.address);
-        this._addIdentity(identity);
-        return this._wrapAccountState(identity.address);
-      }).then(account => {
-        this.eventDispatcher.dispatch(EventType.ImportAccount, account);
-        this.eventDispatcher.dispatch(EventType.AppendLog, { data: account, level: "info" });
-        return account;
-      }).catch(err => {
-        logger.error(err);
-        this.eventDispatcher.dispatch(EventType.AppendLog, { data: err, level: "error" });
-      });
-    } catch (err) {
-      logger.error(err);
-      this.eventDispatcher.dispatch(EventType.AppendLog, { data: err, level: "error" });
+
+    if (isEmpty(encryptedPrivateKey)) {
+      const message = "Encrypted private key is empty";
+      this._dispatchError(message);
+      return Promise.reject(message);
     }
+
+    if (isEmpty(password)) {
+      const message = "Password to decrypt is empty";
+      this._dispatchError(message);
+      return Promise.reject(message);
+    }
+
+    return Promise.resolve(decodePrivateKey(encryptedPrivateKey)).then(encryptedBytes => {
+      return decryptPrivateKey(encryptedBytes, password);
+    }).then(decryptedBytes => {
+      return identifyFromPrivateKey(decryptedBytes);
+    }).then(identity => {
+      logger.debug("Imported account identity address:", identity.address);
+      this._addIdentity(identity);
+      return this._wrapAccountState(identity.address);
+    }).then(account => {
+      this.eventDispatcher.dispatch(EventType.ImportAccount, account);
+      this.eventDispatcher.dispatch(EventType.Log, { message: account, level: "info" });
+      this.eventDispatcher.dispatch(EventType.Notify,
+            { message: "Successfully imported account " + account.address, level: "success" });
+      return account;
+    }).catch(err => {
+      logger.error(err);
+      this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Importing account failed", level: "error" });
+    });
  }
 
   exportAccount(accountAddress, password) {
     logger.debug("Export account of", accountAddress);
-    if (!this.address2Identity.has(accountAddress)) {
-      return Promise.resolve("");
+
+    if (isEmpty(accountAddress)) {
+      const message = "Selected account is empty";
+      this._dispatchError(message);
+      return Promise.reject(message);
     }
 
-    return Promise.resolve(this.address2Identity.get(accountAddress))
-              .then(identity => {
-                const rawArray = new Uint8Array(identity.privateKey.toArray());
-                return encryptPrivateKey(rawArray, password);
-              }).then(encryptedBytes => {
-                const encodedEncryptedOne = encodePrivateKey(encryptedBytes);
-                const message = { data: { toString: () => "exported: " + encodedEncryptedOne }, level: "info" };
-                this.eventDispatcher.dispatch(EventType.AppendLog, message);
-                this.eventDispatcher.dispatch(EventType.ExportAccount, encodedEncryptedOne);
-                return encodedEncryptedOne;
-              }).catch(err => {
-                logger.error(err);
-                this.eventDispatcher.dispatch(EventType.AppendLog, { data: err, level: "error" });
-              });
+    if (isEmpty(password)) {
+      const message = "Password to decrypt is empty";
+      this._dispatchError(message);
+      return Promise.reject(message);
+    }
+
+    return Promise.resolve(this.address2Identity.get(accountAddress)).then(identity => {
+      if (typeof identity === undefined) {
+        throw "Cannot found identity for " + accountAddress;
+      }
+      const rawArray = new Uint8Array(identity.privateKey.toArray());
+      return encryptPrivateKey(rawArray, password);
+    }).then(encryptedBytes => {
+      const encodedEncryptedOne = encodePrivateKey(encryptedBytes);
+      const message = "exported: " + encodedEncryptedOne;
+      this.eventDispatcher.dispatch(EventType.ExportAccount, encodedEncryptedOne);
+      this.eventDispatcher.dispatch(EventType.Log, { message: message, level: "info" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: message, level: "success" });
+      return encodedEncryptedOne;
+    }).catch(err => {
+      logger.error(err);
+      this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
+      this.eventDispatcher.dispatch(EventType.Notify, { message: "Exporting acconnt failed", level: "error" });
+    });
   }
 
   changeAccount(accountAddress) {
     logger.debug("Change account to", accountAddress);
+
+    if (isEmpty(accountAddress)) {
+      const message = "Selected account is empty";
+      this._dispatchError(message);
+      return Promise.reject(message);
+    }
+
     return this._wrapAccountState(accountAddress).then(account => {
       this.eventDispatcher.dispatch(EventType.ChangeAccount, account);
       return account;
@@ -92,6 +128,7 @@ export default class AccountService {
 
   sign(accountAddress, rawTransaction) {
     logger.debug("Sign request with", accountAddress, rawTransaction);
+
     if (!this.address2Identity.has(accountAddress)) {
       const message = "No identity found for " + accountAddress;
       logger.debug(message);
@@ -107,6 +144,11 @@ export default class AccountService {
       signedTransaction.hash = hash;
       return signedTransaction;
     });
+  }
+
+  _dispatchError(message) {
+    this.eventDispatcher.dispatch(EventType.Log, { message: message, level: "error" });
+    this.eventDispatcher.dispatch(EventType.Notify, { message: message, level: "error" });
   }
 
   _addIdentity(identity) {

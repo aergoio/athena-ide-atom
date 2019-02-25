@@ -1,7 +1,8 @@
 'use babel';
 
 export default {
-  AppendLog: "AppendLog",
+  Log: "Log",
+  Notify: "Notify",
 
   AutoComplete: "AutoComplete",
   Lint: "Lint",

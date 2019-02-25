@@ -81,7 +81,9 @@ export default class RunPanel extends React.Component {
     logger.debug("Update node status of", nodeUrl);
     this.state.context.services.nodeService.changeNode(nodeUrl).then(() => {
       const accountAddress = this.state.context.current.account.accountAddress;
-      this._updateAccountStatus(accountAddress);
+      if ("" !== accountAddress) {
+        this._updateAccountStatus(accountAddress);
+      }
     });
   }
 
@@ -97,10 +99,8 @@ export default class RunPanel extends React.Component {
   }
 
   _updateAccountStatus(accountAddress) {
-    if ("" !== accountAddress) {
-      logger.debug("Update account status", accountAddress);
-      this.state.context.services.accountService.changeAccount(accountAddress)
-    }
+    logger.debug("Update account status", accountAddress);
+    this.state.context.services.accountService.changeAccount(accountAddress)
   }
 
   _onDeployButtonClicked() {

@@ -41,14 +41,14 @@ export default class ConsoleView extends View {
     this.clear();
   }
 
-  log(message) {
+  log(messageAndLevel) {
     this.show().then(() => {
-      logger.debug("Log message:", message);
-      const data = message.data.toString();
-      const level = message.level;
-      const dataWithTime = this._wrapTime(data);
+      logger.debug("Log message:", messageAndLevel);
+      const message = messageAndLevel.message.toString();
+      const level = messageAndLevel.level;
+      const messageWithTime = this._wrapTime(message);
       this.output.append($$(function() {
-        this.div({class: `level-${level}`}, dataWithTime);
+        this.div({class: `level-${level}`}, messageWithTime);
       }));
       this.body.scrollToBottom();
     });

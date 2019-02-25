@@ -9,7 +9,7 @@ import {
   AutoCompleteService, LintService,
   CompileService, NodeService, AccountService, ContractService
 } from './service';
-import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView} from './view';
+import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView, NotificationView} from './view';
 
 export default {
 
@@ -58,7 +58,8 @@ export default {
     this.lintProvider.bindServices(services);
     return {
       athenaIdeView: new AthenaIdeView(services),
-      consoleView: new ConsoleView()
+      consoleView: new ConsoleView(),
+      notificationView: new NotificationView()
     };
   },
 
@@ -73,6 +74,7 @@ export default {
     subscriptions.add(atom.commands.add('atom-workspace', {
       'athena-ide-view:show': () => {
         this.views.athenaIdeView.show();
+        this.views.consoleView.show();
       }
     }));
     return subscriptions;
