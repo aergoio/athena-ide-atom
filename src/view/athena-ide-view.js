@@ -39,11 +39,11 @@ export default class AtheneIdeView {
           balance: "",
           nonce: "",
         },
+        fee: {
+          price: "",
+          limit: ""
+        },
         contract: {
-          fee: {
-            price: "",
-            limit: ""
-          },
           contractAddress: ""
         }
       },
@@ -51,7 +51,7 @@ export default class AtheneIdeView {
         file2CompiledResult: new Map(),
         nodeUrls: new Set(["localhost:7845", "testnet.aergo.io:7845"]),
         addresses: new Set(),
-        contract2Abi: new Map()
+        contractAddress2Abi: new Map()
       },
       services: services
     };
@@ -130,5 +130,32 @@ export default class AtheneIdeView {
     }
     this.show();
   }
+
+  selectAccount(account) {
+    logger.debug("Update view with selected account", account);
+    const accountAddress = account.accountAddress;
+    const balance = account.balance;
+    const nonce = account.nonce;
+    if (!this.context.store.addresses.has(accountAddress)) {
+      this.context.store.addresses.add(accountAddress);
+    }
+    this.context.current.account = {
+      accountAddress: accountAddress,
+      balance: balance,
+      nonce: nonce
+    }
+    this.show();
+  }
+
+  updadeContractInfo(contractInfo) {
+    logger.debug("Update contract info with", contractInfo);
+    const contractAddress = contractInfo.contractAddress;
+    const abi = contractInfo.abi;
+
+    this.context.store.contractAddress2Abi.set(contractAddress, abi);
+    this.context.current.contract.contractAddress = contractAddress;
+    this.show();
+  }
+
 
 }

@@ -18,19 +18,14 @@ export default class ImportAccountButton extends React.Component {
   constructor(props) {
     super(props);
     this.state = { encryptedPrivateKey: "", passwordToDecrypt: "" };
-  }
 
-  _updateEncryptedPrivateKey(e) {
-    this.setState({encryptedPrivateKey: e.target.value});
-  }
-
-  _updatePasswordToDecrypt(e) {
-    this.setState({passwordToDecrypt: e.target.value});
+    this.encryptedPrivateKeyRef = React.createRef();
+    this.passwordRef = React.createRef();
   }
 
   _onConfirm() {
-    const encryptedPrivateKey = this.state.encryptedPrivateKey;
-    const passwordToDecrypt = this.state.passwordToDecrypt;
+    const encryptedPrivateKey = this.encryptedPrivateKeyRef.current.state.value;
+    const passwordToDecrypt = this.passwordRef.current.state.value;
     logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
     this.props.context.services.accountService.importAccount(encryptedPrivateKey, passwordToDecrypt);
   }
@@ -46,12 +41,12 @@ export default class ImportAccountButton extends React.Component {
               </div>
               <div className='components-row'>
                 <Description description='Private key' />
-                <InputBox onChange={(e) => this._updateEncryptedPrivateKey(e)} type='text'
+                <InputBox ref={this.encryptedPrivateKeyRef} type='text'
                     placeHolder='encrypted private key'/>
               </div>
               <div className='components-row'>
                 <Description description='Password' />
-                <InputBox onChange={(e) => this._updatePasswordToDecrypt(e)} type='text'
+                <InputBox ref={this.passwordRef} type='text'
                     placeHolder='password to decrypt encrypted private key'/>
               </div>
               <div className='components-row components-row-button'>

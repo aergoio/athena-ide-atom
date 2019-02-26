@@ -56,13 +56,7 @@ export default class EventDispatcher {
     });
 
     this.eventEmitter.on(EventType.Deploy, (payload) => {
-      // TODO
-    });
-    this.eventEmitter.on(EventType.Execute, (payload) => {
-      // TODO
-    });
-    this.eventEmitter.on(EventType.Query, (payload) => {
-      // TODO
+      this.views.athenaIdeView.updadeContractInfo(payload);
     });
   }
 

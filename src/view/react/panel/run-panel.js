@@ -9,6 +9,7 @@ import {Button, Title, Description, SelectBox, TextBox, SyncIcon, InputBox} from
 import NewAccountButton from './new-account-button';
 import ImportAccountButton from './import-account-button';
 import ExportAccountButton from './export-account-button';
+import ContractRunComponents from './contract-run-components';
 
 export default class RunPanel extends React.Component {
 
@@ -24,9 +25,7 @@ export default class RunPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      context: props.context,
-      price: "",
-      limit: ""
+      context: props.context
     };
   }
 
@@ -46,16 +45,16 @@ export default class RunPanel extends React.Component {
     return this.state.context.current.account.accountAddress;
   }
 
+  _parseAddresses() {
+    return Array.from(this.state.context.store.addresses.keys());
+  }
+
   _parseBalance() {
     return this.state.context.current.account.balance;
   }
 
   _parseNonce() {
     return this.state.context.current.account.nonce;
-  }
-
-  _parseAddresses() {
-    return Array.from(this.state.context.store.addresses.keys());
   }
 
   _parseCurrentFile() {
@@ -103,12 +102,27 @@ export default class RunPanel extends React.Component {
     this.state.context.services.accountService.changeAccount(accountAddress)
   }
 
+  _updatePrice(event) {
+    const context = this.state.context;
+    context.current.fee.price = event.target.value;
+    this.setState(context);
+  }
+
+  _updateLimit(event) {
+    const context = this.state.context;
+    context.current.fee.limit = event.target.value;
+    this.setState(context);
+  }
+
   _onDeployButtonClicked() {
     const accountAddress = this.state.context.current.account.accountAddress;
-    const price = this.state.price;
-    const limit = this.state.limit;
+    const price = this.state.context.current.fee.price;
+    const limit = this.state.context.current.fee.limit;
     const currentFile = this.state.context.current.file;
-    const contractPayload = this.state.context.store.file2CompiledResult.get(currentFile).payload;
+    let contractPayload = null
+    if (this.state.context.store.file2CompiledResult.has(currentFile)) {
+      contractPayload = this.state.context.store.file2CompiledResult.get(currentFile).payload;
+    }
     logger.debug("Deploy button clicked with", price, limit, currentFile, contractPayload);
     this.state.context.services.contractService.deploy(accountAddress, price, limit, contractPayload);
   }
@@ -130,8 +144,8 @@ export default class RunPanel extends React.Component {
           <div className='components-row'>
             <Description description='Node' />
             <SelectBox
-              value={this._parseCurrentNodeUrl(this.props.context)}
-              options={this._parseNodeUrls(this.props.context)}
+              value={this._parseCurrentNodeUrl()}
+              options={this._parseNodeUrls()}
               onChange={(o) => this._onNodeUrlChange(o)}
               isCreatable
             />
@@ -177,12 +191,12 @@ export default class RunPanel extends React.Component {
           <div className='components-row'>
             <Description description='Price' />
             <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10000 (unit : Aer)'
-                onChange={(e) => this.setState({ price: e.target.value}) }/>
+                onChange={(e) => this._updatePrice(e) }/>
           </div>
           <div className='components-row'>
             <Description description='Limit' />
             <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10'
-                onChange={(e) => this.setState({ limit: e.target.value}) }/>
+                onChange={(e) => this._updateLimit(e) }/>
           </div>
         </div>
 
@@ -193,7 +207,7 @@ export default class RunPanel extends React.Component {
           <div className='components-row'>
             <Button
               name='Deploy'
-              class={['component-btn-runner', 'component-description', 'btn-success']}
+              class={['component-btn-runner', 'component-description', 'component-btn-deploy']}
               onClick={() => this._onDeployButtonClicked()}
             />
             <SelectBox
@@ -204,6 +218,7 @@ export default class RunPanel extends React.Component {
           </div>
         </div>
 
+        <ContractRunComponents context={this.props.context} />
       </div>
     );
   }

@@ -20,6 +20,7 @@ export default class InputBox extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { value: "" };
   }
 
   render() {
@@ -28,7 +29,12 @@ export default class InputBox extends React.Component {
         className={join('inline-block', 'input-text', 'native-key-bindings', inputBoxClass, this.props.class)}
         placeHolder={this.props.placeHolder}
         type={this.props.type}
-        onChange={this.props.onChange}
+        onChange={(e) => {
+          this.setState({ value: e.target.value });
+          if (this.props.onChange) {
+            this.props.onChange(e);
+          }
+        }}
       />
     );
   }

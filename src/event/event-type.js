@@ -18,7 +18,5 @@ export default {
   ExportAccount: "ExportAccount",
   ChangeAccount: "ChangeAccount",
 
-  Deploy: "Deploy",
-  Execute: "Execute",
-  Query: "Query"
+  Deploy: "Deploy"
 }
