@@ -3,6 +3,6 @@
     "f7": "athena-ide:compile"
   },
   "atom-workspace": {
-    "ctrl-alt-e": "athena-ide-view:show"
+    "alt-shift-l": "athena-ide-view:show"
   }
 }

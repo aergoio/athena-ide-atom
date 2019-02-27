@@ -25,6 +25,7 @@ $ apm install athena-ide-atom
 ## How to use
 
 * Compile current file: `f7`
+* Open Athena Ide View: `alt + shift + l`
 
 ## Build
 
