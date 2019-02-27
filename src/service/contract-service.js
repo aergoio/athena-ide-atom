@@ -62,14 +62,14 @@ export default class ContractService {
       });
     }).then(result => {
       logger.debug("Deploy result:", result);
-      this.accountService.changeAccount(accountAddress);
+      this.accountService.updateAccount(accountAddress);
       this.eventDispatcher.dispatch(EventType.Deploy, result);
       this.eventDispatcher.dispatch(EventType.Log, { message: "ContractAddress: " + result.contractAddress, level: "info" });
       this.eventDispatcher.dispatch(EventType.Notify, { message: "Successfully deployed contract", level: "success" });
       return result;
     }).catch(err => {
       logger.error(err);
-      this.accountService.changeAccount(accountAddress);
+      this.accountService.updateAccount(accountAddress);
       this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
       this.eventDispatcher.dispatch(EventType.Notify,
               { message: "Deploying contract failed", level: "error" });
@@ -132,12 +132,12 @@ export default class ContractService {
       this.eventDispatcher.dispatch(EventType.Log, { message: "Execute TxHash: " + txHash, level: "info" });
       return this._pollingReceipt(txHash, receipt => receipt.result);
     }).then(result => {
-      this.accountService.changeAccount(accountAddress);
+      this.accountService.updateAccount(accountAddress);
       this.eventDispatcher.dispatch(EventType.Log, { message: "Execute ret: " + result, level: "info" });
       return result;
     }).catch(err => {
       logger.error(err);
-      this.accountService.changeAccount(accountAddress);
+      this.accountService.updateAccount(accountAddress);
       this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
       this.eventDispatcher.dispatch(EventType.Notify,
               { message: "Executing contract failed", level: "error" });
@@ -162,6 +162,8 @@ export default class ContractService {
           if (!isEmpty(receivedReceipt)) {
             receipt = receivedReceipt;
           }
+        }).catch(err => {
+          logger.debug("GetReceipt failed with", err.toString());
         });
     };
     const timerId = setInterval(receiptRequest, 1000);
@@ -184,7 +186,7 @@ export default class ContractService {
     return {
       from: from,
       to: to,
-      amount: "0", // TODO : herajs should handle empty amount case
+      amount: "0",
       nonce: nonce,
       price: "0", // TODO : set price.toString() after hashTransaction is fixed
       limit: limit,

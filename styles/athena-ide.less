@@ -81,8 +81,18 @@
         .component-selectbox__single-value {
           color: @text-color;
         }
-        .component-selectbox__input {
-          color: @text-color;
+
+        .css-1g6gooi {
+          width: 100%;
+
+          .component-selectbox__input {
+            color: @text-color;
+            width: 100%;
+
+            input {
+              width: 100% !important;
+            }
+          }
         }
       }
 
@@ -99,6 +109,11 @@
 
   .component-inputbox-number {
     text-align: right;
+  }
+
+  .component-inputbox-number::-webkit-outer-spin-button,
+  .component-inputbox-number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
   }
 
   .component-textbox {

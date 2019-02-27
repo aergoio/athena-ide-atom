@@ -112,7 +112,14 @@ export default class AccountService {
   }
 
   changeAccount(accountAddress) {
-    logger.debug("Change account to", accountAddress);
+    return this.updateAccount(accountAddress).then(account => {
+      this.eventDispatcher.dispatch(EventType.Log, { message: account, level: "info" });
+      return account;
+    });
+  }
+
+  updateAccount(accountAddress) {
+    logger.debug("Update account of", accountAddress);
 
     if (isEmpty(accountAddress)) {
       const message = "Selected account is empty";

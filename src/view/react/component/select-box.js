@@ -41,7 +41,6 @@ export default class SelectBox extends React.Component {
       <ComponentTag
         className={join('inline-block', 'native-key-bindings', selectBoxClass)}
         classNamePrefix={selectBoxClass}
-        isSearchable={true}
         value={this._generateOption(this.props.value)}
         options={this._generateOptions(this.props.options)}
         onChange={this.props.onChange}

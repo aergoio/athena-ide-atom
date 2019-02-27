@@ -67,8 +67,11 @@ export default {
     const subscriptions = new CompositeDisposable();
     subscriptions.add(atom.commands.add('atom-text-editor', {
       'athena-ide:compile': () => {
-        const filePath = atom.workspace.getActiveTextEditor().getBuffer().getPath();
-        this.services.compileService.compile(filePath);
+        const absolutePath = atom.workspace.getActiveTextEditor().getBuffer().getPath();
+        const pathInfo = atom.project.relativizePath(absolutePath);
+        const projectRoot = pathInfo[0];
+        const relativePath = pathInfo[1];
+        this.services.compileService.compile(projectRoot, relativePath);
       }
     }));
     subscriptions.add(atom.commands.add('atom-workspace', {

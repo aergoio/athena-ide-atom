@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 import child_process from 'child_process';
 import logger from 'loglevel';
 
@@ -24,18 +25,20 @@ export default class CompileService {
     this.importResolver = new LuaImportResolver();
   }
 
-  compile(filePath) {
-    logger.debug("Resolve compile with", filePath);
+  compile(baseDir, relativePath) {
+    logger.debug("Resolve compile with", baseDir, relativePath);
 
-    const source = this._readFile(filePath);
-    const dependencyResolved = this._resolveDependency(source, filePath);
+    const absolutePath = path.resolve(baseDir, relativePath);
+    logger.debug("Resolved absolute path", absolutePath);
+    const source = this._readFile(absolutePath);
+    const dependencyResolved = this._resolveDependency(source, absolutePath);
     const tempSourceFile = this._saveToTemp(dependencyResolved);
     logger.debug("Dependency resolved source");
     logger.debug(dependencyResolved);
     logger.debug("Temp file saved to", tempSourceFile);
 
     const compileResult = this._compile(tempSourceFile);
-    compileResult.file = filePath;
+    compileResult.file = './' + relativePath;
     logger.debug("Compile result", compileResult);
 
     if (null == compileResult.err) {
@@ -92,7 +95,6 @@ export default class CompileService {
 
   _compile(sourceFilePath) {
     const compileResult = {
-      file: "",
       payload: "",
       abi: "",
       err: null,
