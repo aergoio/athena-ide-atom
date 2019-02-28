@@ -3,6 +3,8 @@
 /* eslint-disable */
 
 import {CompositeDisposable} from 'atom';
+import {install} from 'atom-package-deps';
+import logger from 'loglevel';
 
 import {EventDispatcher} from './event';
 import {
@@ -23,6 +25,11 @@ export default {
   lintProvider: new LintProvider(),
 
   activate(state) {
+    install('athena-ide-atom').then(() => {
+      logger.info("All dependeicies are installed");
+    }).catch(err => {
+      logger.error(err);
+    });
     this.eventDispatcher = new EventDispatcher();
     this.services = this._buildServices(this.eventDispatcher);
     this.views = this._buildViews(this.services);

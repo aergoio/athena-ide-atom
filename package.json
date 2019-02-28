@@ -35,9 +35,10 @@
       }
     }
   },
-  "atomPackageDependencies": {
-    "linter": ">=2.2.0"
-  },
+  "package-deps": [
+    "linter:2.3.0",
+    "linter-ui-default:1.7.0"
+  ],
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.3.1",
@@ -52,6 +53,7 @@
     "@aergoio/luaparse": "git://github.com:aergoio/luaparse.git#master",
     "@herajs/client": "^0.5.2",
     "@herajs/crypto": "^0.1.0",
+    "atom-package-deps": "^5.0.0",
     "atom-space-pen-views": "^2.2.0",
     "lodash": "^4.17.11",
     "loglevel": "^1.6.1",
