@@ -1,5 +1,8 @@
 # Athena-ide package
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Travis_ci](https://travis-ci.org/aergoio/athena-ide-atom.svg?branch=master)](https://travis-ci.org/aergoio/athena-ide-atom.svg?branch=master)
+
 A package for writing smart contract in aergo using atom
 
 ## Features
