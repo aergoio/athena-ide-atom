@@ -1,3 +1,9 @@
+## 0.2.0 - Contract interaction
+
+* Add compile result panel
+* Add contract run panel
+* Add notification for success/failure
+
 ## 0.1.2 - Console ui, Compiler, Bug patch
 
 * Add linux, window compiler

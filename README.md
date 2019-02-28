@@ -8,12 +8,12 @@ A package for writing smart contract in aergo using atom
 - [X] Basic autocomplete
 - [X] Basic linter
 - [X] Compile
+- [X] Deploy smart contract
+- [X] Execute smart contract
 
-- [ ] Advanced autocomplete (aergo specific, nested table, etc..)
-- [ ] Advanced linter (recommandation)
-- [ ] Deploy smart contract
-- [ ] Execute smart contract
 - [ ] Query smart contract result
+- [ ] Advanced autocomplete (lua specific, nested table)
+- [ ] Advanced linter (recommandation)
 - [ ] Simulation
 
 ## Installation
