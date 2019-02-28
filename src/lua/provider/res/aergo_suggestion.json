@@ -1,0 +1,44 @@
+{
+  "symbol": {
+    "state": {
+      "index": 0,
+      "type": "system",
+      "kind": "system"
+    },
+    "system": {
+      "index": 0,
+      "type": "system",
+      "kind": "system"
+    },
+    "abi": {
+      "index": 0,
+      "type": "system",
+      "kind": "system"
+    },
+    "db": {
+      "index": 0,
+      "type": "system",
+      "kind": "system"
+    }
+  },
+  "table": {
+    "state": {
+      "var": {},
+      "value": {},
+      "map": {},
+      "array": {}
+    },
+    "system": {
+      "setItem": {},
+      "getItem": {}
+    },
+    "abi": {
+      "register": {}
+    },
+    "db": {
+      "prepare": {},
+      "exec": {},
+      "query": {}
+    }
+  }
+}

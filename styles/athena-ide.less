@@ -4,5 +4,222 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
-.athena-ide {
+
+#athena-ide-panel-root {
+  height: 100%;
+  overflow: scroll;
+
+  .react-tabs {
+    .react-tabs__tab-list {
+      padding-left: 0em;
+      border-bottom: 0.1em solid gray;
+    }
+
+    .react-tabs__tab {
+      list-style: none;
+      display: inline;
+      padding-left: 0.6em;
+      padding-right: 0.6em;
+    }
+
+    .react-tabs__tab--selected {
+      color: white;
+      background-color: #21252b;
+      background-image: linear-gradient(#2c313a, #21252b);
+    }
+  }
+
+  .components-holder {
+    margin: 0.5em;
+  }
+
+  .components-row:first-child {
+    padding-bottom: 10px;
+    justify-content: space-between;
+  }
+
+  .components-row {
+    padding: 5px 10px 5px 10px;
+    display: flex;
+  }
+
+  .components-row:last-child {
+    padding-bottom: 10px;
+  }
+
+  .components-row-button {
+    justify-content: flex-end;
+  }
+
+  .component-title {
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .component-icon {
+    cursor: pointer;
+  }
+
+  .component-description {
+    width: 6em;
+    padding: 0.3em 0em;
+    height: 100%;
+    text-align: center;
+  }
+
+  .component-selectbox {
+    width: 100%;
+
+    .component-selectbox__control {
+      background-color: @input-background-color;
+      min-height: 0em;
+      height: 100%;
+
+      .component-selectbox__value-container {
+        padding: 0em;
+
+        .component-selectbox__single-value {
+          color: @text-color;
+        }
+
+        .css-1g6gooi {
+          width: 100%;
+
+          .component-selectbox__input {
+            color: @text-color;
+            width: 100%;
+
+            input {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+
+      .component-selectbox__indicators {
+        .component-selectbox__dropdown-indicator {
+          padding: 0em;
+        }
+      }
+    }
+  }
+
+  .component-inputbox {
+  }
+
+  .component-inputbox-number {
+    text-align: right;
+  }
+
+  .component-inputbox-number::-webkit-outer-spin-button,
+  .component-inputbox-number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .component-textbox {
+    width: 100%;
+    white-space: pre-wrap;
+    overflow: auto;
+    word-wrap: break-word;
+    max-height: 13em;
+    background-color: @input-background-color;
+    padding: 0.3em;
+  }
+
+  .component-textbox-abi {
+    max-height: 30em;
+  }
+
+  .component-textbox-number {
+    text-align: right;
+  }
+
+  .component-btn-runner {
+    width: 6em;
+    text-align: center;
+  }
+
+  .component-btn-deploy {
+    background-color: #2ba143;
+    background-image: linear-gradient(#2da946, #2ba143);
+    color: white;
+  }
+
+  .component-btn-execute {
+    background-color: #ad7c0b;
+    background-image: linear-gradient(#b6830c, #ad7c0b);
+    color: white;
+  }
+
+  .popup-content {
+    // TODO : remove important
+    border: 0em !important;
+    padding: 0em !important;
+    background: none !important;
+
+    .component-title {
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+    }
+
+    .component-description {
+      width: 8em;
+    }
+
+    .components-row-button {
+      justify-content: center;
+    }
+  }
+
+  atom-panel.modal {
+    max-width: unset;
+    background: unset;
+  }
+}
+
+#athena-ide-console {
+  .view-scroller {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+  }
+  
+  .panel-body {
+    height: 100%;
+    background-color: @inset-panel-background-color;
+    cursor: text;
+    -webkit-user-select: text;
+
+    &.closed {
+      height: 0px !important;
+    }
+
+    pre {
+      &:empty {
+        padding: 0;
+      }
+      overflow: visible;
+    }
+
+    div {
+      margin: 0;
+
+      &.level-debug {
+        color: @text-color-subtle;
+      }
+
+      &.level-info {
+        color: @text-color;
+      }
+
+      &.level-warn {
+        color: @text-color-warning;
+      }
+
+      &.level-error {
+        color: @text-color-error;
+      }
+    }
+  }
 }

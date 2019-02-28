@@ -1,15 +1,21 @@
 {
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
   "parserOptions": {
     "sourceType": "module"
   },
+  "settings": {
+    "react": {
+      "version": "16.8.2"
+    }
+  },
   "extends": [
     "eslint:recommended",
-    "google"
+    "plugin:react/recommended"
   ],
   "rules": {
-
+    "no-unused-vars": "off"
   }
 }

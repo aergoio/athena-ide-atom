@@ -1,5 +1,7 @@
 'use babel'
 
-import LuaAnalyzer from './lua-analyzer';
+import {luaTypes} from './model';
+import {LuaImportResolver} from './analyzer';
+import {LuaSuggester, LuaLinter} from './provider';
 
-export default LuaAnalyzer;
+export {luaTypes, LuaImportResolver, LuaSuggester, LuaLinter};
