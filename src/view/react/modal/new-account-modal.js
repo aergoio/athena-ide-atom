@@ -5,13 +5,14 @@ import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Title, Button} from '../component';
+import {ComponentsHolder, Row, Title, Button} from '../components';
 
-export default class NewAccountButton extends React.Component {
+export default class NewAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any
+      context: PropTypes.any,
+      trigger: PropTypes.element
     };
   }
 
@@ -26,18 +27,18 @@ export default class NewAccountButton extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={<Button name='New' />}>
+      <Popup modal trigger={this.props.trigger}>
         {close =>
           <atom-panel class='modal'>
-            <div className='components-holder'>
-              <div className='components-row'>
-                <Title class='' title='Do you want to make a new account?' />
-              </div>
-              <div className='components-row components-row-button'>
+            <ComponentsHolder>
+              <Row>
+                <Title title='Do you want to make a new account?' />
+              </Row>
+              <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
-              </div>
-            </div>
+              </Row>
+            </ComponentsHolder>
           </atom-panel>
         }
       </Popup>

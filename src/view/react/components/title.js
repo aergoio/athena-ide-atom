@@ -7,7 +7,7 @@ import {join} from './utils';
 
 const titleClass = 'component-title';
 
-export default class Description extends React.Component {
+export default class Title extends React.Component {
 
   static get propTypes() { 
     return { 

@@ -4,7 +4,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Title, Description, SelectBox, TextBox} from '../component';
+import {
+  Panel, ComponentsHolder, Row,
+  Title, Description, SelectBox, TextBox
+} from '../components';
 
 export default class CompilePanel extends React.Component {
 
@@ -17,26 +20,7 @@ export default class CompilePanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = { context: props.context };
-  }
-
-  _parseCurrentFile() {
-    return this.state.context.current.file;
-  }
-
-  _parseFiles() {
-    return Array.from(this.state.context.store.file2CompiledResult.keys());
-  }
-
-  _parsePayload() {
-    const file = this.state.context.current.file;
-    const file2CompiledResult = this.state.context.store.file2CompiledResult;
-    return file2CompiledResult.has(file) ? file2CompiledResult.get(file).payload : "";
-  }
-
-  _parseAbi() {
-    const file = this.state.context.current.file;
-    const file2CompiledResult = this.state.context.store.file2CompiledResult;
-    return file2CompiledResult.has(file) ? file2CompiledResult.get(file).abi : "";
+    this._onCompiledFileChange = this._onCompiledFileChange.bind(this);
   }
 
   _onCompiledFileChange(selectedOption) {
@@ -46,30 +30,75 @@ export default class CompilePanel extends React.Component {
 
   render() {
     return (
-      <div className='athena-ide-tab-panel'>
-        <div className='inset-panel components-holder'>
-          <div className='components-row'>
-            <Title title='Compile Result'/>
-          </div>
-          <div className='components-row'>
-            <Description description="File" />
-            <SelectBox
-              value={this._parseCurrentFile()}
-              options={this._parseFiles()}
-              onChange={(o) => this._onCompiledFileChange(o)}
-            />
-          </div>
-          <div className='components-row'>
-            <Description description="Payload" />
-            <TextBox text={this._parsePayload()} />
-          </div>
-          <div className='components-row'>
-            <Description description="ABI" />
-            <TextBox class='component-textbox-abi' text={this._parseAbi()} />
-          </div>
-        </div>
-      </div>
+      <Panel>
+        <ComponentsHolder>
+          <CompileResultTitle />
+          <FileSelect context={this.props.context} onChange={this._onCompiledFileChange} />
+          <Payload context={this.props.context} />
+          <Abi context={this.props.context} />
+        </ComponentsHolder>
+      </Panel>
     );
   }
 
+}
+
+const CompileResultTitle = () => {
+  return (
+    <Row>
+      <Title title='Compile Result'/>
+    </Row>
+  );
+}
+
+const FileSelect = (props) => {
+  const option = props.context.current.file;
+  const options = Array.from(props.context.store.file2CompiledResult.keys());
+  return (
+    <Row>
+      <Description description="File" />
+      <SelectBox
+        value={option}
+        options={options}
+        onChange={props.onChange}
+      />
+    </Row>
+  );
+}
+
+FileSelect.propTypes = {
+  context: PropTypes.any,
+  onChange: PropTypes.func
+}
+
+const Payload = (props) => {
+  const file = props.context.current.file;
+  const file2CompiledResult = props.context.store.file2CompiledResult;
+  const payload = file2CompiledResult.has(file) ? file2CompiledResult.get(file).payload : "";
+  return (
+    <Row>
+      <Description description="Payload" />
+      <TextBox text={payload} />
+    </Row>
+  );
+}
+
+Payload.propTypes = {
+  context: PropTypes.any
+}
+
+const Abi = (props) => {
+  const file = props.context.current.file;
+  const file2CompiledResult = props.context.store.file2CompiledResult;
+  const abi = file2CompiledResult.has(file) ? file2CompiledResult.get(file).abi : "";
+  return (
+    <Row>
+      <Description description="ABI" />
+      <TextBox class='component-textbox-abi' text={abi} />
+    </Row>
+  );
+}
+
+Abi.propTypes = {
+  context: PropTypes.any
 }

@@ -5,13 +5,14 @@ import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Title, Description, InputBox, Button} from '../component';
+import {ComponentsHolder, Row, Title, Description, InputBox, Button} from '../components';
 
-export default class ExportAccountButton extends React.Component {
+export default class ExportAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any
+      context: PropTypes.any,
+      trigger: PropTypes.element
     };
   }
 
@@ -36,23 +37,23 @@ export default class ExportAccountButton extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={<Button name='Export' />}>
+      <Popup modal trigger={this.props.trigger}>
         {close =>
           <atom-panel class='modal'>
-            <div className='components-holder'>
-              <div className='components-row'>
-                <Title class='' title='Enter password to decrypt private key' />
-              </div>
-              <div className='components-row'>
+            <ComponentsHolder>
+              <Row>
+                <Title title='Enter password to decrypt private key' />
+              </Row>
+              <Row>
                 <Description description='Password' />
                 <InputBox onChange={(e) => this._updatePasswordToEncrypt(e)} type='text'
                     placeHolder='password to encrypt private key'/>
-              </div>
-              <div className='components-row components-row-button'>
+              </Row>
+              <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
-              </div>
-            </div>
+              </Row>
+            </ComponentsHolder>
           </atom-panel>
         }
       </Popup>

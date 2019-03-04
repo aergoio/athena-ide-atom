@@ -24,10 +24,6 @@ export default class SelectBox extends React.Component {
     super(props);
   }
 
-  _generateOptions(rawOptions) {
-    return rawOptions.map(rawOption => this._generateOption(rawOption));
-  }
-
   _generateOption(option) {
     return {
       value: option,
@@ -36,13 +32,15 @@ export default class SelectBox extends React.Component {
   }
 
   render() {
-    const ComponentTag = this.props.isCreatable ? CreatableSelect : Select;
+    const SelectBoxComponent = this.props.isCreatable ? CreatableSelect : Select;
+    const option = this._generateOption(this.props.value);
+    const options = this.props.options.map(o => this._generateOption(o));
     return (
-      <ComponentTag
+      <SelectBoxComponent
         className={join('inline-block', 'native-key-bindings', selectBoxClass)}
         classNamePrefix={selectBoxClass}
-        value={this._generateOption(this.props.value)}
-        options={this._generateOptions(this.props.options)}
+        value={option}
+        options={options}
         onChange={this.props.onChange}
       />
     );

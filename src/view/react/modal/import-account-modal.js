@@ -5,13 +5,14 @@ import Popup from 'reactjs-popup';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Title, Description, InputBox, Button} from '../component';
+import {ComponentsHolder, Row, Title, Description, InputBox, Button} from '../components';
 
-export default class ImportAccountButton extends React.Component {
+export default class ImportAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any
+      context: PropTypes.any,
+      trigger: PropTypes.element
     };
   }
 
@@ -32,28 +33,28 @@ export default class ImportAccountButton extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={<Button name='Import' />}>
+      <Popup modal trigger={this.props.trigger}>
         {close =>
           <atom-panel class='modal'>
-            <div className='components-holder'>
-              <div className='components-row'>
-                <Title class='' title='Import account with encrypted private key' />
-              </div>
-              <div className='components-row'>
+            <ComponentsHolder>
+              <Row>
+                <Title title='Import account with encrypted private key' />
+              </Row>
+              <Row>
                 <Description description='Private key' />
                 <InputBox ref={this.encryptedPrivateKeyRef} type='text'
                     placeHolder='encrypted private key'/>
-              </div>
-              <div className='components-row'>
+              </Row>
+              <Row>
                 <Description description='Password' />
                 <InputBox ref={this.passwordRef} type='text'
                     placeHolder='password to decrypt encrypted private key'/>
-              </div>
-              <div className='components-row components-row-button'>
+              </Row>
+              <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
-              </div>
-            </div>
+              </Row>
+            </ComponentsHolder>
           </atom-panel>
         }
       </Popup>
