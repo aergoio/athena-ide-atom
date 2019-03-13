@@ -2,23 +2,25 @@
 
 import React from 'react';
 import Popup from 'reactjs-popup';
+import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import {ComponentsHolder, Row, Title, Description, InputBox, Button} from '../components';
 
+@inject('accountStore')
+@observer
 export default class ImportAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any,
       trigger: PropTypes.element
     };
   }
 
   constructor(props) {
     super(props);
-    this.state = { encryptedPrivateKey: "", passwordToDecrypt: "" };
+    this.state = { encryptedPrivateKey: "", password: "" };
 
     this.encryptedPrivateKeyRef = React.createRef();
     this.passwordRef = React.createRef();
@@ -26,9 +28,9 @@ export default class ImportAccountModal extends React.Component {
 
   _onConfirm() {
     const encryptedPrivateKey = this.encryptedPrivateKeyRef.current.state.value;
-    const passwordToDecrypt = this.passwordRef.current.state.value;
+    const password = this.passwordRef.current.state.value;
     logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
-    this.props.context.services.accountService.importAccount(encryptedPrivateKey, passwordToDecrypt);
+    this.props.accountStore.addAccount(encryptedPrivateKey, password);
   }
 
   render() {

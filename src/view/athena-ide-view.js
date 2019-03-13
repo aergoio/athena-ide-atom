@@ -4,16 +4,32 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import logger from 'loglevel';
+import {Provider} from 'mobx-react';
+
+import accountStore from '../store/account-store';
+import compileResultStore from '../store/compile-result-store';
+import consoleStore from '../store/console-store';
+import contractStore from '../store/contract-store';
+import feeStore from '../store/fee-store';
+import nodeStore from '../store/node-store';
+import notificationStore from '../store/notification-store';
 
 import AthenaIdeViewRoot from './react';
 
 export default class AtheneIdeView {
 
-  constructor(services) {
+  constructor() {
     this.element = document.createElement('atom-panel');
     this.element.appendChild(this._buildRoot());
-    this.context = this._buildContext(services);
+    this.stores = {
+      accountStore,
+      compileResultStore,
+      consoleStore,
+      contractStore,
+      feeStore,
+      nodeStore,
+      notificationStore
+    }
   }
 
   _buildRoot() {
@@ -23,38 +39,6 @@ export default class AtheneIdeView {
     rootNode.setAttributeNode(attribute);
     rootNode.setAttribute('tabindex', '-1');
     return rootNode;
-  }
-
-  _buildContext(services) {
-    // TODO : refactor those into model
-    return {
-      current: {
-        file: "",
-        node: {
-          url: "localhost:7845",
-          height: "unknown"
-        },
-        account: {
-          accountAddress: "",
-          balance: "",
-          nonce: "",
-        },
-        fee: {
-          price: "",
-          limit: ""
-        },
-        contract: {
-          contractAddress: ""
-        }
-      },
-      store: {
-        file2CompiledResult: new Map(),
-        nodeUrls: new Set(["localhost:7845", "testnet.aergo.io:7845"]),
-        addresses: new Set(),
-        contractAddress2Abi: new Map()
-      },
-      services: services
-    };
   }
 
   getElement() {
@@ -79,83 +63,24 @@ export default class AtheneIdeView {
 
   show() {
     atom.workspace.getRightDock().show();
-    logger.debug("Show ide view, context:", this.context);
     atom.workspace.open(this, {activatePane: false}).then(() => {
-      ReactDOM.render(
-        <AthenaIdeViewRoot context={this.context}/>,
-        document.getElementById('athena-ide-panel-root')
-      );
+      this._draw();
     });
   }
 
+  _draw() {
+    if (!this.rootReactNode) {
+      this.rootReactNode = ReactDOM.render((
+        <Provider {...this.stores} >
+          <AthenaIdeViewRoot />
+        </Provider>),
+        document.getElementById('athena-ide-panel-root')
+      );
+    }
+  }
+
   distroy() {
-    // TODO : remove view from the bottom dock
+    // TODO : remove view from the right dock
   }
-
-  newCompileInfo(compileResult) {
-    logger.debug("Update view with new compile result", compileResult);
-    const file = compileResult.file;
-    this.context.store.file2CompiledResult.set(file, compileResult);
-    this.selectFile(file);
-  }
-
-  selectFile(file) {
-    logger.debug("Update view with selected file", file);
-    this.context.current.file = file;
-    this.show();
-  }
-
-  selectNode(node) {
-    logger.debug("Update view with selected node", node);
-    const url = node.url;
-    if (!this.context.store.nodeUrls.has(url)) {
-      this.context.store.nodeUrls.add(url);
-    }
-    this.context.current.node = node;
-    this.show();
-  }
-
-  selectAccount(account) {
-    logger.debug("Update view with selected account", account);
-    const accountAddress = account.accountAddress;
-    const balance = account.balance;
-    const nonce = account.nonce;
-    if (!this.context.store.addresses.has(accountAddress)) {
-      this.context.store.addresses.add(accountAddress);
-    }
-    this.context.current.account = {
-      accountAddress: accountAddress,
-      balance: balance,
-      nonce: nonce
-    }
-    this.show();
-  }
-
-  selectAccount(account) {
-    logger.debug("Update view with selected account", account);
-    const accountAddress = account.accountAddress;
-    const balance = account.balance;
-    const nonce = account.nonce;
-    if (!this.context.store.addresses.has(accountAddress)) {
-      this.context.store.addresses.add(accountAddress);
-    }
-    this.context.current.account = {
-      accountAddress: accountAddress,
-      balance: balance,
-      nonce: nonce
-    }
-    this.show();
-  }
-
-  updadeContractInfo(contractInfo) {
-    logger.debug("Update contract info with", contractInfo);
-    const contractAddress = contractInfo.contractAddress;
-    const abi = contractInfo.abi;
-
-    this.context.store.contractAddress2Abi.set(contractAddress, abi);
-    this.context.current.contract.contractAddress = contractAddress;
-    this.show();
-  }
-
 
 }

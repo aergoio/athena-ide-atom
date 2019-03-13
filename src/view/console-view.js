@@ -3,7 +3,10 @@
 /* eslint-disable */
 
 import {$$, View} from 'atom-space-pen-views';
+import {autorun} from 'mobx';
 import logger from 'loglevel';
+
+import consoleStore from '../store/console-store';
 
 export default class ConsoleView extends View {
 
@@ -13,6 +16,15 @@ export default class ConsoleView extends View {
         this.pre({class: 'native-key-bindings', outlet: 'output', tabindex: -1});
       });
     });
+  }
+
+  constructor() {
+    super();
+    autorun(() => {
+      if (null != consoleStore.recent && "" !== consoleStore.recent.message) {
+        this.log(consoleStore.recent);
+      }
+    })
   }
 
   getTitle() {
@@ -43,7 +55,6 @@ export default class ConsoleView extends View {
 
   log(messageAndLevel) {
     this.show().then(() => {
-      logger.debug("Log message:", messageAndLevel);
       const message = messageAndLevel.message.toString();
       const level = messageAndLevel.level;
       const messageWithTime = this._wrapTime(message);

@@ -2,12 +2,22 @@
 
 /* eslint-disable */
 
+import {autorun} from 'mobx';
 import logger from 'loglevel';
+
+import notificationStore from '../store/notification-store';
 
 export default class NotificationView {
 
+  constructor() {
+    autorun(() => {
+      if (null != notificationStore.recent && "" !== notificationStore.recent.message) {
+        this.notify(notificationStore.recent)
+      }
+    })
+  }
+
   notify(messageAndLevel) {
-    logger.debug("Notification message", messageAndLevel);
     const message = messageAndLevel.message.toString();
     const level = messageAndLevel.level;
     switch (level) {

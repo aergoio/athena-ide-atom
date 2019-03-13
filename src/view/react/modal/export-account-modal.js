@@ -2,16 +2,18 @@
 
 import React from 'react';
 import Popup from 'reactjs-popup';
+import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import {ComponentsHolder, Row, Title, Description, InputBox, Button} from '../components';
 
+@inject('accountStore')
+@observer
 export default class ExportAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any,
       trigger: PropTypes.element
     };
   }
@@ -19,20 +21,19 @@ export default class ExportAccountModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      context: props.context,
-      passwordToEncrypt: ""
+      password: ""
     };
+    this._updatePassword = this._updatePassword.bind(this);
   }
 
-  _updatePasswordToEncrypt(e) {
-    this.setState({passwordToEncrypt: e.target.value});
+  _updatePassword(e) {
+    this.setState({ password: e.target.value });
   }
 
   _onConfirm() {
-    const accountAddress = this.state.context.current.account.accountAddress;
-    const passwordToEncrypt = this.state.passwordToEncrypt;
-    logger.debug("Export account button clicked with", accountAddress);
-    this.props.context.services.accountService.exportAccount(accountAddress, passwordToEncrypt);
+    logger.debug("Export account button clicked");
+    const password = this.state.password;
+    this.props.accountStore.exportAccount(password);
   }
 
   render() {
@@ -46,7 +47,7 @@ export default class ExportAccountModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Password' />
-                <InputBox onChange={(e) => this._updatePasswordToEncrypt(e)} type='text'
+                <InputBox onChange={this._updatePassword} type='text'
                     placeHolder='password to encrypt private key'/>
               </Row>
               <Row class='components-row-button'>

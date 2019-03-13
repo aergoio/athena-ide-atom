@@ -5,8 +5,7 @@ import logger from 'loglevel';
 
 export default class LintService {
 
-  constructor(eventDispatcher) {
-    this.eventDispatcher = eventDispatcher;
+  constructor() {
     this.luaLinter = new LuaLinter();
   }
 

@@ -2,6 +2,7 @@
 
 import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
+import {AutoCompleteService} from '../service';
 
 const prefixParsingEnd = [";", "(", ")", "{", "}"];
 
@@ -12,10 +13,8 @@ export default class AutoCompleteProvider {
     this.disableForSelector = '.source.lua .comment';
     this.inclusionPriority = 1;
     this.excludeLowerPriority = true;
-  }
 
-  bindServices(services) {
-    this.services = services;
+    this.autoCompleteService = new AutoCompleteService();
   }
 
   getSuggestions(request) {
@@ -48,7 +47,7 @@ export default class AutoCompleteProvider {
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
     const filePath = textBuffer.getPath();
 
-    return this.services.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
+    return this.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
       logger.debug("Raw suggestions:", rawSuggestions);
       const atomSuggestions = rawSuggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion));
       logger.info("Atom suggestions:", atomSuggestions);

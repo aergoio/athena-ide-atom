@@ -2,27 +2,30 @@
 
 import React from 'react';
 import Popup from 'reactjs-popup';
+import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import {ComponentsHolder, Row, Title, Button} from '../components';
 
+@inject('accountStore')
+@observer
 export default class NewAccountModal extends React.Component {
 
   static get propTypes() {
     return {
-      context: PropTypes.any,
       trigger: PropTypes.element
     };
   }
 
   constructor(props) {
     super(props);
+    this._onConfirm = this._onConfirm.bind(this);
   }
 
   _onConfirm() {
     logger.debug("New account confirm button clicked");
-    this.props.context.services.accountService.newAccount();
+    this.props.accountStore.newAccount();
   }
 
   render() {

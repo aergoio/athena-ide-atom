@@ -2,6 +2,7 @@
 
 import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
+import {LintService} from '../service';
 
 export default class LintProvider {
 
@@ -10,10 +11,8 @@ export default class LintProvider {
     this.scope = 'file'; // or 'project'
     this.lintsOnChange = false;
     this.grammarScopes = ['source.lua'];
-  }
 
-  bindServices(services) {
-    this.services = services;
+    this.lintService = new LintService();
   }
 
   lint(textEditor) {
@@ -29,7 +28,7 @@ export default class LintProvider {
       return indexToPosition(index + indexToLineEnding);
     };
 
-    return this.services.lintService.lint(source, filePath).then((rawLints) => {
+    return this.lintService.lint(source, filePath).then((rawLints) => {
       logger.debug("Raw lints:", rawLints);
       const atomLints = rawLints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
       logger.info("Atom lints:", atomLints);

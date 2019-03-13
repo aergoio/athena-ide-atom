@@ -1,6 +1,7 @@
 'use babel';
 
 import React from 'react';
+import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
@@ -11,19 +12,12 @@ import {
 
 import {NewAccountModal, ImportAccountModal, ExportAccountModal} from '../modal';
 
+@inject('accountStore', 'nodeStore', 'feeStore', 'compileResultStore', 'contractStore')
+@observer
 export default class RunPanel extends React.Component {
-
-  static get propTypes() {
-    return {
-      context: PropTypes.any
-    };
-  }
 
   constructor(props) {
     super(props);
-    this.state = {
-      context: props.context
-    };
 
     this._onSyncNodeStatus = this._onSyncNodeStatus.bind(this);
     this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
@@ -42,129 +36,117 @@ export default class RunPanel extends React.Component {
   }
 
   _onSyncNodeStatus() {
-    const nodeUrl = this.state.context.current.node.url;
-    logger.debug("Sync node status request with", nodeUrl);
-    this._updateNodeAndAccountStatus(nodeUrl);
+    logger.info("Sync node status");
+    this.props.nodeStore.updateNodeState();
   }
 
-  _onNodeUrlChange(selectedNodeUrl) {
-    logger.debug("Node url change", selectedNodeUrl);
-    this._updateNodeAndAccountStatus(selectedNodeUrl.value);
-  }
-
-  _updateNodeAndAccountStatus(nodeUrl) {
-    logger.debug("Update node status of", nodeUrl);
-    this.state.context.services.nodeService.changeNode(nodeUrl).then(() => {
-      const accountAddress = this.state.context.current.account.accountAddress;
-      if ("" !== accountAddress) {
-        this._updateAccountStatus(accountAddress);
-      }
-    });
+  _onNodeUrlChange(selectedNode) {
+    logger.info("Node change", selectedNode.value);
+    this.props.nodeStore.changeNode(selectedNode.value);
   }
 
   _onSyncAddressStatus() {
-    const accountAddress = this.state.context.current.account.accountAddress;
-    logger.debug("Sync account status request with", accountAddress);
-    this._updateAccountStatus(accountAddress);
+    logger.info("Sync account state");
+    this.props.accountStore.updateAccountState();
   }
 
   _onAddressChange(selectedAddress) {
-    logger.debug("Account address change to", selectedAddress);
-    this._updateAccountStatus(selectedAddress.value);
-  }
-
-  _updateAccountStatus(accountAddress) {
-    logger.debug("Update account status", accountAddress);
-    this.state.context.services.accountService.changeAccount(accountAddress)
+    logger.info("Account address change to", selectedAddress.value);
+    this.props.accountStore.changeAccount(selectedAddress.value);
   }
 
   _onPriceChange(event) {
-    const context = this.state.context;
-    context.current.fee.price = event.target.value;
-    this.setState(context);
+    const price = event.target.value;
+    logger.info("Price changed to", price);
+    this.props.feeStore.price = price;
   }
 
   _onLimitChange(event) {
-    const context = this.state.context;
-    context.current.fee.limit = event.target.value;
-    this.setState(context);
+    const limit = event.target.value;
+    logger.info("Limit changed to", limit);
+    this.props.feeStore.limit = event.target.value;
   }
 
   _onDeployButtonClicked() {
-    const accountAddress = this.state.context.current.account.accountAddress;
-    const price = this.state.context.current.fee.price;
-    const limit = this.state.context.current.fee.limit;
-    const currentFile = this.state.context.current.file;
-    let contractPayload = null
-    if (this.state.context.store.file2CompiledResult.has(currentFile)) {
-      contractPayload = this.state.context.store.file2CompiledResult.get(currentFile).payload;
-    }
-    logger.debug("Deploy button clicked with", price, limit, currentFile, contractPayload);
-    this.state.context.services.contractService.deploy(accountAddress, price, limit, contractPayload);
+    this.props.contractStore.deployContract();
   }
 
   _onCompiledFileChange(selectedOption) {
-    logger.debug("Compiled file change", selectedOption);
-    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
+    const file = selectedOption.value;
+    logger.info("Compiled file change", file);
+    this.props.compileResultStore.changeFile(file);
   }
 
   _onContractAddressChange(selectedContractAddress) {
-    logger.debug("Contract address change to", selectedContractAddress);
-    const context = this.state.context;
-    context.current.contract.contractAddress = selectedContractAddress.value;
-    this.setState(context);
+    const contractAddress = selectedContractAddress.value;
+    logger.info("Contract address change to", contractAddress);
+    this.props.contractStore.changeContract(contractAddress);
   }
 
-  _onContractFunctionClicked(argInputRef, targetFunction, contractAddress) {
-    const context = this.state.context;
-    const accountAddress = context.current.account.accountAddress;
-    const price = context.current.fee.price;
-    const limit = context.current.fee.limit;
-    logger.debug("Account:", accountAddress, ", fee:", price, limit);
-
+  _onContractFunctionClicked(argInputRef, targetFunction) {
     logger.debug("Input ref:", argInputRef);
     const targetArgs = argInputRef.current.state.value.split(',').map(arg => arg.trim()).map(arg => {
       const asNumber = Number(arg);
       return Number.isNaN(asNumber) ? arg.replace(/\\"/g, '') : asNumber;
     });
-    const abi = context.store.contractAddress2Abi.get(contractAddress);
-    logger.debug("Contract function execution clicked with", targetFunction, targetArgs,
-                  contractAddress, abi);
-
-    this.state.context.services.contractService.execute(accountAddress, price, limit,
-          targetFunction, targetArgs, contractAddress, abi);
+    logger.info("Execute contract", targetFunction, "with args", targetArgs);
+    this.props.contractStore.executeContract(targetFunction, targetArgs);
   }
 
   render() {
+    // node
+    const node = this.props.nodeStore.currentNode;
+    const nodes = this.props.nodeStore.nodes;
+    const height = this.props.nodeStore.currentHeight;
+    logger.debug("node", node, "nodes", nodes, "height", height);
+
+    // address
+    const address = this.props.accountStore.currentAddress;
+    const addresses = this.props.accountStore.addresses;
+    const balance = this.props.accountStore.currentBalance;;
+    const nonce = this.props.accountStore.currentNonce;;
+
+    // target
+    const currentFile = this.props.compileResultStore.currentFile;
+    const files = this.props.compileResultStore.files;
+
+    // contract
+    const currentContract = this.props.contractStore.currentContract;
+    const contracts = this.props.contractStore.contracts;
+    const currentAbi = this.props.contractStore.currentAbi;
+
     return (
       <Panel>
         <ComponentsHolder>
-          <EnviromentTitle context={this.props.context} onClick={this._onSyncNodeStatus} />
-          <NodeSelect context={this.props.context} onChange={this._onNodeUrlChange} />
-          <NodeHeight context={this.props.context} />
+          <EnviromentTitle onClick={this._onSyncNodeStatus} />
+          <NodeSelect node={node} nodes={nodes} onChange={this._onNodeUrlChange} />
+          <NodeHeight height={height} />
         </ComponentsHolder>
         <ComponentsHolder>
-          <AccountTitle context={this.props.context} onClick={this._onSyncAddressStatus} />
-          <AddressSelect context={this.props.context} onChange={this._onAddressChange} />
-          <Balance context={this.props.context} />
-          <Nonce context={this.props.context} />
-          <AccountManipulateButtons context={this.props.context} />
+          <AccountTitle onClick={this._onSyncAddressStatus} />
+          <AddressSelect address={address} addresses={addresses} onChange={this._onAddressChange} />
+          <Balance balance={balance} />
+          <Nonce nonce={nonce} />
+          <AccountManipulateButtons />
         </ComponentsHolder>
         <ComponentsHolder>
           <FeeTitle />
-          <PriceInput context={this.props.context} onChange={this._onPriceChange} />
-          <LimitInput context={this.props.context} onChange={this._onLimitChange} />
+          <PriceInput onChange={this._onPriceChange} />
+          <LimitInput onChange={this._onLimitChange} />
         </ComponentsHolder>
         <ComponentsHolder>
           <DeployTitle />
-          <DeploySelectAndRun context={this.props.context}
-              onClick={this._onDeployButtonClicked}
-              onChange={this._onCompiledFileChange} />
+          <DeploySelectAndRun
+            file={currentFile}
+            files={files}
+            onClick={this._onDeployButtonClicked}
+            onChange={this._onCompiledFileChange}
+          />
         </ComponentsHolder>
         <ComponentsHolder>
           <RunContractTitle />
-          <AbiSelect context={this.props.context} onChange={this._onContractAddressChange} />
-          <Abis context={this.props.context} onClick={this._onContractFunctionClicked} />
+          <AbiSelect contract={currentContract} contracts={contracts} onChange={this._onContractAddressChange} />
+          <Abis abi={currentAbi} onClick={this._onContractFunctionClicked} />
         </ComponentsHolder>
       </Panel>
     );
@@ -176,25 +158,22 @@ const EnviromentTitle = (props) => {
   return (
     <Row>
       <Title title='Enviroment'/>
-      <SyncIcon context={props.context} onClick={props.onClick} />
+      <SyncIcon onClick={props.onClick} />
     </Row>
   );
 }
 
 EnviromentTitle.propTypes = {
-  context: PropTypes.any,
   onClick: PropTypes.func
 }
 
 const NodeSelect = (props) => {
-  const option = props.context.current.node.url;
-  const options = Array.from(props.context.store.nodeUrls.keys());
   return (
     <Row>
       <Description description='Node' />
       <SelectBox
-        value={option}
-        options={options}
+        value={props.node}
+        options={props.nodes}
         onChange={props.onChange}
         isCreatable
       />
@@ -203,47 +182,44 @@ const NodeSelect = (props) => {
 }
 
 NodeSelect.propTypes = {
-  context: PropTypes.any,
+  node: PropTypes.string,
+  nodes: PropTypes.array,
   onChange: PropTypes.func
 }
 
 const NodeHeight = (props) => {
-  const height = props.context.current.node.height;
   return (
     <Row>
       <Description description='Height' />
-      <TextBox class='component-textbox-number' text={height} />
+      <TextBox class='component-textbox-number' text={props.height} />
     </Row>
   );
 }
 
 NodeHeight.propTypes = {
-  context: PropTypes.any
+  height: PropTypes.string
 }
 
 const AccountTitle = (props) => {
   return (
     <Row>
       <Title title='Account'/>
-      <SyncIcon context={props.context} onClick={props.onClick} />
+      <SyncIcon onClick={props.onClick} />
     </Row>
   );
 }
 
 AccountTitle.propTypes = {
-  context: PropTypes.any,
   onClick: PropTypes.func
 }
 
 const AddressSelect = (props) => {
-  const option = props.context.current.account.accountAddress;
-  const options = Array.from(props.context.store.addresses.keys());
   return (
     <Row>
       <Description description='Address' />
       <SelectBox
-        value={option}
-        options={options}
+        value={props.address}
+        options={props.addresses}
         onChange={props.onChange}
       />
     </Row>
@@ -251,53 +227,45 @@ const AddressSelect = (props) => {
 };
 
 AddressSelect.propTypes = {
-  context: PropTypes.any,
+  address : PropTypes.string,
+  addresses : PropTypes.array,
   onChange: PropTypes.func
 }
 
 const Balance = (props) => {
-  const balance = props.context.current.account.balance;
   return (
     <Row>
       <Description description='Balance' />
-      <TextBox class='component-textbox-number' text={balance} />
+      <TextBox class='component-textbox-number' text={props.balance} />
     </Row>
   );
 };
 
 Balance.propTypes = {
-  context: PropTypes.any
+  context: PropTypes.string
 }
 
 const Nonce = (props) => {
-  const nonce = props.context.current.account.nonce;
   return (
     <Row>
       <Description description='Nonce' />
-      <TextBox class='component-textbox-number' text={nonce} />
+      <TextBox class='component-textbox-number' text={props.nonce} />
     </Row>
   );
 };
 
 Nonce.propTypes = {
-  context: PropTypes.any
+  nonce: PropTypes.string
 }
 
-const AccountManipulateButtons = (props) => {
-  const newButton = <Button name='New' />;
-  const importButton = <Button name='Import' />;
-  const exportButton = <Button name='Export' />;
+const AccountManipulateButtons = () => {
   return (
     <Row class='components-row-button'>
-      <NewAccountModal context={props.context} trigger={newButton} />
-      <ImportAccountModal context={props.context} trigger={importButton} />
-      <ExportAccountModal context={props.context} trigger={exportButton} />
+      <NewAccountModal trigger={<Button name='New' />} />
+      <ImportAccountModal trigger={<Button name='Import' />} />
+      <ExportAccountModal trigger={<Button name='Export' />} />
     </Row>
   );
-}
-
-AccountManipulateButtons.propTypes = {
-  context: PropTypes.any
 }
 
 const FeeTitle = () => {
@@ -345,8 +313,6 @@ const DeployTitle = () => {
 }
 
 const DeploySelectAndRun = (props) => {
-  const option = props.context.current.file;
-  const options = Array.from(props.context.store.file2CompiledResult.keys());
   return (
     <Row>
       <Button
@@ -355,8 +321,8 @@ const DeploySelectAndRun = (props) => {
         onClick={props.onClick}
       />
       <SelectBox
-        value={option}
-        options={options}
+        value={props.file}
+        options={props.files}
         onChange={props.onChange}
       />
     </Row>
@@ -364,7 +330,8 @@ const DeploySelectAndRun = (props) => {
 }
 
 DeploySelectAndRun.propTypes = {
-  context: PropTypes.any,
+  file: PropTypes.string,
+  files: PropTypes.array,
   onClick: PropTypes.func,
   onChange: PropTypes.func
 }
@@ -378,14 +345,12 @@ const RunContractTitle = () => {
 }
 
 const AbiSelect = (props) => {
-  const option = props.context.current.contract.contractAddress;
-  const options = Array.from(props.context.store.contractAddress2Abi.keys());
   return (
     <Row>
       <Description description='ABI' />
       <SelectBox
-        value={option}
-        options={options}
+        value={props.contract}
+        options={props.contracts}
         onChange={props.onChange}
       />
     </Row>
@@ -393,20 +358,17 @@ const AbiSelect = (props) => {
 }
 
 AbiSelect.propTypes = {
-  context: PropTypes.any,
+  contract: PropTypes.string,
+  contracts: PropTypes.array,
   onChange: PropTypes.func
 }
 
 const Abis = (props) => {
-  const context = props.context;
-  const contractAddress = context.current.contract.contractAddress;
-  if (!context.store.contractAddress2Abi.has(contractAddress)) {
+  const abiFunctions = props.abi.functions;
+  if (typeof abiFunctions === "undefined") {
     return <div></div>;
   }
-
-  const abi = context.store.contractAddress2Abi.get(contractAddress);
-  logger.debug("Current Abi", abi);
-  return abi.functions.map((abiFunction, index) => {
+  return props.abi.functions.map((abiFunction, index) => {
     const argsRef = React.createRef();
     const args = abiFunction.arguments;
     const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
@@ -415,7 +377,7 @@ const Abis = (props) => {
         <Button
           name={abiFunction.name}
           class={['component-btn-runner', 'component-description', 'component-btn-execute']}
-          onClick={() => props.onClick(argsRef, abiFunction.name, contractAddress)}
+          onClick={() => props.onClick(argsRef, abiFunction.name)}
         />
         <InputBox type='text' class='component-inputbox-text'
           ref={argsRef}
@@ -427,7 +389,7 @@ const Abis = (props) => {
 }
 
 Abis.propTypes = {
-  context: PropTypes.any,
+  abi: PropTypes.object,
   trigger: PropTypes.element,
   onClick: PropTypes.func
 }

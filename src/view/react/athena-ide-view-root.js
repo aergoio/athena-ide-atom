@@ -2,17 +2,10 @@
 
 import React from 'react';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
-import PropTypes from 'prop-types';
 
 import {CompilePanel, RunPanel} from './panel';
 
 export default class AthenaIdeViewRoot extends React.Component {
-
-  static get propTypes() {
-    return {
-      context: PropTypes.any
-    };
-  }
 
   constructor(props) {
     super(props);
@@ -27,10 +20,10 @@ export default class AthenaIdeViewRoot extends React.Component {
           <Tab>Run</Tab>
         </TabList>
         <TabPanel>
-          <CompilePanel context={this.props.context}/>
+          <CompilePanel />
         </TabPanel>
         <TabPanel>
-          <RunPanel context={this.props.context}/>
+          <RunPanel />
         </TabPanel>
       </Tabs>
     );

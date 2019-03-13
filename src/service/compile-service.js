@@ -8,8 +8,6 @@ import logger from 'loglevel';
 
 import {LuaImportResolver} from '../lua';
 
-import {EventType} from '../event';
-
 const LUA_COMPILER_OSX = "aergoluac_osx";
 const LUA_COMPILER_LINUX = "aergoluac_linux";
 const LUA_COMPILER_WINDOW = "aergoluac_window";
@@ -20,8 +18,7 @@ const LUA_TEMP_FILE = "temp_athena_ide_atom.lua";
 
 export default class CompileService {
 
-  constructor(eventDispatcher) {
-    this.eventDispatcher = eventDispatcher;
+  constructor() {
     this.importResolver = new LuaImportResolver();
   }
 
@@ -38,26 +35,13 @@ export default class CompileService {
     logger.debug("Temp file saved to", tempSourceFile);
 
     const compileResult = this._compile(tempSourceFile);
-    compileResult.file = './' + relativePath;
     logger.debug("Compile result", compileResult);
 
-    if (null == compileResult.err) {
-      this.eventDispatcher.dispatch(EventType.NewCompileTarget, compileResult);
-      this.eventDispatcher.dispatch(EventType.Log, { message: compileResult, level: "info" });
-      this.eventDispatcher.dispatch(EventType.Notify, { message: "Compiled successfully", level: "success" });
-    } else {
-      this.eventDispatcher.dispatch(EventType.Log, { message: compileResult, level: "error" });
-      this.eventDispatcher.dispatch(EventType.Notify, { message: "Compile failed", level: "error" });
-    }
-
-    return Promise.resolve(compileResult);
-  }
-
-  changeCompiledTarget(file) {
-    logger.debug("Change compiled target to", file);
-    return new Promise(() => {
-      this.eventDispatcher.dispatch(EventType.ChangeCompileTarget, file)
-      return file;
+    return new Promise((resolve, reject) => {
+      if (null != compileResult.err) {
+        reject(compileResult.err);
+      }
+      resolve(compileResult.result);
     });
   }
 
@@ -96,12 +80,7 @@ export default class CompileService {
   _compile(sourceFilePath) {
     const compileResult = {
       payload: "",
-      abi: "",
-      err: null,
-      toString: function() {
-        return null == this.err ? "payload: " + this.payload + "abi: " + this.abi
-                                : this.err.toString();
-      }
+      abi: ""
     };
 
     const compiler = this._resolveCompilerPath();
@@ -119,14 +98,13 @@ export default class CompileService {
     const abiResult = child_process.spawnSync(compiler, ["--abi", abiTempFile, sourceFilePath, bcTempFile]);
     logger.debug("Abi result:", abiResult);
     if (this._isSpanFail(abiResult)) {
-      compileResult.err = abiResult.stderr.toString();
-      return compileResult;
+      return { result: null, err: abiResult.stderr.toString() };
     }
 
     compileResult.payload = payloadResult.stdout.toString();
     compileResult.abi = JSON.stringify(JSON.parse(this._readFile(abiTempFile)), null, 2);
 
-    return compileResult;
+    return { result: compileResult, err: null };
   }
 
   _isSpanFail(spanResult) {

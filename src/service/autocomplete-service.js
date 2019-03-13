@@ -5,8 +5,7 @@ import logger from 'loglevel';
 
 export default class AutoCompleteService {
 
-  constructor(eventDispatcher) {
-    this.eventDispatcher = eventDispatcher;
+  constructor() {
     this.luaSuggester = new LuaSuggester();
   }
 

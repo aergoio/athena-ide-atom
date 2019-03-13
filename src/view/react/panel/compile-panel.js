@@ -1,6 +1,7 @@
 'use babel';
 
 import React from 'react';
+import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
@@ -9,33 +10,33 @@ import {
   Title, Description, SelectBox, TextBox
 } from '../components';
 
+@inject('compileResultStore')
+@observer
 export default class CompilePanel extends React.Component {
-
-  static get propTypes() {
-    return {
-      context: PropTypes.any
-    };
-  }
 
   constructor(props) {
     super(props);
-    this.state = { context: props.context };
     this._onCompiledFileChange = this._onCompiledFileChange.bind(this);
   }
 
   _onCompiledFileChange(selectedOption) {
     logger.debug("Compiled file change", selectedOption);
-    this.state.context.services.compileService.changeCompiledTarget(selectedOption.value);
+    this.props.compileResultStore.changeFile(selectedOption.value);
   }
 
   render() {
+    const currentFile = this.props.compileResultStore.currentFile;
+    const files = this.props.compileResultStore.files;
+    const payload = this.props.compileResultStore.compileResult.payload;
+    const abi = this.props.compileResultStore.compileResult.abi;
+
     return (
       <Panel>
         <ComponentsHolder>
           <CompileResultTitle />
-          <FileSelect context={this.props.context} onChange={this._onCompiledFileChange} />
-          <Payload context={this.props.context} />
-          <Abi context={this.props.context} />
+          <FileSelect file={currentFile} files={files} onChange={this._onCompiledFileChange} />
+          <Payload payload={payload} />
+          <Abi abi={abi} />
         </ComponentsHolder>
       </Panel>
     );
@@ -52,14 +53,12 @@ const CompileResultTitle = () => {
 }
 
 const FileSelect = (props) => {
-  const option = props.context.current.file;
-  const options = Array.from(props.context.store.file2CompiledResult.keys());
   return (
     <Row>
       <Description description="File" />
       <SelectBox
-        value={option}
-        options={options}
+        value={props.file}
+        options={props.files}
         onChange={props.onChange}
       />
     </Row>
@@ -67,38 +66,33 @@ const FileSelect = (props) => {
 }
 
 FileSelect.propTypes = {
-  context: PropTypes.any,
+  file: PropTypes.string,
+  files: PropTypes.array,
   onChange: PropTypes.func
 }
 
 const Payload = (props) => {
-  const file = props.context.current.file;
-  const file2CompiledResult = props.context.store.file2CompiledResult;
-  const payload = file2CompiledResult.has(file) ? file2CompiledResult.get(file).payload : "";
   return (
     <Row>
       <Description description="Payload" />
-      <TextBox text={payload} />
+      <TextBox text={props.payload} />
     </Row>
   );
 }
 
 Payload.propTypes = {
-  context: PropTypes.any
+  payload: PropTypes.string
 }
 
 const Abi = (props) => {
-  const file = props.context.current.file;
-  const file2CompiledResult = props.context.store.file2CompiledResult;
-  const abi = file2CompiledResult.has(file) ? file2CompiledResult.get(file).abi : "";
   return (
     <Row>
       <Description description="ABI" />
-      <TextBox class='component-textbox-abi' text={abi} />
+      <TextBox class='component-textbox-abi' text={props.abi} />
     </Row>
   );
 }
 
 Abi.propTypes = {
-  context: PropTypes.any
+  abi: PropTypes.string
 }

@@ -1,100 +1,76 @@
 'use babel';
 
+import {signTransaction, hashTransaction} from '@herajs/crypto';
 import {Contract, FunctionCall} from '@herajs/client';
+
 import _ from 'lodash';
 import logger from 'loglevel';
 
-import {EventType} from '../event';
 import {isEmpty} from './utils';
+import consoleStore from '../store/console-store';
 
 const contractTxSuccesses = ["CREATED", "SUCCESS"];
 
 export default class ContractService {
 
-  constructor(nodeService, accountService, eventDispatcher) {
-    this.nodeService = nodeService;
-    this.accountService = accountService;
-    this.eventDispatcher = eventDispatcher;
-    this.contractAddress2Abi = new Map();
+  constructor(client) {
+    this.client = client;
   }
 
-  deploy(accountAddress, price, limit, contractPayload) {
-    logger.debug("Deploy with", accountAddress, price, limit, contractPayload);
-
-    if (isEmpty(accountAddress)) {
-      const message = "Selected account is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+  deploy(identity, price, limit, contractPayload) {
+    if (isEmpty(identity)) {
+      return Promise.reject("Selected account is empty");
     }
 
+    const accountAddress = identity.address;
+    logger.debug("Deploy with", accountAddress, price, limit, contractPayload);
+
     if (isEmpty(price) || isEmpty(limit)) {
-      const message = "Price or limit is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+      return Promise.reject("Price or limit is empty");
     }
 
     if (isEmpty(contractPayload)) {
-      const message = "Deploy target is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+      return Promise.reject("Deploy target is empty");
     }
 
     const trimmedPayload = contractPayload.trim();
     return Promise.resolve(Contract.fromCode(trimmedPayload).asPayload([10])).then(payload => {
       const trier = (nonce) => {
         const rawTx = this._buildDeployTx(accountAddress, "", nonce, price, limit, payload);
-        return this._signTx(accountAddress, rawTx).then(signedTx => {
+        return this._signTx(identity, rawTx).then(signedTx => {
           logger.debug("Signed tx", signedTx);
-          return this.nodeService.getClient().sendSignedTransaction(signedTx);
+          return this.client.sendSignedTransaction(signedTx);
         });
       };
       return this._tryWithNonceRefresh(accountAddress, trier);
     }).then(txHash => {
-      this.eventDispatcher.dispatch(EventType.Log, { message: "Deploy TxHash: " + txHash, level: "info" });
+      consoleStore.log("Deploy TxHash: " + txHash, "info");
       return this._pollingReceipt(txHash, receipt => receipt.contractaddress);
     }).then(contractAddress => {
-      return this.nodeService.getClient().getABI(contractAddress).then(abi => {
+      return this.client.getABI(contractAddress).then(abi => {
         logger.debug("Queried Abi", abi);
         return {
           contractAddress: contractAddress.toString(),
           abi: abi
         }
       });
-    }).then(result => {
-      logger.debug("Deploy result:", result);
-      this.accountService.updateAccount(accountAddress);
-      this.eventDispatcher.dispatch(EventType.Deploy, result);
-      this.eventDispatcher.dispatch(EventType.Log, { message: "ContractAddress: " + result.contractAddress, level: "info" });
-      this.eventDispatcher.dispatch(EventType.Notify, { message: "Successfully deployed contract", level: "success" });
-      return result;
-    }).catch(err => {
-      logger.error(err);
-      this.accountService.updateAccount(accountAddress);
-      this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
-      this.eventDispatcher.dispatch(EventType.Notify,
-              { message: "Deploying contract failed", level: "error" });
-    });
+    }).then(result => result);
   }
 
-  execute(accountAddress, price, limit, targetFunction, targetArgs, contractAddress, abi) {
-    logger.debug("Execution with", accountAddress, price, limit, targetFunction, targetArgs, contractAddress, abi);
-
-    if (isEmpty(accountAddress)) {
-      const message = "Selected account is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+  execute(identity, targetFunction, targetArgs, contractAddress, abi, price, limit) {
+    if (isEmpty(identity)) {
+      return Promise.reject("Selected account is empty");
     }
 
+    const accountAddress = identity.address;
+    logger.debug("Execution with", accountAddress, price, limit, targetFunction, targetArgs, contractAddress, abi);
+
     if (isEmpty(price) || isEmpty(limit)) {
-      const message = "Price or limit is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+      return Promise.reject("Price or limit is empty");
     }
 
     if (isEmpty(targetFunction) || isEmpty(targetArgs) || isEmpty(contractAddress) || isEmpty(abi)) {
-      const message = "One of contract execution information is empty";
-      this._dispatchError(message);
-      return Promise.reject(message);
+      return Promise.reject("One of contract execution information is empty");
     }
 
     const contract = Contract.fromAbi(abi).setAddress(contractAddress);
@@ -103,9 +79,7 @@ export default class ContractService {
     const targetFunctionAbi = abi.functions.filter(f => f.name === targetFunction)[0];
     logger.debug("Abi functions:", abi.functions, "target function:", targetFunctionAbi);
     if (typeof targetFunctionAbi === 'undefined') {
-      const message = "Target function is not found in abi";
-      this._dispatchError(message);
-      return Promise.reject(message);
+      return Promise.reject("Target function is not found in abi");
     }
 
     const functionCall = contract[targetFunctionAbi.name](...targetArgs);
@@ -122,25 +96,15 @@ export default class ContractService {
     const trier = (nonce) => {
       const rawTx = _.cloneDeep(functionCallTx);
       rawTx.nonce = nonce;
-      return this._signTx(accountAddress, rawTx).then(signedTx => {
+      return this._signTx(identity, rawTx).then(signedTx => {
         logger.debug("Signed tx", signedTx);
-        return this.nodeService.getClient().sendSignedTransaction(signedTx);
+        return this.client.sendSignedTransaction(signedTx);
       });
     };
 
     return this._tryWithNonceRefresh(accountAddress, trier).then(txHash => {
-      this.eventDispatcher.dispatch(EventType.Log, { message: "Execute TxHash: " + txHash, level: "info" });
+      consoleStore.log("Execute TxHash: " + txHash, "info");
       return this._pollingReceipt(txHash, receipt => receipt.result);
-    }).then(result => {
-      this.accountService.updateAccount(accountAddress);
-      this.eventDispatcher.dispatch(EventType.Log, { message: "Execute ret: " + result, level: "info" });
-      return result;
-    }).catch(err => {
-      logger.error(err);
-      this.accountService.updateAccount(accountAddress);
-      this.eventDispatcher.dispatch(EventType.Log, { message: err, level: "error" });
-      this.eventDispatcher.dispatch(EventType.Notify,
-              { message: "Executing contract failed", level: "error" });
     });
   }
 
@@ -150,14 +114,14 @@ export default class ContractService {
   }
 
   _fetchNextNonceOf(accountAddress) {
-    const aergoClient = this.nodeService.getClient();
+    const aergoClient = this.client;
     return aergoClient.getState(accountAddress).then((s) => s.nonce + 1);
   }
 
   _pollingReceipt(txHash, callback) {
     let receipt = null;
     const receiptRequest = () => {
-        this.nodeService.getClient().getTransactionReceipt(txHash).then(receivedReceipt => {
+        this.client.getTransactionReceipt(txHash).then(receivedReceipt => {
           logger.debug("Received receipt", receivedReceipt);
           if (!isEmpty(receivedReceipt)) {
             receipt = receivedReceipt;
@@ -172,9 +136,9 @@ export default class ContractService {
             if (receipt) {
               clearInterval(timerId);
               if (contractTxSuccesses.indexOf(receipt.status) !== -1) {
-                return resolve(callback(receipt));
+                resolve(callback(receipt));
               } else {
-                return reject(receipt.status);
+                reject(receipt.status);
               }
             }
             setTimeout(waitForComplete, 30);
@@ -194,14 +158,15 @@ export default class ContractService {
     };
   }
 
-  _signTx(from, rawTransaction) {
-    logger.debug("Raw transaction", rawTransaction);
-    return this.accountService.sign(from, rawTransaction);
-  }
-
-  _dispatchError(message) {
-    this.eventDispatcher.dispatch(EventType.Log, { message: message, level: "error" });
-    this.eventDispatcher.dispatch(EventType.Notify, { message: message, level: "error" });
+  _signTx(identity, rawTransaction) {
+    const signedTransaction = _.cloneDeep(rawTransaction)
+    return signTransaction(rawTransaction, identity.keyPair).then(sign => {
+      signedTransaction.sign = sign;
+      return hashTransaction(signedTransaction, "base58");
+    }).then(hash => {
+      signedTransaction.hash = hash;
+      return signedTransaction;
+    });
   }
 
 }
