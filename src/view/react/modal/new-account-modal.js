@@ -14,6 +14,7 @@ export default class NewAccountModal extends React.Component {
 
   static get propTypes() {
     return {
+      accountStore: PropTypes.any,
       trigger: PropTypes.element
     };
   }

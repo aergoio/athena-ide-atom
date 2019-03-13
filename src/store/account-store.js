@@ -25,7 +25,7 @@ export class AccountStore {
       notificationStore.notify(message, "success");
     }).catch(err => {
       logger.error(err);
-      consoleStore.log({ message: err, level: "error" });
+      consoleStore.log(err, "error");
       notificationStore.notify("Creating account failed", "error");
     });
 
@@ -94,7 +94,7 @@ export class AccountStore {
     logger.debug("Remove account", address);
     if (this.address2Identity.has(address)) {
       this.address2Identity.remove(address);
-      changeAccount("");
+      this.changeAccount("");
       consoleStore.log("Remove account " + address, "info");
       notificationStore.notify("Successfully removed account", "success");
     } else {

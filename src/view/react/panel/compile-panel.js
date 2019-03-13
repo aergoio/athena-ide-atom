@@ -14,6 +14,12 @@ import {
 @observer
 export default class CompilePanel extends React.Component {
 
+  static get propTypes() {
+    return {
+      compileResultStore: PropTypes.any
+    };
+  }
+
   constructor(props) {
     super(props);
     this._onCompiledFileChange = this._onCompiledFileChange.bind(this);

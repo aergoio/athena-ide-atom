@@ -54,9 +54,8 @@ export class ContractStore {
       accountStore.updateAccountState();
       consoleStore.log("Execute ret: " + execResult, "info");
     }).catch(err => {
-      accountStore.updateAccountState();
       logger.error(err);
-      this.accountService.updateAccount(accountAddress);
+      accountStore.updateAccountState();
       consoleStore.log(err, "error");
       notificationStore.notify("Executing contract failed", "error");
     });

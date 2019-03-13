@@ -16,6 +16,16 @@ import {NewAccountModal, ImportAccountModal, ExportAccountModal} from '../modal'
 @observer
 export default class RunPanel extends React.Component {
 
+  static get propTypes() {
+    return {
+      accountStore: PropTypes.any,
+      nodeStore: PropTypes.any,
+      feeStore: PropTypes.any,
+      compileResultStore: PropTypes.any,
+      contractStore: PropTypes.any
+    };
+  }
+
   constructor(props) {
     super(props);
 
@@ -103,8 +113,8 @@ export default class RunPanel extends React.Component {
     // address
     const address = this.props.accountStore.currentAddress;
     const addresses = this.props.accountStore.addresses;
-    const balance = this.props.accountStore.currentBalance;;
-    const nonce = this.props.accountStore.currentNonce;;
+    const balance = this.props.accountStore.currentBalance;
+    const nonce = this.props.accountStore.currentNonce;
 
     // target
     const currentFile = this.props.compileResultStore.currentFile;
@@ -242,7 +252,7 @@ const Balance = (props) => {
 };
 
 Balance.propTypes = {
-  context: PropTypes.string
+  balance: PropTypes.string
 }
 
 const Nonce = (props) => {

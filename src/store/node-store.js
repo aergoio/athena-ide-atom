@@ -14,7 +14,7 @@ export class NodeStore {
   @action addNode(node) {
     logger.debug("Add node", node);
     this.nodes.push(node);
-    changeNode(node);
+    this.changeNode(node);
   }
 
   @action changeNode(node) {

@@ -3,8 +3,12 @@
     "node": true,
     "es6": true
   },
+  "parser": "babel-eslint",
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "legacyDecorators": true
+    }
   },
   "settings": {
     "react": {
