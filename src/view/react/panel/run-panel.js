@@ -117,6 +117,10 @@ export default class RunPanel extends React.Component {
     const nonce = this.props.accountStore.currentNonce;
 
     // target
+    const price = this.props.feeStore.price;
+    const limit = this.props.feeStore.limit;
+
+    // target
     const currentFile = this.props.compileResultStore.currentFile;
     const files = this.props.compileResultStore.files;
 
@@ -142,8 +146,8 @@ export default class RunPanel extends React.Component {
         </ComponentsHolder>
         <ComponentsHolder>
           <FeeTitle />
-          <PriceInput onChange={this._onPriceChange} />
-          <LimitInput onChange={this._onLimitChange} />
+          <PriceInput price={price} onChange={this._onPriceChange} />
+          <LimitInput limit={limit} onChange={this._onLimitChange} />
         </ComponentsHolder>
         <ComponentsHolder>
           <DeployTitle />
@@ -300,12 +304,14 @@ const PriceInput = (props) => {
     <Row>
       <Description description='Price' />
       <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10000 (unit : Aer)'
-          onChange={props.onChange} />
+          onChange={props.onChange} value={props.price}
+      />
     </Row>
   );
 }
 
 PriceInput.propTypes = {
+  price: PropTypes.string,
   onChange: PropTypes.func
 }
 
@@ -314,12 +320,14 @@ const LimitInput = (props) => {
     <Row>
       <Description description='Limit' />
       <InputBox type='number' class='component-inputbox-number' placeHolder='eg. 10'
-          onChange={props.onChange} />
+          onChange={props.onChange} value={props.limit}
+      />
     </Row>
   );
 }
 
 LimitInput.propTypes = {
+  limit: PropTypes.string,
   onChange: PropTypes.func
 }
 

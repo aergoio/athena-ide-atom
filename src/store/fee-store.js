@@ -4,8 +4,8 @@ import {observable, action} from 'mobx';
 
 export class NodeStore {
 
-  @observable price = 0;
-  @observable limit = 0;
+  @observable price = "0";
+  @observable limit = "0";
 
   @action setPrice(price) {
     this.price = price;
