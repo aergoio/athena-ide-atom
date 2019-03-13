@@ -6,7 +6,7 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {ComponentsHolder, Row, Title, Button} from '../components';
+import {Row, Title, Button} from '../components';
 
 @inject('accountStore')
 @observer
@@ -34,7 +34,7 @@ export default class NewAccountModal extends React.Component {
       <Popup modal trigger={this.props.trigger}>
         {close =>
           <atom-panel class='modal'>
-            <ComponentsHolder>
+            <div>
               <Row>
                 <Title title='Do you want to make a new account?' />
               </Row>
@@ -42,7 +42,7 @@ export default class NewAccountModal extends React.Component {
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
               </Row>
-            </ComponentsHolder>
+            </div>
           </atom-panel>
         }
       </Popup>
