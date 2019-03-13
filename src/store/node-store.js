@@ -9,12 +9,20 @@ export class NodeStore {
 
   @observable currentNode = "localhost:7845";
   @observable currentHeight = "unknown";
-  @observable nodes = ["localhost:7845", "testnet.aergo.io:7845"];
+  @observable nodeSet = new Set(["localhost:7845", "testnet.aergo.io:7845"]);
 
   @action addNode(node) {
     logger.debug("Add node", node);
-    this.nodes.push(node);
+    if (typeof node === "undefined" || "" === node) {
+      return;
+    }
+
+    this.nodeSet.add(node);
     this.changeNode(node);
+  }
+
+  @computed get nodes() {
+    return Array.from(this.nodeSet.values());
   }
 
   @action changeNode(node) {
@@ -26,16 +34,21 @@ export class NodeStore {
 
   @action updateNodeState() {
     logger.debug("Update node state of", this.currentNode);
-    if (typeof this.currentNode === "undefined" || "" === this.currentNode) {
-      return;
-    }
-
     serviceProvider.nodeService.blockchainStatus().then(status => {
       this.currentHeight = status.height;
     })
     accountStore.updateAccountState(accountStore);
   }
 
+  @action removeNode() {
+    logger.debug("Remove node", this.currentNode);
+    if (typeof this.currentNode === "undefined" || "" === this.currentNode) {
+      return;
+    }
+
+    this.nodeSet.delete(this.currentNode);
+    this.changeNode("");
+  }
 
 }
 

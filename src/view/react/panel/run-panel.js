@@ -10,7 +10,7 @@ import {
   Button, Title, Description, SelectBox, TextBox, SyncIcon, InputBox
 } from '../components';
 
-import {NewAccountModal, ImportAccountModal, ExportAccountModal} from '../modal';
+import {NewNodeModal, RemoveNodeModal, NewAccountModal, ImportAccountModal, ExportAccountModal} from '../modal';
 
 @inject('accountStore', 'nodeStore', 'feeStore', 'compileResultStore', 'contractStore')
 @observer
@@ -131,6 +131,7 @@ export default class RunPanel extends React.Component {
           <EnviromentTitle onClick={this._onSyncNodeStatus} />
           <NodeSelect node={node} nodes={nodes} onChange={this._onNodeUrlChange} />
           <NodeHeight height={height} />
+          <NodeManipulateButtons />
         </ComponentsHolder>
         <ComponentsHolder>
           <AccountTitle onClick={this._onSyncAddressStatus} />
@@ -185,7 +186,6 @@ const NodeSelect = (props) => {
         value={props.node}
         options={props.nodes}
         onChange={props.onChange}
-        isCreatable
       />
     </Row>
   );
@@ -208,6 +208,15 @@ const NodeHeight = (props) => {
 
 NodeHeight.propTypes = {
   height: PropTypes.string
+}
+
+const NodeManipulateButtons = () => {
+  return (
+    <Row class='components-row-button'>
+      <NewNodeModal trigger={<Button name='New' />} />
+      <RemoveNodeModal trigger={<Button name='Remove' />} />
+    </Row>
+  );
 }
 
 const AccountTitle = (props) => {
