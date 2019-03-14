@@ -1,3 +1,10 @@
+## 0.2.1 - Patch
+
+* Add node new/remove button
+* Update compiler to v0.12.2
+* Little ui adjustement
+* Fix some potential bugs
+
 ## 0.2.0 - Contract interaction
 
 * Add compile result panel
