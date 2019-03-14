@@ -28,11 +28,11 @@ export class ContractStore {
       const contractAddress = deployResult.contractAddress;
       const abi = deployResult.abi;
       this.contract2Abi.set(contractAddress, abi);
-      this.changeContract(contractAddress);
 
       accountStore.updateAccountState();
       consoleStore.log("ContractAddress: " + contractAddress, "info");
       notificationStore.notify("Successfully deployed contract", "success");
+      this.changeContract(contractAddress);
     }).catch(err => {
       accountStore.updateAccountState();
       logger.error(err);
@@ -62,7 +62,9 @@ export class ContractStore {
   }
 
   @action changeContract(contractAddress) {
-    logger.debug("Change contract to", contractAddress);
+    const message = "Change contract to " + contractAddress;
+    logger.debug(message);
+    consoleStore.log(message, "info");
     this.currentContract = contractAddress;
   }
 

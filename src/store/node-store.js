@@ -4,6 +4,8 @@ import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 import serviceProvider from '../service';
 import accountStore from './account-store';
+import consoleStore from './console-store';
+import notificationStore from './notification-store';
 
 export class NodeStore {
 
@@ -26,7 +28,9 @@ export class NodeStore {
   }
 
   @action changeNode(node) {
-    logger.debug("Change node", node);
+    const message = "Change node to " + node;
+    logger.debug(message);
+    consoleStore.log(message, "info");
     this.currentNode = node;
     serviceProvider.setEndpoint(node);
     this.updateNodeState();
@@ -37,7 +41,7 @@ export class NodeStore {
     serviceProvider.nodeService.blockchainStatus().then(status => {
       this.currentHeight = status.height;
     })
-    accountStore.updateAccountState(accountStore);
+    accountStore.updateAccountState();
   }
 
   @action removeNode() {

@@ -19,10 +19,10 @@ export class AccountStore {
     logger.debug("New account");
     serviceProvider.accountService.newAccount().then(identity => {
       this.address2Identity.set(identity.address, identity);
-      this.changeAccount(identity.address);
       const message = "Created account " + identity.address + " successfully";
       consoleStore.log(message, "info");
       notificationStore.notify(message, "success");
+      this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
       consoleStore.log(err, "error");
@@ -35,10 +35,10 @@ export class AccountStore {
     logger.debug("Add account with", encryptedPrivateKey);
     serviceProvider.accountService.decryptIdentity(encryptedPrivateKey, password).then(identity => {
       this.address2Identity.set(identity.address, identity);
-      this.changeAccount(identity.address);
       const message = "Successfully imported account " + identity.address;
       consoleStore.log(message, "info");
       notificationStore.notify(message, "success");
+      this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
       consoleStore.log(err, "error");
@@ -47,7 +47,9 @@ export class AccountStore {
   }
 
   @action changeAccount(address) {
-    logger.debug("Change account to", address);
+    const message = "Change account to " + address;
+    logger.debug(message);
+    consoleStore.log(message, "info");
     this.currentAddress = address;
     this.updateAccountState();
   }
@@ -94,9 +96,9 @@ export class AccountStore {
     logger.debug("Remove account", address);
     if (this.address2Identity.has(address)) {
       this.address2Identity.remove(address);
-      this.changeAccount("");
       consoleStore.log("Remove account " + address, "info");
       notificationStore.notify("Successfully removed account", "success");
+      this.changeAccount("");
     } else {
       const message = "No account " + address;
       logger.error(message);
