@@ -47,7 +47,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
       const parameters = node.init[0].parameters;
       this._addFunctionDeclaration(this.symbolTable, identifierName, parameters, index);
     } else {
-      this.symbolTable.addEntry(identifierName, index, initType, kind);
+      this.symbolTable.addEntry(identifierName, index, initType, kind, identifierName);
     }
   }
   _parseStartIndex(rangeHolder) {
@@ -89,15 +89,16 @@ export default class LuaSymbolTableGenerator extends Visitor {
   }
 
   _addFunctionDeclaration(symbolTable, name, parameters, index) {
-    const nameWithArgs = name + " (" + parameters.reduce((acc, curr, index) => {
+    const asPlaceholder = (index, name) => "${" + (index + 1) + ":" + name + "}";
+    const nameWithArgs = name + "(" + parameters.reduce((acc, curr, index) => {
       if (0 !== index) {
-        return  acc + ", " + curr.name;
+        return  acc + ", " + asPlaceholder(index, curr.name);
       }
-      return curr.name;
+      return asPlaceholder(index, curr.name);
     }, "") + ")";
     const type = luaTypes.LUA_TYPE_FUNCTION;
     const kind = luaTypes.LUA_KIND_FUNCTION;
-    symbolTable.addEntry(nameWithArgs, index, type, kind);
+    symbolTable.addEntry(name, index, type, kind, nameWithArgs);
   }
 
   _addFunctionParameters(symbolTable, parameters) {
@@ -106,7 +107,7 @@ export default class LuaSymbolTableGenerator extends Visitor {
       const index = this._parseStartIndex(parameter);
       const type = luaTypes.LUA_TYPE_UNKNOWN;
       const kind = luaTypes.LUA_KIND_VARIABLE;
-      symbolTable.addEntry(name, index, type, kind);
+      symbolTable.addEntry(name, index, type, kind, name);
     });
   }
 

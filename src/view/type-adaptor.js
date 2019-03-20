@@ -17,7 +17,7 @@ export function adaptSuggestionToAtom(suggestion) {
   }
   return  {
     text: suggestion.name,
-    snippet: suggestion.name,
+    snippet: suggestion.snippet,
     type: atomSymbolKind,
     rightLabel: suggestion.type
   };

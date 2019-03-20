@@ -1,5 +1,17 @@
 'use babel';
 
+
+export class LuaSymbolEntry {
+
+  constructor(index, type, kind, snippet) {
+    this.index = index;
+    this.type = type;
+    this.kind = kind;
+    this.snippet = snippet;
+  }
+
+}
+
 export default class LuaSymbolTable {
 
   static create(fileName, entries) {
@@ -34,10 +46,9 @@ export default class LuaSymbolTable {
     this.range.end = end;
   }
 
-  addEntry(identifier, index, type, kind) {
+  addEntry(identifier, index, type, kind, snippet) {
     if (!this.entries.hasOwnProperty(identifier)) {
-      const entry = {index: index, type: type, kind: kind};
-      this.entries[identifier] = entry
+      this.entries[identifier] = new LuaSymbolEntry(index, type, kind, snippet);
     }
   }
 

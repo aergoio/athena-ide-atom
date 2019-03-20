@@ -3,22 +3,26 @@
     "state": {
       "index": 0,
       "type": "system",
-      "kind": "system"
+      "kind": "system",
+      "snippet": "state"
     },
     "system": {
       "index": 0,
       "type": "system",
-      "kind": "system"
+      "kind": "system",
+      "snippet": "system"
     },
     "abi": {
       "index": 0,
       "type": "system",
-      "kind": "system"
+      "kind": "system",
+      "snippet": "abi"
     },
     "db": {
       "index": 0,
       "type": "system",
-      "kind": "system"
+      "kind": "system",
+      "snippet": "db"
     }
   },
   "table": {

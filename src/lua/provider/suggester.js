@@ -53,7 +53,7 @@ export default class LuaSuggester {
         Object.keys(symbolTable.entries).forEach((name) => {
           const entry = symbolTable.entries[name];
           if (name.indexOf(prefix) === 0) {
-            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
+            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind, entry.snippet));
           }
         });
       }
@@ -67,7 +67,7 @@ export default class LuaSuggester {
       Object.keys(symbolTable.entries).forEach((name) => {
         const entry = symbolTable.entries[name];
         if (entry.index < index && name.indexOf(prefix) === 0) {
-          suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
+          suggestions.push(new LuaSuggestion(name, entry.type, entry.kind, entry.snippet));
         }
       });
       symbolTable.children.forEach(child => {
@@ -99,7 +99,7 @@ export default class LuaSuggester {
         Object.keys(currEntry).forEach((name) => {
           if (name.indexOf(lastPrefix) === 0) {
             const entry = {type: luaTypes.LUA_TYPE_TABLE_MEMBER, kind: luaTypes.LUA_KIND_TABLE_MEMBER};
-            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind));
+            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind, name));
           }
         });
       }
