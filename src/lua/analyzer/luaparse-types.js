@@ -18,11 +18,11 @@ export const LUAPARSE_LITERALS = [
 ];
 
 // luaparse table related nodes
-//   - TableConstructorExpression   'local tableName = { ... }' or 'tableName = { ... }'
-//   - TableCallExpression          'tableName { field = "init" }'
-//   - TableKey        '{ fieldName = "init" }'
-//   - TableKeyString  '{ ["fieldName"] = "init" }' or '{ [33] = "init" }' or '{ [identifier] = "init" }'
-//   - TableValue      '{ withoutInit }'
+//   - TableConstructorExpression  'local tableName = { ... }' or 'tableName = { ... }'
+//   - TableCallExpression         'tableName { field = "init" }'
+//   - TableKey                    '{ ["fieldName"] = "init" }' or '{ [33] = "init" }' or '{ [identifier] = "init" }'
+//   - TableKeyString              '{ fieldName = "init" }'
+//   - TableValue                  '{ withoutInit }'
 export const LUAPARSE_TABLE_CONSTRUCTOR_EXPRESSION = "TableConstructorExpression";
 export const LUAPARSE_TABLE_CALL_EXPRESSION = "TableCallExpression";
 export const LUAPARSE_TABLE_MEMBER_EXPRESSION = "MemberExpression";

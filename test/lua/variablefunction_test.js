@@ -16,11 +16,10 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 77;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 3);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 3);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 3);
     });
 
   });
@@ -29,18 +28,16 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 350;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 3);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 3);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 3);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 1);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 1);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
     });
 
   });
@@ -49,18 +46,16 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 681;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 4);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 2);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 2);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 2);
     });
 
   });
@@ -69,18 +64,16 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 991;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 4);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 3);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 3);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 3);
     });
 
   });
@@ -89,25 +82,22 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 170;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 4);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
     });
 
-    it("arg", () => {
-      luaSuggester.suggest(source, filePath, "arg", index).then(suggestions => {
-        assert.equal(suggestions.length, 2);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
-      });
+    it("arg", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "arg", index);
+      assert.equal(suggestions.length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 1);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 1);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
     });
 
   });
@@ -116,25 +106,22 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 481;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 4);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
     });
 
-    it("arg", () => {
-      luaSuggester.suggest(source, filePath, "arg", index).then(suggestions => {
-        assert.equal(suggestions.length, 2);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
-      });
+    it("arg", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "arg", index);
+      assert.equal(suggestions.length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 2);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 2);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 2);
     });
 
   });
@@ -143,25 +130,22 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 798;
 
-    it("variable", () => {
-      luaSuggester.suggest(source, filePath, "variable", index).then(suggestions => {
-        assert.equal(suggestions.length, 4);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
-      });
+    it("variable", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "variable", index);
+      assert.equal(suggestions.length, 4);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 4);
     });
 
-    it("arg", () => {
-      luaSuggester.suggest(source, filePath, "arg", index).then(suggestions => {
-        assert.equal(suggestions.length, 0);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 0);
-      });
+    it("arg", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "arg", index);
+      assert.equal(suggestions.length, 0);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 0);
     });
 
-    it("func", () => {
-      luaSuggester.suggest(source, filePath, "func", index).then(suggestions => {
-        assert.equal(suggestions.length, 3);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 3);
-      });
+    it("func", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "func", index);
+      assert.equal(suggestions.length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 3);
     });
 
   });
@@ -170,12 +154,11 @@ describe("Autocomplete for plain variable, function", () => {
 
     const index = 1098;
 
-    it("library", () => {
-      luaSuggester.suggest(source, filePath, "library", index).then(suggestions => {
-        assert.equal(suggestions.length, 3);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
-        assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
-      });
+    it("library", async () => {
+      const suggestions = await luaSuggester.suggest(source, filePath, "library", index);
+      assert.equal(suggestions.length, 3);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_VARIABLE === s.kind).length, 2);
+      assert.equal(suggestions.filter(s => luaTypes.LUA_KIND_FUNCTION === s.kind).length, 1);
     });
   });
 

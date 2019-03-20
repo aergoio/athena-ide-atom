@@ -1,37 +1,47 @@
 'use babel';
 
-export default class LuaTableFieldTree {
+import logger from 'loglevel';
+import * as luaTypes from './types';
+
+export class LuaTableFieldValue {
+
+  constructor(type, kind, snippet) {
+    this.type = type;
+    this.kind = kind;
+    this.snippet = snippet;
+  }
+
+}
+
+export class LuaTableFieldTree {
 
   static create(entries) {
     return new LuaTableFieldTree(entries);
   }
 
   constructor(entries) {
-    this.entries = null == entries ? {} : entries;
+    this.root = null == entries ? {} : entries;
   }
 
-  getEntries() {
-    return this.entries;
+  getRoot() {
+    return this.root;
   }
 
-  addEntry(tableName, ...fieldNames) {
-    if (0 === fieldNames.length) {
-      return;
-    }
-
-    // in this data structure, concat of tableName and fieldsName is possible
-    // but for clarity, split following 3 lines
-    if (!this.entries.hasOwnProperty(tableName)) {
-      this.entries[tableName] = {};
-    }
-    // fields addition
-    let currEntry = this.entries[tableName];
-    fieldNames.forEach(fieldName => {
-      if (!currEntry.hasOwnProperty(fieldName)) {
-        currEntry[fieldName] = {};
+  addFieldValue(fieldChain, type, snippet) {
+    let currField = this.root;
+    fieldChain.forEach(field => {
+      if (!currField.hasOwnProperty(field)) {
+        currField[field] = {};
       }
-      currEntry = currEntry[fieldName];
+      currField = currField[field];
     });
+
+    if (typeof currField.values === "undefined") {
+      currField.__possibleValues = [];
+    }
+    currField.__possibleValues.push(new LuaTableFieldValue(type, luaTypes.LUA_KIND_TABLE_MEMBER, snippet));
   }
 
 }
+
+export default LuaTableFieldTree;

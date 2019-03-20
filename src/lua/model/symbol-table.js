@@ -1,6 +1,5 @@
 'use babel';
 
-
 export class LuaSymbolEntry {
 
   constructor(index, type, kind, snippet) {
@@ -12,7 +11,7 @@ export class LuaSymbolEntry {
 
 }
 
-export default class LuaSymbolTable {
+export class LuaSymbolTable {
 
   static create(fileName, entries) {
     return new LuaSymbolTable(fileName, entries);
@@ -61,3 +60,5 @@ export default class LuaSymbolTable {
   }
 
 }
+
+export default LuaSymbolTable;

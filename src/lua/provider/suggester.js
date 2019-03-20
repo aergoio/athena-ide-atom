@@ -86,24 +86,38 @@ export default class LuaSuggester {
     let suggestions = [];
     tableFieldTrees.forEach(tableFieldTree => {
       let index = 0;
-      let currEntry = tableFieldTree.getEntries();
+      let currEntry = tableFieldTree.getRoot();
       while (index < prefixChain.length - 1 && null != currEntry) {
         const prefix = prefixChain[index];
-        const filteredKeys = Object.keys(currEntry).filter(item => item === prefix);
-        currEntry = (1 === filteredKeys.length) ? currEntry[filteredKeys[0]] : null;
+        if (!currEntry.hasOwnProperty(prefix)) {
+          currEntry = null;
+          break;
+        }
+        currEntry = currEntry[prefix]
         ++index;
       }
 
       if (null != currEntry) {
-        const lastPrefix = prefixChain[prefixChain.length - 1];
-        Object.keys(currEntry).forEach((name) => {
-          if (name.indexOf(lastPrefix) === 0) {
-            const entry = {type: luaTypes.LUA_TYPE_TABLE_MEMBER, kind: luaTypes.LUA_KIND_TABLE_MEMBER};
-            suggestions.push(new LuaSuggestion(name, entry.type, entry.kind, name));
-          }
-        });
+        const lastPrefix = prefixChain[index];
+        Object.keys(currEntry)
+          .filter(key => key !== "__possibleValues")
+          .forEach(key => {
+            if (key.indexOf(lastPrefix) === 0) {
+              const entryValues = currEntry[key].__possibleValues;
+              if (typeof entryValues !== "undefined") {
+                entryValues.forEach(entryValue => {
+                  suggestions.push(new LuaSuggestion(key, entryValue.type, entryValue.kind, entryValue.snippet));
+                });
+              } else {
+                const type = luaTypes.LUA_TYPE_TABLE;
+                const kind = luaTypes.LUA_KIND_TABLE_MEMBER;
+                suggestions.push(new LuaSuggestion(key, type, kind, key));
+              }
+            }
+          });
       }
     });
+
     return suggestions;
   }
 
