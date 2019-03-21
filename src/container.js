@@ -46,12 +46,12 @@ export default {
     const subscriptions = new CompositeDisposable();
     subscriptions.add(atom.commands.add('atom-text-editor', {
       'athena-ide:compile': () => {
-        const absolutePath = atom.workspace.getActiveTextEditor().getBuffer().getPath();
-        const pathInfo = atom.project.relativizePath(absolutePath);
-        const projectRoot = pathInfo[0];
-        const relativePath = pathInfo[1];
-        this._show();
-        compileResultStore.addCompileResult(projectRoot, relativePath);
+        const modifiedEditors = atom.workspace.getTextEditors().filter(e => e.isModified())
+        if (modifiedEditors.length > 0) {
+          this._showSaveConfirmModal(modifiedEditors);
+        } else {
+          this._compile();
+        }
       }
     }));
     subscriptions.add(atom.commands.add('atom-workspace', {
@@ -60,6 +60,40 @@ export default {
       }
     }));
     return subscriptions;
+  },
+
+  _showSaveConfirmModal(modifiedEditors) {
+    atom.confirm({
+      message: "Do you want to save file before compile?",
+      detail: modifiedEditors
+        .map(e => this._getEditorTarget(e))
+        .map(t => t[1])
+        .reduce((pre, curr, index) => {
+          if (0 === index) {
+            return curr;
+          }
+          return  pre + "\n" + curr;
+        }),
+      buttons: ["Ok", "Cancel"]
+    }, response => {
+      if (response === 0) {
+        Promise.all(modifiedEditors.map(e => e.save()));
+        this._compile();
+      }
+    })
+  },
+
+  _compile() {
+    const pathInfo = this._getEditorTarget(atom.workspace.getActiveTextEditor());
+    const projectRoot = pathInfo[0];
+    const relativePath = pathInfo[1];
+    this._show();
+    compileResultStore.addCompileResult(projectRoot, relativePath);
+  },
+
+  _getEditorTarget(editor) {
+    const absolutePath = editor.getBuffer().getPath();
+    return atom.project.relativizePath(absolutePath);
   },
 
   _show() {
