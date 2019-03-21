@@ -395,24 +395,26 @@ const Abis = (props) => {
   if (typeof abiFunctions === "undefined") {
     return <div></div>;
   }
-  return props.abi.functions.map((abiFunction, index) => {
-    const argsRef = React.createRef();
-    const args = abiFunction.arguments;
-    const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
-    return (
-      <Row key={index} >
-        <Button
-          name={abiFunction.name}
-          class={['component-btn-runner', 'component-description', 'component-btn-execute']}
-          onClick={() => props.onClick(argsRef, abiFunction.name)}
-        />
-        <InputBox type='text' class='component-inputbox-text'
-          ref={argsRef}
-          placeHolder={inputPlaceHolder}
-        />
-      </Row>
-    );
-  });
+  return props.abi.functions.filter(f => "constructor" !== f.name)
+    .map((abiFunction, index) => {
+      const argsRef = React.createRef();
+      const args = abiFunction.arguments;
+      const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
+      return (
+        <Row key={index} >
+          <Button
+            name={abiFunction.name}
+            class={['component-btn-runner', 'component-description', 'component-btn-execute']}
+            onClick={() => props.onClick(argsRef, abiFunction.name)}
+          />
+          <InputBox type='text' class='component-inputbox-text'
+            ref={argsRef}
+            placeHolder={inputPlaceHolder}
+          />
+        </Row>
+      );
+    }
+  );
 }
 
 Abis.propTypes = {
