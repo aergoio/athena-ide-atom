@@ -1,0 +1,459 @@
+{
+  "system": {
+    "getSender": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getSender()"
+        }
+      ]
+    },
+    "getBlockheight": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getBlockheight()"
+        }
+      ]
+    },
+    "getTxhash": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getTxhash()"
+        }
+      ]
+    },
+    "getTimestamp": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getTimestamp()"
+        }
+      ]
+    },
+    "getContractID": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getContractID()"
+        }
+      ]
+    },
+    "setItem": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "setItem(${1:key}, ${2:value})"
+        }
+      ]
+    },
+    "getItem": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getItem(${1:key})"
+        }
+      ]
+    },
+    "getAmount": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getAmount()"
+        }
+      ]
+    },
+    "getCreator": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getCreator()"
+        }
+      ]
+    },
+    "getOrigin": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getOrigin()"
+        }
+      ]
+    },
+    "getPrevBlockHash": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "getPrevBlockHash()"
+        }
+      ]
+    },
+    "print": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "print(${1:args...})"
+        }
+      ]
+    }
+  },
+  "contract": {
+    "send": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "send(${1:address}, ${2:amount})"
+        }
+      ]
+    },
+    "deploy": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "deploy(${1:code}, ${2:args...})"
+        }
+      ]
+    },
+    "call": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "call(${1:address}, ${2:funcName}, ${3:args...})"
+        }
+      ]
+    },
+    "delegatecall": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "delegatecall(${1:address}, ${2:funcName}, ${3:args...})"
+        }
+      ]
+    },
+    "pcall": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "pcall(${1:fn}, ${2:args...})"
+        }
+      ]
+    },
+    "balance": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "balance(${1:address})"
+        }
+      ]
+    },
+    "event": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "event(${1:eventName}, ${2:args...})"
+        }
+      ]
+    }
+  },
+  "state": {
+    "var": {
+      "__possibleValues": [
+        {
+          "type": "table",
+          "kind": "member",
+          "snippet": "var {\n  ${1:key} = ${2:value}\n}"
+        }
+      ]
+    },
+    "value": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "value()"
+        }
+      ]
+    },
+    "map": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "map()"
+        }
+      ]
+    },
+    "array": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "array(${1:size})"
+        }
+      ]
+    }
+  },
+  "db": {
+    "exec": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "exec(\"${1:statement}\")"
+        }
+      ]
+    },
+    "query": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "query(\"${1:statement}\")"
+        }
+      ]
+    },
+    "prepare": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "prepare(\"${1:statement}\")"
+        }
+      ]
+    }
+  },
+  "abi": {
+    "register": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "register(${1:func...})"
+        }
+      ]
+    },
+    "payable": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "payable(${1:func...})"
+        }
+      ]
+    },
+    "view": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "view(${1:func...})"
+        }
+      ]
+    }
+  },
+  "json": {
+    "encode": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "encode(${1:arg})"
+        }
+      ]
+    },
+    "decode": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "decode(${1:string})"
+        }
+      ]
+    }
+  },
+  "crypto": {
+    "sha256": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "sha256(${1:arg})"
+        }
+      ]
+    },
+    "ecverity": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "ecverity(${1:message}, ${2:signature}, ${3:address})"
+        }
+      ]
+    }
+  },
+  "bignum": {
+    "number": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "number(${1:value})"
+        }
+      ]
+    },
+    "isneg": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "isneg(${1:value})"
+        }
+      ]
+    },
+    "iszero": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "iszero(${1:value})"
+        }
+      ]
+    },
+    "tonumber": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "tonumber(${1:value})"
+        }
+      ]
+    },
+    "tostring": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "tostring(${1:value})"
+        }
+      ]
+    },
+    "neg": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "neg(${1:value})"
+        }
+      ]
+    },
+    "sqrt": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "sqrt(${1:value})"
+        }
+      ]
+    },
+    "compare": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "compare(${1:value})"
+        }
+      ]
+    },
+    "add": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "add(${1:left}, ${2:right})"
+        }
+      ]
+    },
+    "sub": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "sub(${1:left}, ${2:right})"
+        }
+      ]
+    },
+    "mul": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "mul(${1:left}, ${2:right})"
+        }
+      ]
+    },
+    "mod": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "mod(${1:target}, ${2:value})"
+        }
+      ]
+    },
+    "div": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "div(${1:target}, ${2:value})"
+        }
+      ]
+    },
+    "pow": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "pow(${1:base}, ${2:exponent})"
+        }
+      ]
+    },
+    "divmod": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "divmod(${1:target}, ${2:value})"
+        }
+      ]
+    },
+    "powmod": {
+      "__possibleValues": [
+        {
+          "type": "function",
+          "kind": "member",
+          "snippet": "powmod(${1:base}, ${2:exponent}, ${3:modValue})"
+        }
+      ]
+    }
+  }
+}

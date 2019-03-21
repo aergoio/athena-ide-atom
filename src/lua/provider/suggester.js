@@ -4,16 +4,18 @@ import logger from 'loglevel';
 import {LuaSuggestion, LuaSymbolTable, LuaTableFieldTree, luaTypes} from '../model';
 import {LuaAnalyzer} from '../analyzer';
 
-const AERGO_SUGGESTION = 'aergo_suggestion.json';
+const AERGO_SYMBOLS = 'aergo-symbols.json';
+const AERGO_TABLE_TREE = 'aergo-table-tree.json';
 
 export default class LuaSuggester {
 
   constructor() {
     this.analyzer = new LuaAnalyzer();
 
-    const aergoSuggestion = require(__dirname + '/res/' + AERGO_SUGGESTION);
-    this.aergoSymbolTable = LuaSymbolTable.create("aergo", aergoSuggestion.symbol);
-    this.aergoTableFieldTree = LuaTableFieldTree.create(aergoSuggestion.table);
+    const aergoSymbols = require(__dirname + '/res/' + AERGO_SYMBOLS);
+    const aergoTableTree = require(__dirname + '/res/' + AERGO_TABLE_TREE);
+    this.aergoSymbolTable = LuaSymbolTable.create("aergo", aergoSymbols);
+    this.aergoTableFieldTree = LuaTableFieldTree.create(aergoTableTree);
   }
 
   suggest(source, filePath, prefix, index) {

@@ -1,0 +1,50 @@
+{
+  "system": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "system"
+  },
+  "contract": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "contract"
+  },
+  "state": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "state"
+  },
+  "db": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "db"
+  },
+  "abi": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "abi"
+  },
+  "json": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "json"
+  },
+  "crypto": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "crypto"
+  },
+  "bignum": {
+    "index": 0,
+    "type": "system",
+    "kind": "system",
+    "snippet": "bignum"
+  }
+}
