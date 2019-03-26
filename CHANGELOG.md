@@ -1,3 +1,10 @@
+## 0.2.2 - Patch & Improvements
+
+* Add aergo snippets
+* Filter constructor function
+* Add confirm modal when file is mark as dirty
+* Process nestedTable
+
 ## 0.2.1 - Patch
 
 * Add node new/remove button
