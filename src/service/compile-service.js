@@ -6,7 +6,7 @@ import path from 'path';
 import child_process from 'child_process';
 import logger from 'loglevel';
 
-import {LuaImportResolver} from '../lua';
+import {LuaImportResolver} from '@aergoio/athena-analysis';
 
 const LUA_COMPILER_OSX = "aergoluac_osx";
 const LUA_COMPILER_LINUX = "aergoluac_linux";

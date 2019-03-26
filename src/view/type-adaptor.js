@@ -1,6 +1,6 @@
 'use babel';
 
-import {luaTypes} from '../lua';
+import {luaTypes} from '@aergoio/athena-analysis';
 import * as atomTypes from './atom-types';
 
 export function adaptSuggestionToAtom(suggestion) {

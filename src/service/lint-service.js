@@ -1,6 +1,6 @@
 'use babel';
 
-import {LuaLinter} from '../lua';
+import {LuaLinter} from '@aergoio/athena-analysis';
 import logger from 'loglevel';
 
 export default class LintService {
