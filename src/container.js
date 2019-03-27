@@ -75,9 +75,9 @@ export default {
           return  pre + "\n" + curr;
         }),
       buttons: ["Ok", "Cancel"]
-    }, response => {
+    }, async response => {
       if (response === 0) {
-        Promise.all(modifiedEditors.map(e => e.save()));
+        await Promise.all(modifiedEditors.map(e => e.save()));
         this._compile();
       }
     })

@@ -1,8 +1,4 @@
-function constructor(key, arg1, arg2)
-  if key ~= nil then
-    system.setItem(key, {intVal=arg1, stringVal=arg2})
-  end
-end
+import "./library.lua"
 
 function event(key, arg1, arg2)
   contract.event("event", key, arg1, arg2)
@@ -16,4 +12,4 @@ function get(key)
   return system.getItem(key)
 end
 
-abi.register(event, set, get)
+abi.register(libraryFunc, get, set)
