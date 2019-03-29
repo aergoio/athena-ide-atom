@@ -6,29 +6,21 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'mobx-react';
 
-import accountStore from '../store/account-store';
-import compileResultStore from '../store/compile-result-store';
-import consoleStore from '../store/console-store';
-import contractStore from '../store/contract-store';
-import feeStore from '../store/fee-store';
-import nodeStore from '../store/node-store';
-import notificationStore from '../store/notification-store';
-
 import AthenaIdeViewRoot from './react';
 
 export default class AtheneIdeView {
 
-  constructor() {
+  constructor(rootStore) {
     this.element = document.createElement('atom-panel');
     this.element.appendChild(this._buildRoot());
     this.stores = {
-      accountStore,
-      compileResultStore,
-      consoleStore,
-      contractStore,
-      feeStore,
-      nodeStore,
-      notificationStore
+      accountStore: rootStore.accountStore,
+      compileResultStore: rootStore.compileResultStore,
+      consoleStore: rootStore.consoleStore,
+      contractStore: rootStore.contractStore,
+      feeStore: rootStore.feeStore,
+      nodeStore: rootStore.nodeStore,
+      notificationStore: rootStore.notificationStore
     }
   }
 

@@ -6,8 +6,6 @@ import {$$, View} from 'atom-space-pen-views';
 import {autorun} from 'mobx';
 import logger from 'loglevel';
 
-import consoleStore from '../store/console-store';
-
 export default class ConsoleView extends View {
 
   static content() {
@@ -18,11 +16,11 @@ export default class ConsoleView extends View {
     });
   }
 
-  constructor() {
+  constructor(rootStore) {
     super();
     autorun(() => {
-      if (null != consoleStore.recent && "" !== consoleStore.recent.message) {
-        this.log(consoleStore.recent);
+      if (null != rootStore.consoleStore.recent && "" !== rootStore.consoleStore.recent.message) {
+        this.log(rootStore.consoleStore.recent);
       }
     })
   }

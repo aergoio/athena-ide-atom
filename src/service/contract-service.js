@@ -7,7 +7,6 @@ import _ from 'lodash';
 import logger from 'loglevel';
 
 import {isEmpty} from './utils';
-import consoleStore from '../store/console-store';
 
 const contractTxSuccesses = ["CREATED", "SUCCESS"];
 
@@ -44,7 +43,7 @@ export default class ContractService {
       };
       return this._tryWithNonceRefresh(accountAddress, trier);
     }).then(txHash => {
-      consoleStore.log("Deploy TxHash: " + txHash, "info");
+      logger.debug("Deploy TxHash", txHash);
       return this._pollingReceipt(txHash, receipt => receipt.contractaddress);
     }).then(contractAddress => {
       return this.client.getABI(contractAddress).then(abi => {
@@ -103,7 +102,7 @@ export default class ContractService {
     };
 
     return this._tryWithNonceRefresh(accountAddress, trier).then(txHash => {
-      consoleStore.log("Execute TxHash: " + txHash, "info");
+      logger.debug("Execute TxHash", txHash);
       return this._pollingReceipt(txHash, receipt => receipt.result);
     });
   }

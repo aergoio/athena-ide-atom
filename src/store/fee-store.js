@@ -1,11 +1,24 @@
 'use babel'
 
 import {observable, action} from 'mobx';
+import logger from 'loglevel';
 
-export class NodeStore {
+export default class NodeStore {
 
   @observable price = "0";
   @observable limit = "0";
+
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  serialize() {
+    return {};
+  }
+
+  @action deserialize(data) {
+    logger.debug("Deserialize", data);
+  }
 
   @action setPrice(price) {
     this.price = price;
@@ -16,5 +29,3 @@ export class NodeStore {
   }
 
 }
-
-export default new NodeStore();

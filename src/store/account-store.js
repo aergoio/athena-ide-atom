@@ -5,28 +5,37 @@ import logger from 'loglevel';
 
 import serviceProvider from '../service';
 
-import consoleStore from './console-store';
-import notificationStore from './notification-store';
-
-export class AccountStore {
+export default class AccountStore {
 
   @observable currentAddress = "";
   @observable currentBalance = "";
   @observable currentNonce = "";
   @observable address2Identity = new Map();
 
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  serialize() {
+    return {};
+  }
+
+  @action deserialize(data) {
+    logger.debug("Deserialize", data);
+  }
+
   @action newAccount() {
     logger.debug("New account");
     serviceProvider.accountService.newAccount().then(identity => {
       this.address2Identity.set(identity.address, identity);
       const message = "Created account " + identity.address + " successfully";
-      consoleStore.log(message, "info");
-      notificationStore.notify(message, "success");
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
       this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
-      consoleStore.log(err, "error");
-      notificationStore.notify("Creating account failed", "error");
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Creating account failed", "error");
     });
 
   }
@@ -36,20 +45,20 @@ export class AccountStore {
     serviceProvider.accountService.decryptIdentity(encryptedPrivateKey, password).then(identity => {
       this.address2Identity.set(identity.address, identity);
       const message = "Successfully imported account " + identity.address;
-      consoleStore.log(message, "info");
-      notificationStore.notify(message, "success");
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
       this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
-      consoleStore.log(err, "error");
-      notificationStore.notify("Importing account failed", "error");
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Importing account failed", "error");
     });
   }
 
   @action changeAccount(address) {
     const message = "Change account to " + address;
     logger.debug(message);
-    consoleStore.log(message, "info");
+    this.rootStore.consoleStore.log(message, "info");
     this.currentAddress = address;
     this.updateAccountState();
   }
@@ -83,12 +92,12 @@ export class AccountStore {
     const identity = this.address2Identity.get(this.currentAddress);
     serviceProvider.accountService.encryptIdentity(identity, password).then(encrypted => {
       const message = "exported: " + encrypted;
-      consoleStore.log(message, "info");
-      notificationStore.notify(message, "success");
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
     }).catch(err => {
       logger.error(err);
-      consoleStore.log(err, "error");
-      notificationStore.notify("Exporting account failed", "error");
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Exporting account failed", "error");
     });
   }
 
@@ -96,17 +105,15 @@ export class AccountStore {
     logger.debug("Remove account", address);
     if (this.address2Identity.has(address)) {
       this.address2Identity.remove(address);
-      consoleStore.log("Remove account " + address, "info");
-      notificationStore.notify("Successfully removed account", "success");
+      this.rootStore.consoleStore.log("Remove account " + address, "info");
+      this.rootStore.notificationStore.notify("Successfully removed account", "success");
       this.changeAccount("");
     } else {
       const message = "No account " + address;
       logger.error(message);
-      consoleStore.log(message, "error");
-      notificationStore.notify("Removing account failed", "success");
+      this.rootStore.consoleStore.log(message, "error");
+      this.rootStore.notificationStore.notify("Removing account failed", "success");
     }
   }
 
 }
-
-export default new AccountStore();

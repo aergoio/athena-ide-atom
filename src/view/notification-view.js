@@ -5,14 +5,12 @@
 import {autorun} from 'mobx';
 import logger from 'loglevel';
 
-import notificationStore from '../store/notification-store';
-
 export default class NotificationView {
 
-  constructor() {
+  constructor(rootStore) {
     autorun(() => {
-      if (null != notificationStore.recent && "" !== notificationStore.recent.message) {
-        this.notify(notificationStore.recent)
+      if (null != rootStore.notificationStore.recent && "" !== rootStore.notificationStore.recent.message) {
+        this.notify(rootStore.notificationStore.recent)
       }
     })
   }
@@ -62,6 +60,10 @@ export default class NotificationView {
 
   _notifyFatalError(message) {
     atom.notifications.addFatalError(message);
+  }
+
+  distroy() {
+    // do nothing
   }
 
 }

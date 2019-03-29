@@ -6,11 +6,12 @@ import {CompositeDisposable} from 'atom';
 import {install} from 'atom-package-deps';
 import logger from 'loglevel';
 
-import compileResultStore from './store/compile-result-store';
+import RootStore from './store';
 import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView, NotificationView} from './view';
 
 export default {
 
+  rootStore: null,
   views: {},
   subscriptions: null,
 
@@ -23,8 +24,25 @@ export default {
     }).catch(err => {
       logger.error(err);
     });
-    this.views = this._buildViews();
+    this.rootStore = new RootStore();
+    this.views = this._buildViews(this.rootStore);
     this.subscriptions = this._buildSubscriptions();
+    if (state) {
+      atom.deserializers.deserialize(state);
+    }
+  },
+
+  deserializeStores(data) {
+    logger.info("Deserialize", data);
+    this.rootStore.deserialize(data);
+  },
+
+  serialize() {
+    const data = this.rootStore.serialize();
+    return {
+      deserializer: "RootStore",
+      data: data
+    };
   },
 
   deactivate() {
@@ -34,11 +52,11 @@ export default {
     this.subscriptions = null;
   },
 
-  _buildViews() {
+  _buildViews(rootStore) {
     return {
-      athenaIdeView: new AthenaIdeView(),
-      consoleView: new ConsoleView(),
-      notificationView: new NotificationView()
+      athenaIdeView: new AthenaIdeView(rootStore),
+      consoleView: new ConsoleView(rootStore),
+      notificationView: new NotificationView(rootStore)
     };
   },
 
@@ -88,7 +106,7 @@ export default {
     const projectRoot = pathInfo[0];
     const relativePath = pathInfo[1];
     this._show();
-    compileResultStore.addCompileResult(projectRoot, relativePath);
+    this.rootStore.compileResultStore.addCompileResult(projectRoot, relativePath);
   },
 
   _getEditorTarget(editor) {

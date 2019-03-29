@@ -4,13 +4,23 @@ import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
-import consoleStore from './console-store';
-import notificationStore from './notification-store';
 
-export class CompileResultStore {
+export default class CompileResultStore {
 
   @observable currentFile = "";
   @observable file2CompileResult = new Map();
+
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  serialize() {
+    return {};
+  }
+
+  @action deserialize(data) {
+    logger.debug("Deserialize", data);
+  }
 
   @action addCompileResult(baseDir, filePath) {
     logger.debug("Resolve compile with", baseDir, filePath);
@@ -18,13 +28,13 @@ export class CompileResultStore {
       this.changeFile(filePath);
       this.file2CompileResult.set(filePath, compileResult);
       const message = "payload: " + compileResult.payload + " abi: " + compileResult.abi;
-      consoleStore.log(message, "info");
-      notificationStore.notify("Compiled successfully", "success");
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify("Compiled successfully", "success");
     }).catch(err => {
       logger.error(err);
       const message = err.toString();
-      consoleStore.log(message, "error");
-      notificationStore.notify("Compile failed", "error");
+      this.rootStore.consoleStore.log(message, "error");
+      this.rootStore.notificationStore.notify("Compile failed", "error");
     });
   }
 
@@ -45,5 +55,3 @@ export class CompileResultStore {
   }
 
 }
-
-export default new CompileResultStore();

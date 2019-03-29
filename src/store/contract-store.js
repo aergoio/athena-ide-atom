@@ -5,22 +5,35 @@ import logger from 'loglevel';
 
 import serviceProvider from '../service';
 
-import accountStore from './account-store';
-import compileResultStore from './compile-result-store';
-import feeStore from './fee-store';
-import consoleStore from './console-store';
-import notificationStore from './notification-store';
-
-export class ContractStore {
+export default class ContractStore {
 
   @observable currentContract = "";
   @observable contract2Abi = new Map();
 
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  serialize() {
+    return {
+      currentContract: this.currentContract,
+      contract2Abi: JSON.stringify([...this.contract2Abi])
+    };
+  }
+
+  @action deserialize(data) {
+    logger.debug("Deserialize", data);
+    if (data) {
+      this.currentContract = data.currentContract,
+      this.contract2Abi = new Map(JSON.parse(data.contract2Abi));
+    }
+  }
+
   @action deployContract() {
-    const identity = accountStore.currentIdentity;
-    const price = feeStore.price;
-    const limit = feeStore.limit;
-    const payload = compileResultStore.compileResult.payload;
+    const identity = this.rootStore.accountStore.currentIdentity;
+    const price = this.rootStore.feeStore.price;
+    const limit = this.rootStore.feeStore.limit;
+    const payload = this.rootStore.compileResultStore.compileResult.payload;
     logger.debug("Deploy contract with", price, limit, payload);
 
     serviceProvider.contractService.deploy(identity, price, limit, payload).then(deployResult => {
@@ -29,42 +42,42 @@ export class ContractStore {
       const abi = deployResult.abi;
       this.contract2Abi.set(contractAddress, abi);
 
-      accountStore.updateAccountState();
-      consoleStore.log("ContractAddress: " + contractAddress, "info");
-      notificationStore.notify("Successfully deployed contract", "success");
+      this.rootStore.accountStore.updateAccountState();
+      this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
+      this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
       this.changeContract(contractAddress);
     }).catch(err => {
-      accountStore.updateAccountState();
+      this.rootStore.accountStore.updateAccountState();
       logger.error(err);
-      consoleStore.log(err, "error");
-      notificationStore.notify("Deploying contract failed", "error");
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Deploying contract failed", "error");
     });
   }
 
   @action executeContract(functionName, args) {
-    const identity = accountStore.currentIdentity;
+    const identity = this.rootStore.accountStore.currentIdentity;
     const contractAddress = this.currentContract;
     const abi = this.currentAbi;
-    const price = feeStore.price;
-    const limit = feeStore.limit;
+    const price = this.rootStore.feeStore.price;
+    const limit = this.rootStore.feeStore.limit;
     logger.debug("Execute contract with", functionName, args, contractAddress, abi, price, limit);
 
     serviceProvider.contractService.execute(identity, functionName, args,
           contractAddress, abi, price, limit).then(execResult => {
-      accountStore.updateAccountState();
-      consoleStore.log("Execute ret: " + execResult, "info");
+      this.rootStore.accountStore.updateAccountState();
+      this.rootStore.consoleStore.log("Execute ret: " + execResult, "info");
     }).catch(err => {
       logger.error(err);
-      accountStore.updateAccountState();
-      consoleStore.log(err, "error");
-      notificationStore.notify("Executing contract failed", "error");
+      this.rootStore.accountStore.updateAccountState();
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Executing contract failed", "error");
     });
   }
 
   @action changeContract(contractAddress) {
     const message = "Change contract to " + contractAddress;
     logger.debug(message);
-    consoleStore.log(message, "info");
+    this.rootStore.consoleStore.log(message, "info");
     this.currentContract = contractAddress;
   }
 
@@ -80,5 +93,3 @@ export class ContractStore {
   }
 
 }
-
-export default new ContractStore();

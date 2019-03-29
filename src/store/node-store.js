@@ -3,15 +3,31 @@
 import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 import serviceProvider from '../service';
-import accountStore from './account-store';
-import consoleStore from './console-store';
-import notificationStore from './notification-store';
 
-export class NodeStore {
+export default class NodeStore {
 
   @observable currentNode = "localhost:7845";
   @observable currentHeight = "unknown";
   @observable nodeSet = new Set(["localhost:7845", "testnet.aergo.io:7845"]);
+
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  serialize() {
+    return {
+      currentNode: this.currentNode,
+      nodeSet: JSON.stringify(this.nodes)
+    };
+  }
+
+  @action deserialize(data) {
+    logger.debug("Deserialize", data);
+    if (data) {
+      this.currentNode = data.currentNode;
+      this.nodeSet = new Set(JSON.parse(data.nodeSet));
+    }
+  }
 
   @action addNode(node) {
     logger.debug("Add node", node);
@@ -30,7 +46,7 @@ export class NodeStore {
   @action changeNode(node) {
     const message = "Change node to " + node;
     logger.debug(message);
-    consoleStore.log(message, "info");
+    this.rootStore.consoleStore.log(message, "info");
     this.currentNode = node;
     serviceProvider.setEndpoint(node);
     this.updateNodeState();
@@ -41,7 +57,7 @@ export class NodeStore {
     serviceProvider.nodeService.blockchainStatus().then(status => {
       this.currentHeight = status.height;
     })
-    accountStore.updateAccountState();
+    this.rootStore.accountStore.updateAccountState();
   }
 
   @action removeNode() {
@@ -55,5 +71,3 @@ export class NodeStore {
   }
 
 }
-
-export default new NodeStore();
