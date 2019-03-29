@@ -35,9 +35,6 @@ export default class RunPanel extends React.Component {
     this._onSyncAddressStatus = this._onSyncAddressStatus.bind(this);
     this._onAddressChange = this._onAddressChange.bind(this);
 
-    this._onPriceChange = this._onPriceChange.bind(this);
-    this._onLimitChange = this._onLimitChange.bind(this);
-
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
     this._onCompiledFileChange = this._onCompiledFileChange.bind(this);
 
@@ -63,18 +60,6 @@ export default class RunPanel extends React.Component {
   _onAddressChange(selectedAddress) {
     logger.info("Account address change to", selectedAddress.value);
     this.props.accountStore.changeAccount(selectedAddress.value);
-  }
-
-  _onPriceChange(event) {
-    const price = event.target.value;
-    logger.info("Price changed to", price);
-    this.props.feeStore.price = price;
-  }
-
-  _onLimitChange(event) {
-    const limit = event.target.value;
-    logger.info("Limit changed to", limit);
-    this.props.feeStore.limit = event.target.value;
   }
 
   _onDeployButtonClicked() {
@@ -119,10 +104,6 @@ export default class RunPanel extends React.Component {
     const nonce = this.props.accountStore.currentNonce;
 
     // target
-    const price = this.props.feeStore.price;
-    const limit = this.props.feeStore.limit;
-
-    // target
     const currentFile = this.props.compileResultStore.currentFile;
     const files = this.props.compileResultStore.files;
 
@@ -145,11 +126,6 @@ export default class RunPanel extends React.Component {
           <Balance balance={balance} />
           <Nonce nonce={nonce} />
           <AccountManipulateButtons />
-        </ComponentsHolder>
-        <ComponentsHolder>
-          <FeeTitle />
-          <PriceInput price={price} onChange={this._onPriceChange} />
-          <LimitInput limit={limit} onChange={this._onLimitChange} />
         </ComponentsHolder>
         <ComponentsHolder>
           <DeployTitle />
