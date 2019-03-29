@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'mobx-react';
 
-import AthenaIdeViewRoot from './react';
+import AthenaIdeViewRoot from './components';
 
 export default class AtheneIdeView {
 

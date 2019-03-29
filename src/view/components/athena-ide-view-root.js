@@ -3,7 +3,7 @@
 import React from 'react';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
-import {CompilePanel, RunPanel} from './panel';
+import {CompilePanel, RunPanel} from './templates';
 
 export default class AthenaIdeViewRoot extends React.Component {
 

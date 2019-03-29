@@ -6,7 +6,7 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Row, Title, Description, InputBox, Button} from '../components';
+import {Row, Title, Description, InputBox, Button} from '../../atoms';
 
 @inject('accountStore')
 @observer

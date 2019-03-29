@@ -6,11 +6,11 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Row, Title, Description, InputBox, Button} from '../components';
+import {Row, Title, Button} from '../../atoms';
 
 @inject('accountStore')
 @observer
-export default class ExportAccountModal extends React.Component {
+export default class NewAccountModal extends React.Component {
 
   static get propTypes() {
     return {
@@ -21,20 +21,12 @@ export default class ExportAccountModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      password: ""
-    };
-    this._updatePassword = this._updatePassword.bind(this);
-  }
-
-  _updatePassword(e) {
-    this.setState({ password: e.target.value });
+    this._onConfirm = this._onConfirm.bind(this);
   }
 
   _onConfirm() {
-    logger.debug("Export account button clicked");
-    const password = this.state.password;
-    this.props.accountStore.exportAccount(password);
+    logger.debug("New account confirm button clicked");
+    this.props.accountStore.newAccount();
   }
 
   render() {
@@ -44,12 +36,7 @@ export default class ExportAccountModal extends React.Component {
           <atom-panel class='modal'>
             <div>
               <Row>
-                <Title title='Enter password to decrypt private key' />
-              </Row>
-              <Row>
-                <Description description='Password' />
-                <InputBox onChange={this._updatePassword} type='text'
-                    placeHolder='password to encrypt private key'/>
+                <Title title='Do you want to make a new account?' />
               </Row>
               <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />

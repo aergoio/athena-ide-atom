@@ -6,11 +6,11 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Row, Title, Button} from '../components';
+import {Row, Title, Description, InputBox, Button} from '../../atoms';
 
 @inject('nodeStore')
 @observer
-export default class RemoveNodeModal extends React.Component {
+export default class NewNodeModal extends React.Component {
 
   static get propTypes() {
     return {
@@ -21,12 +21,20 @@ export default class RemoveNodeModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this._onConfirm = this._onConfirm.bind(this);
+    this.state = {
+      node: ""
+    };
+    this._updateNode = this._updateNode.bind(this);
+  }
+
+  _updateNode(e) {
+    this.setState({ node: e.target.value });
   }
 
   _onConfirm() {
-    logger.debug("Remove node confirm button clicked");
-    this.props.nodeStore.removeNode();
+    logger.debug("Add node button clicked");
+    const node = this.state.node;
+    this.props.nodeStore.addNode(node);
   }
 
   render() {
@@ -36,7 +44,12 @@ export default class RemoveNodeModal extends React.Component {
           <atom-panel class='modal'>
             <div>
               <Row>
-                <Title title='Do you want to remove current node?' />
+                <Title title='Enter node endpoint' />
+              </Row>
+              <Row>
+                <Description description='Node' />
+                <InputBox onChange={this._updateNode} type='text'
+                    placeHolder='eg. 192.168.1.168:7845'/>
               </Row>
               <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
