@@ -7,25 +7,17 @@ import {join} from './utils';
 
 const testBoxClass = 'component-textbox';
 
-export default class TextBox extends React.Component {
+export const TextBox = (props) => {
+  return (
+    <div className={join('inline-block', testBoxClass, props.class)}>
+      {props.text}
+    </div>
+  );
+};
 
-  static get propTypes() {
-    return {
-      text: PropTypes.string,
-      class: PropTypes.class
-    };
-  }
+TextBox.propTypes = {
+  text: PropTypes.string,
+  class: PropTypes.class
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={join('inline-block', testBoxClass, this.props.class)}>
-        {this.props.text}
-      </div>
-    );
-  }
-
-}
+export default TextBox;

@@ -5,24 +5,16 @@ import PropTypes from 'prop-types';
 
 const panelClass = 'athena-ide-tab-panel';
 
-export default class Panel extends React.Component {
+export const Panel = (props) => {
+  return (
+    <div className={panelClass}>
+      {props.children}
+    </div>
+  );
+};
 
-  static get propTypes() {
-    return {
-      children: PropTypes.element.isRequired
-    };
-  }
+Panel.propTypes = {
+  children: PropTypes.element.isRequired
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={panelClass}>
-        {this.props.children}
-      </div>
-    );
-  }
-
-}
+export default Panel;

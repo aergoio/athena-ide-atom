@@ -7,24 +7,16 @@ import {join} from './utils';
 
 const componentsHolderClass = 'components-holder';
 
-export default class ComponentsHolder extends React.Component {
+export const ComponentsHolder = (props) => {
+  return (
+    <div className={join('inset-panel', componentsHolderClass)}>
+      {props.children}
+    </div>
+  );
+};
 
-  static get propTypes() {
-    return {
-      children: PropTypes.element.isRequired
-    };
-  }
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={join('inset-panel', componentsHolderClass)}>
-        {this.props.children}
-      </div>
-    );
-  }
-
+ComponentsHolder.propTypes = {
+  children: PropTypes.element.isRequired
 }
+
+export default ComponentsHolder;

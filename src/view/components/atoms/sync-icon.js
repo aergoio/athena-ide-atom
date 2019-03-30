@@ -7,25 +7,17 @@ import {join} from './utils';
 
 const syncIconClass = 'component-icon';
 
-export default class SyncIcon extends React.Component {
+export const SyncIcon = (props) => {
+  return (
+    <div
+      className={join('inline-block', 'icon-sync', syncIconClass)}
+      onClick={props.onClick}>
+    </div>
+  );
+};
 
-  static get propTypes() {
-    return {
-      onClick: PropTypes.func
-    };
-  }
+SyncIcon.propTypes = {
+  onClick: PropTypes.func
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div
-        className={join('inline-block', 'icon-sync', syncIconClass)}
-        onClick={this.props.onClick}>
-      </div>
-    );
-  }
-
-}
+export default SyncIcon;

@@ -7,25 +7,17 @@ import {join} from './utils';
 
 const rowClass = 'components-row';
 
-export default class Row extends React.Component {
+export const Row = (props) => {
+  return (
+    <div className={join(rowClass, props.class)}>
+      {props.children}
+    </div>
+  );
+};
 
-  static get propTypes() {
-    return {
-      children: PropTypes.element.isRequired,
-      class: PropTypes.class
-    };
-  }
+Row.propTypes = {
+  children: PropTypes.element.isRequired,
+  class: PropTypes.class
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={join(rowClass, this.props.class)}>
-        {this.props.children}
-      </div>
-    );
-  }
-
-}
+export default Row;

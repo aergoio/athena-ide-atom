@@ -7,24 +7,16 @@ import {join} from './utils';
 
 const titleClass = 'component-title';
 
-export default class Title extends React.Component {
+export const Title = (props) => {
+  return (
+    <div className={join('inline-block', titleClass)}>
+      {props.title}
+    </div>
+  );
+};
 
-  static get propTypes() { 
-    return { 
-      title: PropTypes.string
-    }; 
-  }
+Title.propTypes = {
+  title: PropTypes.string
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className={join('inline-block', titleClass)}>
-        {this.props.title}
-      </div>
-    );
-  }
-
-}
+export default Title;
