@@ -16,7 +16,7 @@ export default class AthenaIdeViewRoot extends React.Component {
     return (
       <Tabs onSelect={index => this.setState({ tabIndex: index })}>
         <TabList className="react-tabs__tab-list panel-heading">
-          <Tab>Compile</Tab>
+          <Tab>Deploy</Tab>
           <Tab>Run</Tab>
         </TabList>
         <TabPanel>
