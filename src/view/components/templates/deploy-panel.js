@@ -7,6 +7,7 @@ import logger from 'loglevel';
 
 import { Panel } from '../atoms';
 import { Environment, Deployment, CompileResult } from '../organisms';
+import { editor, SaveConfirmView } from '../../';
 
 @inject('compileResultStore', 'contractStore')
 @observer
@@ -34,6 +35,14 @@ export default class DeployPanel extends React.Component {
 
   _onCompileButtonClicked() {
     logger.debug("Compile contract");
+    if (editor.isAnyEditorDirty()) {
+      new SaveConfirmView(() => this._compile()).show();
+    } else {
+      this._compile();
+    }
+  }
+
+  _compile() {
     this.props.compileResultStore.compileWithCurrent();
   }
 

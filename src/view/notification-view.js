@@ -13,7 +13,7 @@ export default class NotificationView {
         this.notify(rootStore.notificationStore.recent)
       }
     })
-  }
+}
 
   notify(messageAndLevel) {
     const message = messageAndLevel.message.toString();

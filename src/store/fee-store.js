@@ -3,7 +3,7 @@
 import {observable, action} from 'mobx';
 import logger from 'loglevel';
 
-export default class NodeStore {
+export default class FeeStore {
 
   @observable price = "0";
   @observable limit = "0";

@@ -7,7 +7,10 @@ import {install} from 'atom-package-deps';
 import logger from 'loglevel';
 
 import RootStore from './store';
-import {AutoCompleteProvider, LintProvider, AthenaIdeView, ConsoleView, NotificationView} from './view';
+import {
+  AthenaIdeView, AutoCompleteProvider, ConsoleView, LintProvider, NotificationView, SaveConfirmView
+} from './view';
+import { editor } from './view';
 
 export default {
 
@@ -30,7 +33,49 @@ export default {
     if (state) {
       atom.deserializers.deserialize(state);
     }
-    this.setupRootDir();
+    this._setupRootDir();
+  },
+
+  _buildViews(rootStore) {
+    return {
+      athenaIdeView: new AthenaIdeView(rootStore),
+      consoleView: new ConsoleView(rootStore),
+      notificationView: new NotificationView(rootStore)
+    };
+  },
+
+  _buildSubscriptions() {
+    const subscriptions = new CompositeDisposable();
+    subscriptions.add(atom.commands.add('atom-text-editor', {
+      'athena-ide:compile': () => {
+        if (editor.isAnyEditorDirty()) {
+          new SaveConfirmView(() => this._compile()).show();
+        } else {
+          this._compile();
+        }
+     }
+    }));
+    subscriptions.add(atom.commands.add('atom-workspace', {
+      'athena-ide-view:show': () => {
+        this._show();
+      }
+    }));
+    return subscriptions;
+  },
+
+  _compile() {
+    this._show();
+    this.rootStore.compileResultStore.changeFile(editor.getCurrentByRelative());
+    this.rootStore.compileResultStore.compileWithCurrent();
+  },
+
+  _show() {
+    this.views.athenaIdeView.show();
+    this.views.consoleView.show();
+  },
+
+  _setupRootDir() {
+    this.rootStore.compileResultStore.setRootDir(editor.getProjectRootDir());
   },
 
   deserializeStores(data) {
@@ -51,79 +96,6 @@ export default {
     this.views = null;
     this.subscriptions.dispose();
     this.subscriptions = null;
-  },
-
-  setupRootDir() {
-    const pathInfo = this._getEditorTarget(atom.workspace.getActiveTextEditor());
-    const projectRoot = pathInfo[0];
-    this.rootStore.compileResultStore.setRootDir(projectRoot);
-  },
-
-  _buildViews(rootStore) {
-    return {
-      athenaIdeView: new AthenaIdeView(rootStore),
-      consoleView: new ConsoleView(rootStore),
-      notificationView: new NotificationView(rootStore)
-    };
-  },
-
-  _buildSubscriptions() {
-    const subscriptions = new CompositeDisposable();
-    subscriptions.add(atom.commands.add('atom-text-editor', {
-      'athena-ide:compile': () => {
-        const modifiedEditors = atom.workspace.getTextEditors().filter(e => e.isModified())
-        if (modifiedEditors.length > 0) {
-          this._showSaveConfirmModal(modifiedEditors);
-        } else {
-          this._compile();
-        }
-      }
-    }));
-    subscriptions.add(atom.commands.add('atom-workspace', {
-      'athena-ide-view:show': () => {
-        this._show();
-      }
-    }));
-    return subscriptions;
-  },
-
-  _showSaveConfirmModal(modifiedEditors) {
-    atom.confirm({
-      message: "Do you want to save file before compile?",
-      detail: modifiedEditors
-        .map(e => this._getEditorTarget(e))
-        .map(t => t[1])
-        .reduce((pre, curr, index) => {
-          if (0 === index) {
-            return curr;
-          }
-          return  pre + "\n" + curr;
-        }),
-      buttons: ["Ok", "Cancel"]
-    }, async response => {
-      if (response === 0) {
-        await Promise.all(modifiedEditors.map(e => e.save()));
-        this._compile();
-      }
-    })
-  },
-
-  _compile() {
-    const pathInfo = this._getEditorTarget(atom.workspace.getActiveTextEditor());
-    const currentFile = pathInfo[1];
-    this._show();
-    this.rootStore.compileResultStore.changeFile(currentFile);
-    this.rootStore.compileResultStore.compileWithCurrent();
-  },
-
-  _getEditorTarget(editor) {
-    const absolutePath = editor.getBuffer().getPath();
-    return atom.project.relativizePath(absolutePath);
-  },
-
-  _show() {
-    this.views.athenaIdeView.show();
-    this.views.consoleView.show();
   },
 
   getProvider () {
