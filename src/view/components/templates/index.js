@@ -1,5 +1,6 @@
 'use babel';
 
-import CompilePanel from './compile-panel';
+import DeployPanel from './deploy-panel';
 import RunPanel from './run-panel';
-export {CompilePanel, RunPanel};
+
+export {DeployPanel, RunPanel};

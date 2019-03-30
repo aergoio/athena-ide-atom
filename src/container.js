@@ -30,6 +30,7 @@ export default {
     if (state) {
       atom.deserializers.deserialize(state);
     }
+    this.setupRootDir();
   },
 
   deserializeStores(data) {
@@ -50,6 +51,12 @@ export default {
     this.views = null;
     this.subscriptions.dispose();
     this.subscriptions = null;
+  },
+
+  setupRootDir() {
+    const pathInfo = this._getEditorTarget(atom.workspace.getActiveTextEditor());
+    const projectRoot = pathInfo[0];
+    this.rootStore.compileResultStore.setRootDir(projectRoot);
   },
 
   _buildViews(rootStore) {
@@ -103,10 +110,10 @@ export default {
 
   _compile() {
     const pathInfo = this._getEditorTarget(atom.workspace.getActiveTextEditor());
-    const projectRoot = pathInfo[0];
-    const relativePath = pathInfo[1];
+    const currentFile = pathInfo[1];
     this._show();
-    this.rootStore.compileResultStore.addCompileResult(projectRoot, relativePath);
+    this.rootStore.compileResultStore.changeFile(currentFile);
+    this.rootStore.compileResultStore.compileWithCurrent();
   },
 
   _getEditorTarget(editor) {

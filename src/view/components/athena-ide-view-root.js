@@ -3,7 +3,7 @@
 import React from 'react';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
-import {CompilePanel, RunPanel} from './templates';
+import {DeployPanel, RunPanel} from './templates';
 
 export default class AthenaIdeViewRoot extends React.Component {
 
@@ -20,7 +20,7 @@ export default class AthenaIdeViewRoot extends React.Component {
           <Tab>Run</Tab>
         </TabList>
         <TabPanel>
-          <CompilePanel />
+          <DeployPanel />
         </TabPanel>
         <TabPanel>
           <RunPanel />

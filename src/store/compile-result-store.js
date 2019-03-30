@@ -7,6 +7,7 @@ import serviceProvider from '../service';
 
 export default class CompileResultStore {
 
+  @observable rootDir = "";
   @observable currentFile = "";
   @observable file2CompileResult = new Map();
 
@@ -22,13 +23,16 @@ export default class CompileResultStore {
     logger.debug("Deserialize", data);
   }
 
-  @action addCompileResult(baseDir, filePath) {
-    logger.debug("Resolve compile with", baseDir, filePath);
-    serviceProvider.compileService.compile(baseDir, filePath).then(compileResult => {
-      this.changeFile(filePath);
-      this.file2CompileResult.set(filePath, compileResult);
-      const message = "payload: " + compileResult.payload + " abi: " + compileResult.abi;
-      this.rootStore.consoleStore.log(message, "info");
+  @action setRootDir(rootDir) {
+    this.rootDir = rootDir;
+  }
+
+  @action compileWithCurrent() {
+    logger.debug("Resolve compile with", this.rootDir, this.currentFile);
+    serviceProvider.compileService.compile(this.rootDir, this.currentFile).then(compileResult => {
+      this.file2CompileResult.set(this.currentFile, compileResult);
+      this.rootStore.consoleStore.log("Compile success", "info");
+      this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
       this.rootStore.notificationStore.notify("Compiled successfully", "success");
     }).catch(err => {
       logger.error(err);

@@ -1,7 +1,7 @@
 'use babel';
 
 import {signTransaction, hashTransaction} from '@herajs/crypto';
-import {Contract, FunctionCall} from '@herajs/client';
+import {Contract} from '@herajs/client';
 
 import _ from 'lodash';
 import logger from 'loglevel';

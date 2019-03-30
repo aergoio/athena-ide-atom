@@ -7,7 +7,7 @@ import { ComponentsHolder, Row, Title, SyncIcon, Button } from '../atoms';
 import { NodeSelect, NodeHeight } from '../molecules';
 import { NewNodeModal, RemoveNodeModal } from './modals';
 
-export const Enviroment = (props) => {
+export const Node = (props) => {
   const onSyncNode = props.onSyncNode;
   const node = props.node;
   const nodes = props.nodes;
@@ -16,7 +16,7 @@ export const Enviroment = (props) => {
   return (
     <ComponentsHolder>
       <Row>
-        <Title title='Enviroment'/>
+        <Title title='Node'/>
         <SyncIcon onClick={onSyncNode} />
       </Row>
       <NodeSelect node={node} nodes={nodes} onChange={onNodeChange} />
@@ -29,7 +29,7 @@ export const Enviroment = (props) => {
   );
 }
 
-Enviroment.propTypes = {
+Node.propTypes = {
   onSyncNode: PropTypes.func,
   node: PropTypes.string,
   nodes: PropTypes.array,
@@ -37,4 +37,4 @@ Enviroment.propTypes = {
   onNodeChange: PropTypes.func
 }
 
-export default Enviroment;
+export default Node;

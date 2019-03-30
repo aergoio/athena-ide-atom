@@ -20,6 +20,5 @@
     "plugin:react/recommended"
   ],
   "rules": {
-    "no-unused-vars": "off"
   }
 }

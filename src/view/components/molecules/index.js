@@ -5,12 +5,11 @@ import Abi from './abi';
 import Abis from './abis';
 import AccountSelect from './account-select';
 import Balance from './balance';
-import DeploySelectAndRun from './deploy-select-run';
-import FileSelect from './file-select';
 import NodeHeight from './node-height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
 import Payload from './payload';
+import TargetSelect from './target-select';
 
 export {
   AbiSelect,
@@ -18,10 +17,9 @@ export {
   Abis,
   AccountSelect,
   Balance,
-  DeploySelectAndRun,
-  FileSelect,
   NodeHeight,
   NodeSelect,
   Nonce,
-  Payload
+  Payload,
+  TargetSelect,
 };
