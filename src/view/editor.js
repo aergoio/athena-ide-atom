@@ -4,17 +4,27 @@
 
 export default {
 
+  hasActiveEditor() {
+    return typeof atom.workspace.getActiveTextEditor() !== "undefined";
+  },
+
   getProjectRootDir() {
     const pathInfos = atom.project.relativizePath(this.getCurrentByAbsolute());
     return pathInfos[0];
   },
 
   getCurrentByAbsolute() {
+    if (!this.hasActiveEditor()) {
+      return undefined;
+    }
     return atom.workspace.getActiveTextEditor().getBuffer().getPath();
   },
 
   getCurrentByRelative() {
-    return this._getReliative(this.getCurrentByAbsolute());
+    if (!this.hasActiveEditor()) {
+      return undefined;
+    }
+    return this.getRelative(this.getCurrentByAbsolute());
   },
 
   isAnyEditorDirty() {
@@ -28,10 +38,10 @@ export default {
   getModifiedEditorsPath() {
     return this.getModifiedEditors()
       .map(e => e.getBuffer().getPath())
-      .map(this._getReliative);
+      .map(this.getRelative);
   },
 
-  _getReliative(absolutePath) {
+  getRelative(absolutePath) {
     return atom.project.relativizePath(absolutePath)[1];
   },
 

@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 
-import {CompositeDisposable} from 'atom';
+import {CompositeDisposable, TextEditor} from 'atom';
 import {install} from 'atom-package-deps';
 import logger from 'loglevel';
 
@@ -33,7 +33,6 @@ export default {
     if (state) {
       atom.deserializers.deserialize(state);
     }
-    this._setupRootDir();
   },
 
   _buildViews(rootStore) {
@@ -46,36 +45,68 @@ export default {
 
   _buildSubscriptions() {
     const subscriptions = new CompositeDisposable();
-    subscriptions.add(atom.commands.add('atom-text-editor', {
-      'athena-ide:compile': () => {
-        if (editor.isAnyEditorDirty()) {
-          new SaveConfirmView(() => this._compile()).show();
-        } else {
-          this._compile();
-        }
-     }
-    }));
-    subscriptions.add(atom.commands.add('atom-workspace', {
-      'athena-ide-view:show': () => {
-        this._show();
+    subscriptions.add(
+      atom.commands.add('atom-text-editor', {
+        'athena-ide:compile': () => {
+          if (editor.isAnyEditorDirty()) {
+            new SaveConfirmView(() => this._compile()).show();
+          } else {
+            this._compile();
+          }
       }
-    }));
+      }),
+      atom.commands.add('atom-workspace', {
+        'athena-ide-view:show': () => {
+          this._show();
+        }
+      }),
+      atom.workspace.observeTextEditors(activeEditor => {
+        const targetAbsolute = activeEditor.getBuffer().getPath();
+        if (this._isContractTarget(targetAbsolute)) {
+          const targetRelative = editor.getRelative(targetAbsolute);
+          this.rootStore.deployTargetStore.addTarget(targetRelative);
+          this.rootStore.deployTargetStore.changeTarget(targetRelative);
+        }
+      }),
+      atom.workspace.onDidChangeActiveTextEditor(activeEditor => {
+        if (typeof activeEditor === "undefined") {
+          this.rootStore.deployTargetStore.changeTarget("");
+          return;
+        }
+
+        const targetAbsolute = activeEditor.getBuffer().getPath();
+        if (this._isContractTarget(targetAbsolute)) {
+          const targetRelative = editor.getRelative(targetAbsolute);
+          this.rootStore.deployTargetStore.addTarget(targetRelative);
+          this.rootStore.deployTargetStore.changeTarget(targetRelative);
+        }
+      }),
+      atom.workspace.onDidDestroyPaneItem(event => {
+        const item = event.item;
+        if (item instanceof TextEditor) {
+          const targetAbsolute = item.getBuffer().getPath();
+          const targetRelative = editor.getRelative(targetAbsolute);
+          this.rootStore.deployTargetStore.removeTarget(targetRelative);
+        }
+      })
+    );
     return subscriptions;
+  },
+
+  _isContractTarget(path) {
+    return /\/\S+\.(lua|ascl)$/.test(path);
   },
 
   _compile() {
     this._show();
-    this.rootStore.compileResultStore.changeFile(editor.getCurrentByRelative());
-    this.rootStore.compileResultStore.compileWithCurrent();
+    const baseDir = editor.getProjectRootDir();
+    const target = editor.getCurrentByRelative();
+    this.rootStore.compileStore.compile(baseDir, target);
   },
 
   _show() {
     this.views.athenaIdeView.show();
     this.views.consoleView.show();
-  },
-
-  _setupRootDir() {
-    this.rootStore.compileResultStore.setRootDir(editor.getProjectRootDir());
   },
 
   deserializeStores(data) {

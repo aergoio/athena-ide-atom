@@ -3,9 +3,10 @@
 import logger from 'loglevel';
 
 import AccountStore from './account-store';
-import CompileResultStore from './compile-result-store';
+import CompileStore from './compile-store';
 import ConsoleStore from './console-store';
 import ContractStore from './contract-store';
+import DeployTargetStore from './deploy-target-store';
 import FeeStore from './fee-store';
 import NodeStore from './node-store';
 import NotificationStore from './notification-store';
@@ -15,9 +16,10 @@ export default class RootStore {
   constructor() {
     this.stores = {
       accountStore: new AccountStore(this),
-      compileResultStore: new CompileResultStore(this),
+      compileStore: new CompileStore(this),
       consoleStore: new ConsoleStore(this),
       contractStore: new ContractStore(this),
+      deployTargetStore: new DeployTargetStore(this),
       feeStore: new FeeStore(this),
       nodeStore: new NodeStore(this),
       notificationStore: new NotificationStore(this),
@@ -40,8 +42,8 @@ export default class RootStore {
     return this.stores.accountStore;
   }
 
-  get compileResultStore() {
-    return this.stores.compileResultStore;
+  get compileStore() {
+    return this.stores.compileStore;
   }
 
   get consoleStore() {
@@ -50,6 +52,10 @@ export default class RootStore {
 
   get contractStore() {
     return this.stores.contractStore;
+  }
+
+  get deployTargetStore() {
+    return this.stores.deployTargetStore;
   }
 
   get feeStore() {

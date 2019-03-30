@@ -16,6 +16,14 @@ export default class AccountStore {
     this.rootStore = rootStore;
   }
 
+  @computed get currentIdentity() {
+    return this.address2Identity.get(this.currentAddress);
+  }
+
+  @computed get addresses() {
+    return Array.from(this.address2Identity.keys());
+  }
+
   serialize() {
     return {};
   }
@@ -73,14 +81,6 @@ export default class AccountStore {
       this.currentBalance = state.balance;
       this.currentNonce = state.nonce;
     });
-  }
-
-  @computed get currentIdentity() {
-    return this.address2Identity.get(this.currentAddress);
-  }
-
-  @computed get addresses() {
-    return Array.from(this.address2Identity.keys());
   }
 
   @action exportAccount(password) {

@@ -4,18 +4,18 @@ import fs from 'fs';
 chai.use(chaiAsPromised);
 const assert = chai.assert;
 
-import CompileResultStore from '../../src/store/compile-result-store';
+import CompileStore from '../../src/store/compile-store';
 
-describe("CompileResultStore", () => {
+describe("CompileStore", () => {
 
   describe("Persistant test", () => {
 
     it("should serialized and deserialize right", () => {
-      const origin = new CompileResultStore();
+      const origin = new CompileStore();
       const serialized = origin.serialize();
       assert.isNotNull(serialized);
 
-      const newOne = new CompileResultStore();
+      const newOne = new CompileStore();
       newOne.deserialize(serialized);
     });
 

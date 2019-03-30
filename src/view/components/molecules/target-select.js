@@ -9,8 +9,8 @@ export const TargetSelect = (props) => {
     <Row>
       <Description description="Target" />
       <SelectBox
-        value={props.file}
-        options={props.files}
+        value={props.target}
+        options={props.targets}
         onChange={props.onChange}
       />
     </Row>
@@ -18,8 +18,8 @@ export const TargetSelect = (props) => {
 }
 
 TargetSelect.propTypes = {
-  file: PropTypes.string,
-  files: PropTypes.array,
+  target: PropTypes.string,
+  targets: PropTypes.array,
   onChange: PropTypes.func
 }
 

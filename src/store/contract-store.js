@@ -14,6 +14,15 @@ export default class ContractStore {
     this.rootStore = rootStore;
   }
 
+  @computed get currentAbi() {
+    return this.contract2Abi.has(this.currentContract) ? 
+      this.contract2Abi.get(this.currentContract) : {};
+  }
+
+  @computed get contracts() {
+    return Array.from(this.contract2Abi.keys());
+  }
+
   serialize() {
     return {
       currentContract: this.currentContract,
@@ -33,7 +42,7 @@ export default class ContractStore {
     const identity = this.rootStore.accountStore.currentIdentity;
     const price = this.rootStore.feeStore.price;
     const limit = this.rootStore.feeStore.limit;
-    const payload = this.rootStore.compileResultStore.compileResult.payload;
+    const payload = this.rootStore.deployTargetStore.compileResult.payload;
     logger.debug("Deploy contract with", price, limit, payload);
 
     serviceProvider.contractService.deploy(identity, price, limit, payload).then(deployResult => {
@@ -79,17 +88,6 @@ export default class ContractStore {
     logger.debug(message);
     this.rootStore.consoleStore.log(message, "info");
     this.currentContract = contractAddress;
-  }
-
-  @computed get currentAbi() {
-    if (!this.contract2Abi.has(this.currentContract)) {
-      return {};
-    }
-    return this.contract2Abi.get(this.currentContract);
-  }
-
-  @computed get contracts() {
-    return Array.from(this.contract2Abi.keys());
   }
 
 }

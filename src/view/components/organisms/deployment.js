@@ -7,8 +7,8 @@ import { ComponentsHolder, Row, Title, Button } from '../atoms';
 import { TargetSelect } from '../molecules';
 
 export const Deployment = (props) => {
-  const currentFile = props.currentFile;
-  const files = props.files;
+  const currentTarget = props.currentTarget;
+  const targets = props.targets;
   const onCompile = props.onCompile;
   const onDeploy = props.onDeploy;
   const onChangeTarget = props.onChangeTarget;
@@ -18,8 +18,8 @@ export const Deployment = (props) => {
         <Title title='Deploy'/>
       </Row>
       <TargetSelect
-        file={currentFile}
-        files={files}
+        target={currentTarget}
+        targets={targets}
         onChange={onChangeTarget}
       />
       <Row class='components-row-button'>
@@ -37,8 +37,8 @@ export const Deployment = (props) => {
 }
 
 Deployment.propTypes = {
-  currentFile: PropTypes.string,
-  files: PropTypes.array,
+  currentTarget: PropTypes.string,
+  targets: PropTypes.array,
   onChangeTarget: PropTypes.func,
   onCompile: PropTypes.func,
   onDeploy: PropTypes.func

@@ -14,6 +14,10 @@ export default class NodeStore {
     this.rootStore = rootStore;
   }
 
+  @computed get nodes() {
+    return Array.from(this.nodeSet.values());
+  }
+
   serialize() {
     return {
       currentNode: this.currentNode,
@@ -37,10 +41,6 @@ export default class NodeStore {
 
     this.nodeSet.add(node);
     this.changeNode(node);
-  }
-
-  @computed get nodes() {
-    return Array.from(this.nodeSet.values());
   }
 
   @action changeNode(node) {
