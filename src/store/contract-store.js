@@ -38,6 +38,21 @@ export default class ContractStore {
     }
   }
 
+  @action addContract(contract) {
+    logger.debug("Add contract", contract);
+    serviceProvider.contractService.getABI(contract).then(abi => {
+      this.contract2Abi.set(contract, abi);
+      this.changeContract(contract);
+      const message = "Successfully imported contract " + contract;
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
+    }).catch(err => {
+      logger.error(err);
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Importing contract failed", "error");
+    });
+  }
+
   @action deployContract() {
     const identity = this.rootStore.accountStore.currentIdentity;
     const price = this.rootStore.feeStore.price;
@@ -88,6 +103,16 @@ export default class ContractStore {
     logger.debug(message);
     this.rootStore.consoleStore.log(message, "info");
     this.currentContract = contractAddress;
+  }
+
+  @action removeContract(contract) {
+    logger.debug("Remove contract", contract);
+    if (!this.contract2Abi.has(contract)) {
+      return;
+    }
+
+    this.contract2Abi.delete(contract);
+    this.changeContract("");
   }
 
 }

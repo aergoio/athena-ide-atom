@@ -103,17 +103,13 @@ export default class AccountStore {
 
   @action removeAccount(address) {
     logger.debug("Remove account", address);
-    if (this.address2Identity.has(address)) {
-      this.address2Identity.remove(address);
-      this.rootStore.consoleStore.log("Remove account " + address, "info");
-      this.rootStore.notificationStore.notify("Successfully removed account", "success");
-      this.changeAccount("");
-    } else {
-      const message = "No account " + address;
-      logger.error(message);
-      this.rootStore.consoleStore.log(message, "error");
-      this.rootStore.notificationStore.notify("Removing account failed", "success");
+    if (!this.address2Identity.has(address)) {
+      return;
     }
+
+    this.address2Identity.remove(address);
+    this.changeNode("");
+    this.changeAccount("");
   }
 
 }

@@ -1,7 +1,7 @@
 'use babel';
 
 import {signTransaction, hashTransaction} from '@herajs/crypto';
-import {Contract} from '@herajs/client';
+import {Address, Contract} from '@herajs/client';
 
 import _ from 'lodash';
 import logger from 'loglevel';
@@ -14,6 +14,14 @@ export default class ContractService {
 
   constructor(client) {
     this.client = client;
+  }
+
+  async getABI(contractAddress) {
+    if (isEmpty(contractAddress)) {
+      throw new Error("Contract address is empty");
+    }
+    const decoded = Address.decode(contractAddress);
+    return await this.client.getABI(decoded);
   }
 
   deploy(identity, price, limit, contractPayload) {

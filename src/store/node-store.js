@@ -60,13 +60,13 @@ export default class NodeStore {
     this.rootStore.accountStore.updateAccountState();
   }
 
-  @action removeNode() {
-    logger.debug("Remove node", this.currentNode);
-    if (typeof this.currentNode === "undefined" || "" === this.currentNode) {
+  @action removeNode(node) {
+    logger.debug("Remove node", node);
+    if (!this.nodeSet.has(node)) {
       return;
     }
 
-    this.nodeSet.delete(this.currentNode);
+    this.nodeSet.delete(node);
     this.changeNode("");
   }
 

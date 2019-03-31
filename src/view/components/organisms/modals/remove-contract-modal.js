@@ -8,13 +8,13 @@ import logger from 'loglevel';
 
 import {Row, Title, Button} from '../../atoms';
 
-@inject('nodeStore')
+@inject('contractStore')
 @observer
-export default class RemoveNodeModal extends React.Component {
+export default class RemoveContractModal extends React.Component {
 
   static get propTypes() {
     return {
-      nodeStore: PropTypes.any,
+      contractStore: PropTypes.any,
       trigger: PropTypes.element
     };
   }
@@ -25,9 +25,9 @@ export default class RemoveNodeModal extends React.Component {
   }
 
   _onConfirm() {
-    logger.debug("Remove node confirm button clicked");
-    const node = this.props.nodeStore.currentNode;
-    this.props.nodeStore.removeNode(node);
+    logger.debug("Remove contract confirm button clicked");
+    const contract = this.props.contractStore.currentContract;
+    this.props.contractStore.removeContract(contract);
   }
 
   render() {
@@ -37,7 +37,7 @@ export default class RemoveNodeModal extends React.Component {
           <atom-panel class='modal'>
             <div>
               <Row>
-                <Title title='Do you want to remove current node?' />
+                <Title title='Do you want to remove current contract?' />
               </Row>
               <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Environment, ContractCall } from '../organisms';
+import { Environment, ContractSelect, ContractCall } from '../organisms';
 
 @inject('contractStore')
 @observer
@@ -44,20 +44,24 @@ export default class RunPanel extends React.Component {
   }
 
   render() {
-    // run
+    // contract select
     const onContractChange = this._onContractAddressChange;
     const currentContract = this.props.contractStore.currentContract;
     const contracts = this.props.contractStore.contracts;
+
+    // execute / query
     const currentAbi = this.props.contractStore.currentAbi;
     const onAbiCall = this._onContractFunctionClicked;
 
     return (
       <Panel>
         <Environment />
-        <ContractCall
+        <ContractSelect
           onContractChange={onContractChange}
           currentContract={currentContract}
           contracts={contracts}
+        />
+        <ContractCall
           currentAbi={currentAbi}
           onAbiCall={onAbiCall}
         />

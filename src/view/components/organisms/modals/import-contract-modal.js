@@ -6,28 +6,33 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Row, Title, Button} from '../../atoms';
+import {Row, Title, Description, InputBox, Button} from '../../atoms';
 
-@inject('nodeStore')
+@inject('contractStore')
 @observer
-export default class RemoveNodeModal extends React.Component {
+export default class NewNodeModal extends React.Component {
 
   static get propTypes() {
     return {
-      nodeStore: PropTypes.any,
+      contractStore: PropTypes.any,
       trigger: PropTypes.element
     };
   }
 
   constructor(props) {
     super(props);
-    this._onConfirm = this._onConfirm.bind(this);
+    this.state = { contract: "" };
+    this._updateContract = this._updateContract.bind(this);
+  }
+
+  _updateContract(e) {
+    this.setState({ contract: e.target.value });
   }
 
   _onConfirm() {
-    logger.debug("Remove node confirm button clicked");
-    const node = this.props.nodeStore.currentNode;
-    this.props.nodeStore.removeNode(node);
+    logger.debug("Add node button clicked");
+    const contract = this.state.contract;
+    this.props.contractStore.addContract(contract);
   }
 
   render() {
@@ -37,7 +42,12 @@ export default class RemoveNodeModal extends React.Component {
           <atom-panel class='modal'>
             <div>
               <Row>
-                <Title title='Do you want to remove current node?' />
+                <Title title='Enter contract address' />
+              </Row>
+              <Row>
+                <Description description='Contract' />
+                <InputBox onChange={this._updateContract} type='text'
+                    placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
               </Row>
               <Row class='components-row-button'>
                 <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
