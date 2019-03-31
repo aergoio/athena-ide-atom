@@ -20,7 +20,7 @@ const Abis = (props) => {
         <Row key={index} >
           <Button
             name={abiFunction.name}
-            class={['component-btn-runner', 'component-description', 'component-btn-execute']}
+            class={['component-btn-runner', 'component-description', 'btn-warning']}
             onClick={() => onAbiCall(argsRef, abiFunction.name)}
           />
           <InputBox type='text' class='component-inputbox-text'

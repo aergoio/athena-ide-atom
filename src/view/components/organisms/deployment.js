@@ -38,10 +38,12 @@ export const Deployment = (props) => {
       <Row class='components-row-button'>
         <Button
           name='Compile'
+          class='btn-primary'
           onClick={onCompile}
         />
         <Button
           name='Deploy'
+          class='btn-warning'
           onClick={() => onDeploy(argsRef)}
         />
       </Row>
