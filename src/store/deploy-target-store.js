@@ -18,6 +18,24 @@ export default class DeployTargetStore {
       compileResult : { payload: "", abi: "" };
   }
 
+  @computed get constructorArgs() {
+    const compileResult = this.target2CompileResult.get(this.currentTarget);
+    if (typeof compileResult === "undefined") {
+      return [];
+    }
+
+    const abi = JSON.parse(compileResult.abi);
+    const abiFunctions = abi.functions;
+    if (typeof abiFunctions === "undefined") {
+      return [];
+    }
+
+    return abiFunctions.filter(f => "constructor" === f.name)
+      .map(f => f.arguments)
+      .reduce((acc, a) => acc.concat(a), []) // flatten
+      .map(a => a.name);
+  }
+
   @computed get targets() {
     return Array.from(this.target2CompileResult.keys());
   }

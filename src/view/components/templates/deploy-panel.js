@@ -9,6 +9,8 @@ import { Panel } from '../atoms';
 import { Environment, Deployment, CompileResult } from '../organisms';
 import { editor, SaveConfirmView } from '../../';
 
+import { parseArgs } from './utils';
+
 @inject('compileStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class DeployPanel extends React.Component {
@@ -51,9 +53,14 @@ export default class DeployPanel extends React.Component {
     }
   }
 
-  _onDeployButtonClicked() {
+  _onDeployButtonClicked(argInputRef) {
     logger.debug("Deploy contract");
-    this.props.contractStore.deployContract();
+    logger.debug("Input ref:", argInputRef);
+    let constructorArgs = [];
+    if (argInputRef.current) {
+      constructorArgs = parseArgs(argInputRef.current.state.value);
+    }
+    this.props.contractStore.deployContract(constructorArgs);
   }
 
   render() {
@@ -63,6 +70,7 @@ export default class DeployPanel extends React.Component {
     const onChangeTarget = this._onFileChange;
     const onCompile = this._onCompileButtonClicked;
     const onDeploy = this._onDeployButtonClicked;
+    const constructorArgs = this.props.deployTargetStore.constructorArgs;
 
     // compile result
     const payload = this.props.deployTargetStore.compileResult.payload;
@@ -77,6 +85,7 @@ export default class DeployPanel extends React.Component {
           onChangeTarget={onChangeTarget}
           onCompile={onCompile}
           onDeploy={onDeploy}
+          constructorArgs={constructorArgs}
         />
         <CompileResult
           payload={payload}

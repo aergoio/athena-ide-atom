@@ -53,14 +53,15 @@ export default class ContractStore {
     });
   }
 
-  @action deployContract() {
+  @action deployContract(constructorArgs) {
+    logger.debug("deploy contract with", constructorArgs);
     const identity = this.rootStore.accountStore.currentIdentity;
     const price = this.rootStore.feeStore.price;
     const limit = this.rootStore.feeStore.limit;
     const payload = this.rootStore.deployTargetStore.compileResult.payload;
-    logger.debug("Deploy contract with", price, limit, payload);
+    logger.debug("Deploy contract with", price, limit, payload, constructorArgs);
 
-    serviceProvider.contractService.deploy(identity, price, limit, payload).then(deployResult => {
+    serviceProvider.contractService.deploy(identity, price, limit, payload, constructorArgs).then(deployResult => {
       logger.debug("Deploy result:", deployResult);
       const contractAddress = deployResult.contractAddress;
       const abi = deployResult.abi;

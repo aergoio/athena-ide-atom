@@ -5,6 +5,7 @@ import Abi from './abi';
 import Abis from './abis';
 import AccountSelect from './account-select';
 import Balance from './balance';
+import ContractConstructor from './contract-constructor';
 import NodeHeight from './node-height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
@@ -17,6 +18,7 @@ export {
   Abis,
   AccountSelect,
   Balance,
+  ContractConstructor,
   NodeHeight,
   NodeSelect,
   Nonce,

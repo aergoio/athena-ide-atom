@@ -24,7 +24,7 @@ export default class ContractService {
     return await this.client.getABI(decoded);
   }
 
-  deploy(identity, price, limit, contractPayload) {
+  deploy(identity, price, limit, contractPayload, args) {
     if (isEmpty(identity)) {
       return Promise.reject("Selected account is empty");
     }
@@ -40,8 +40,12 @@ export default class ContractService {
       return Promise.reject("Deploy target is empty");
     }
 
+    if (isEmpty(args)) {
+      return Promise.reject("Deploy args is empty");
+    }
+
     const trimmedPayload = contractPayload.trim();
-    return Promise.resolve(Contract.fromCode(trimmedPayload).asPayload()).then(payload => {
+    return Promise.resolve(Contract.fromCode(trimmedPayload).asPayload(args)).then(payload => {
       const trier = (nonce) => {
         const rawTx = this._buildDeployTx(accountAddress, "", nonce, price, limit, payload);
         return this._signTx(identity, rawTx).then(signedTx => {

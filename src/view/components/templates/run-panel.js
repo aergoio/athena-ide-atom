@@ -8,6 +8,8 @@ import logger from 'loglevel';
 import { Panel } from '../atoms';
 import { Environment, ContractSelect, ContractCall } from '../organisms';
 
+import { parseArgs } from './utils';
+
 @inject('contractStore')
 @observer
 export default class RunPanel extends React.Component {
@@ -33,12 +35,7 @@ export default class RunPanel extends React.Component {
 
   _onContractFunctionClicked(argInputRef, targetFunction) {
     logger.debug("Input ref:", argInputRef);
-    const targetArgs = argInputRef.current.state.value.split(',')
-      .map(arg => arg.trim())
-      .map(arg => {
-      const asNumber = Number(arg);
-      return Number.isNaN(asNumber) ? arg.replace(/['"]+/g, '') : asNumber;
-    });
+    const targetArgs = parseArgs(argInputRef.current.state.value);
     logger.info("Execute contract", targetFunction, "with args", targetArgs);
     this.props.contractStore.executeContract(targetFunction, targetArgs);
   }

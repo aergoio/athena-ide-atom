@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 
 import { ComponentsHolder, Row, Title, Button } from '../atoms';
-import { TargetSelect } from '../molecules';
+import { ContractConstructor, TargetSelect } from '../molecules';
 
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
@@ -12,6 +12,18 @@ export const Deployment = (props) => {
   const onCompile = props.onCompile;
   const onDeploy = props.onDeploy;
   const onChangeTarget = props.onChangeTarget;
+  const constructorArgs = props.constructorArgs;
+  const argsRef = React.createRef();
+
+  let ConstructorOrNot;
+  if (constructorArgs.length > 0) {
+    ConstructorOrNot = () => (
+      <ContractConstructor args={constructorArgs} argsRef={argsRef} />
+    );
+  } else {
+    ConstructorOrNot = () => <div></div>;
+  }
+
   return (
     <ComponentsHolder>
       <Row>
@@ -22,6 +34,7 @@ export const Deployment = (props) => {
         targets={targets}
         onChange={onChangeTarget}
       />
+      <ConstructorOrNot />
       <Row class='components-row-button'>
         <Button
           name='Compile'
@@ -29,7 +42,7 @@ export const Deployment = (props) => {
         />
         <Button
           name='Deploy'
-          onClick={onDeploy}
+          onClick={() => onDeploy(argsRef)}
         />
       </Row>
     </ComponentsHolder>
@@ -41,7 +54,8 @@ Deployment.propTypes = {
   targets: PropTypes.array,
   onChangeTarget: PropTypes.func,
   onCompile: PropTypes.func,
-  onDeploy: PropTypes.func
+  onDeploy: PropTypes.func,
+  constructorArgs: PropTypes.array
 }
 
 export default Deployment;
