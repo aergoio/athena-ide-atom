@@ -1,5 +1,6 @@
 'use babel'
 
+import path from 'path';
 import {action} from 'mobx';
 import logger from 'loglevel';
 
@@ -19,11 +20,19 @@ export default class CompileStore {
     logger.debug("Deserialize", data);
   }
 
-  @action compile(baseDir, target) {
+  @action compileCurrentTarget() {
+    const target = this.rootStore.deployTargetStore.currentTarget;
+    if ("" === target) {
+      return;
+    }
+
+    const baseDir = this.rootStore.deployTargetStore.currentBaseDir;
     logger.debug("Compile with", baseDir, target);
-    serviceProvider.compileService.compile(baseDir, target).then(compileResult => {
+    Promise.resolve(path.resolve(baseDir, target)).then(absolutePath => {
+      return serviceProvider.compileService.compile(absolutePath);
+    }).then(compileResult => {
       this.rootStore.deployTargetStore.changeTarget(target);
-      this.rootStore.deployTargetStore.addTarget(target, compileResult);
+      this.rootStore.deployTargetStore.addTargetResult(target, compileResult);
       this.rootStore.consoleStore.log("Compile success", "info");
       this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
       this.rootStore.notificationStore.notify("Compiled successfully", "success");

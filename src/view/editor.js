@@ -41,8 +41,12 @@ export default {
       .map(this.getRelative);
   },
 
+  getBaseDirAndRelativePath(absolutePath) {
+    return atom.project.relativizePath(absolutePath);
+  },
+
   getRelative(absolutePath) {
-    return atom.project.relativizePath(absolutePath)[1];
+    return this.getBaseDirAndRelativePath(absolutePath)[1];
   },
 
 };

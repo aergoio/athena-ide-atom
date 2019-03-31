@@ -46,11 +46,7 @@ export default class DeployPanel extends React.Component {
   }
 
   _compile() {
-    if (editor.hasActiveEditor()) {
-      const baseDir = editor.getProjectRootDir();
-      const target = editor.getCurrentByRelative();
-      this.props.compileStore.compile(baseDir, target);
-    }
+    this.props.compileStore.compileCurrentTarget();
   }
 
   _onDeployButtonClicked(argInputRef) {

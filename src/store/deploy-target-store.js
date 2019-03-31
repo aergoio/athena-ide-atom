@@ -6,10 +6,15 @@ import logger from 'loglevel';
 export default class DeployTargetStore {
 
   @observable currentTarget = "";
+  @observable target2BaseDir = new Map();
   @observable target2CompileResult = new Map();
 
   constructor(rootStore) {
     this.rootStore = rootStore;
+  }
+
+  @computed get currentBaseDir() {
+    return this.target2BaseDir.get(this.currentTarget);
   }
 
   @computed get compileResult() {
@@ -37,7 +42,7 @@ export default class DeployTargetStore {
   }
 
   @computed get targets() {
-    return Array.from(this.target2CompileResult.keys());
+    return Array.from(this.target2BaseDir.keys());
   }
 
   serialize() {
@@ -48,9 +53,14 @@ export default class DeployTargetStore {
     logger.debug("Deserialize", data);
   }
 
-  @action addTarget(candidate, compileResult) {
-    logger.debug("Add compile target", candidate, compileResult);
-    this.target2CompileResult.set(candidate, compileResult);
+  @action addTarget(target, baseDir) {
+    logger.debug("Add compile target", target, baseDir);
+    this.target2BaseDir.set(target, baseDir);
+  }
+
+  @action addTargetResult(target, compileResult) {
+    logger.debug("Add compile target result", target, compileResult);
+    this.target2CompileResult.set(target, compileResult);
   }
 
   @action changeTarget(target) {
@@ -60,16 +70,11 @@ export default class DeployTargetStore {
 
   @action removeTarget(target) {
     logger.debug("Remove possibly candidate", target);
-    if (!this.target2CompileResult.has(target)) {
+    // can't remove already compiled item
+    if (this.target2CompileResult.has(target)) {
       return;
     }
-
-    const result = this.target2CompileResult.get(target);
-    if (typeof result !== "undefined") {
-      return;
-    }
-
-    this.target2CompileResult.delete(target);
+    this.target2BaseDir.delete(target);
   }
 
 }

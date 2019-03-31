@@ -63,9 +63,9 @@ export default {
       atom.workspace.observeTextEditors(activeEditor => {
         const targetAbsolute = activeEditor.getBuffer().getPath();
         if (this._isContractTarget(targetAbsolute)) {
-          const targetRelative = editor.getRelative(targetAbsolute);
-          this.rootStore.deployTargetStore.addTarget(targetRelative);
-          this.rootStore.deployTargetStore.changeTarget(targetRelative);
+          const baseDirAndRelative = editor.getBaseDirAndRelativePath(targetAbsolute);
+          this.rootStore.deployTargetStore.addTarget(baseDirAndRelative[1], baseDirAndRelative[0]);
+          this.rootStore.deployTargetStore.changeTarget(baseDirAndRelative[1]);
         }
       }),
       atom.workspace.onDidChangeActiveTextEditor(activeEditor => {
@@ -76,9 +76,9 @@ export default {
 
         const targetAbsolute = activeEditor.getBuffer().getPath();
         if (this._isContractTarget(targetAbsolute)) {
-          const targetRelative = editor.getRelative(targetAbsolute);
-          this.rootStore.deployTargetStore.addTarget(targetRelative);
-          this.rootStore.deployTargetStore.changeTarget(targetRelative);
+          const baseDirAndRelative = editor.getBaseDirAndRelativePath(targetAbsolute);
+          this.rootStore.deployTargetStore.addTarget(baseDirAndRelative[1], baseDirAndRelative[0]);
+          this.rootStore.deployTargetStore.changeTarget(baseDirAndRelative[1]);
         }
       }),
       atom.workspace.onDidDestroyPaneItem(event => {
@@ -101,7 +101,8 @@ export default {
     this._show();
     const baseDir = editor.getProjectRootDir();
     const target = editor.getCurrentByRelative();
-    this.rootStore.compileStore.compile(baseDir, target);
+    this.rootStore.deployTargetStore.addTarget(target, baseDir);
+    this.rootStore.compileStore.compileCurrentTarget();
   },
 
   _show() {
