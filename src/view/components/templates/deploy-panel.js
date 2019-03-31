@@ -54,7 +54,7 @@ export default class DeployPanel extends React.Component {
     logger.debug("Input ref:", argInputRef);
     let constructorArgs = [];
     if (argInputRef.current) {
-      constructorArgs = parseArgs(argInputRef.current.state.value);
+      constructorArgs = parseArgs(argInputRef.current.value);
     }
     this.props.contractStore.deployContract(constructorArgs);
   }

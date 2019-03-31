@@ -21,17 +21,12 @@ export default class NewNodeModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { contract: "" };
-    this._updateContract = this._updateContract.bind(this);
-  }
-
-  _updateContract(e) {
-    this.setState({ contract: e.target.value });
+    this.contractInputRef = React.createRef();
   }
 
   _onConfirm() {
     logger.debug("Add node button clicked");
-    const contract = this.state.contract;
+    const contract = this.contractInputRef.current.value;
     this.props.contractStore.addContract(contract);
   }
 
@@ -46,7 +41,7 @@ export default class NewNodeModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Contract' />
-                <InputBox onChange={this._updateContract} type='text'
+                <InputBox inputRef={this.contractInputRef} type='text'
                     placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
               </Row>
               <Row class='components-row-button'>

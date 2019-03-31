@@ -21,19 +21,12 @@ export default class NewNodeModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      node: ""
-    };
-    this._updateNode = this._updateNode.bind(this);
-  }
-
-  _updateNode(e) {
-    this.setState({ node: e.target.value });
+    this.nodetInputRef = React.createRef();
   }
 
   _onConfirm() {
     logger.debug("Add node button clicked");
-    const node = this.state.node;
+    const node = this.nodetInputRef.current.value;
     this.props.nodeStore.addNode(node);
   }
 
@@ -48,7 +41,7 @@ export default class NewNodeModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Node' />
-                <InputBox onChange={this._updateNode} type='text'
+                <InputBox inputRef={this.nodetInputRef} type='text'
                     placeHolder='eg. 192.168.1.168:7845'/>
               </Row>
               <Row class='components-row-button'>

@@ -24,7 +24,7 @@ const Abis = (props) => {
             onClick={() => onAbiCall(argsRef, abiFunction.name)}
           />
           <InputBox type='text' class='component-inputbox-text'
-            ref={argsRef}
+            inputRef={argsRef}
             placeHolder={inputPlaceHolder}
           />
         </Row>

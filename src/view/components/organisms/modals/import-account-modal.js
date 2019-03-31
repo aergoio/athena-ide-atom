@@ -21,15 +21,13 @@ export default class ImportAccountModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { encryptedPrivateKey: "", password: "" };
-
-    this.encryptedPrivateKeyRef = React.createRef();
-    this.passwordRef = React.createRef();
+    this.privateKeyInputRef = React.createRef();
+    this.passwordInputRef = React.createRef();
   }
 
   _onConfirm() {
-    const encryptedPrivateKey = this.encryptedPrivateKeyRef.current.state.value;
-    const password = this.passwordRef.current.state.value;
+    const encryptedPrivateKey = this.privateKeyInputRef.current.value;
+    const password = this.passwordInputRef.current.value;
     logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
     this.props.accountStore.addAccount(encryptedPrivateKey, password);
   }
@@ -45,12 +43,12 @@ export default class ImportAccountModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Private key' />
-                <InputBox ref={this.encryptedPrivateKeyRef} type='text'
+                <InputBox inputRef={this.privateKeyInputRef} type='text'
                     placeHolder='encrypted private key'/>
               </Row>
               <Row>
                 <Description description='Password' />
-                <InputBox ref={this.passwordRef} type='text'
+                <InputBox inputRef={this.passwordInputRef} type='text'
                     placeHolder='password to decrypt encrypted private key'/>
               </Row>
               <Row class='components-row-button'>

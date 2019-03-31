@@ -21,19 +21,12 @@ export default class ExportAccountModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      password: ""
-    };
-    this._updatePassword = this._updatePassword.bind(this);
-  }
-
-  _updatePassword(e) {
-    this.setState({ password: e.target.value });
+    this.passwordInputRef = React.createRef();
   }
 
   _onConfirm() {
     logger.debug("Export account button clicked");
-    const password = this.state.password;
+    const password = this.passwordInputRef.current.value;
     this.props.accountStore.exportAccount(password);
   }
 
@@ -48,7 +41,7 @@ export default class ExportAccountModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Password' />
-                <InputBox onChange={this._updatePassword} type='text'
+                <InputBox inputRef={this.passwordInputRef} type='text'
                     placeHolder='password to encrypt private key'/>
               </Row>
               <Row class='components-row-button'>

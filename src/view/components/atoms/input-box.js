@@ -11,17 +11,16 @@ export default class InputBox extends React.Component {
 
   static get propTypes() {
     return {
+      class: PropTypes.class,
       placeHolder: PropTypes.string,
       value: PropTypes.any,
       type: PropTypes.string,
-      class: PropTypes.class,
-      onChange: PropTypes.func
+      inputRef: PropTypes.string
     };
   }
 
   constructor(props) {
     super(props);
-    this.state = { value: "" };
   }
 
   render() {
@@ -31,12 +30,7 @@ export default class InputBox extends React.Component {
         value={this.props.value}
         placeHolder={this.props.placeHolder}
         type={this.props.type}
-        onChange={(e) => {
-          this.setState({ value: e.target.value });
-          if (this.props.onChange) {
-            this.props.onChange(e);
-          }
-        }}
+        ref={this.props.inputRef}
       />
     );
   }
