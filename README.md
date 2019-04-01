@@ -7,7 +7,7 @@ A package for writing smart contract in aergo using atom
 
 ## Compatible Aergo Version
 
-v0.12.x
+v1.0.x
 
 ## Features
 

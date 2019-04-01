@@ -1,3 +1,7 @@
+## 0.3.0 - Apply chainIdHash
+
+* Apply chainIdHash (compatible with aergo 1.0.x)
+
 ## 0.2.3 - Ui reorg & Add missing function
 
 * Introduce deploy ui
