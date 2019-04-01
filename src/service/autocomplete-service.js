@@ -9,9 +9,9 @@ export default class AutoCompleteService {
     this.luaSuggester = new LuaSuggester();
   }
 
-  suggest(source, filePath, prefix, index) {
+  async suggest(source, filePath, prefix, index) {
     logger.debug("Resolve suggestion with", filePath, prefix, index);
-    return this.luaSuggester.suggest(source, filePath, prefix, index);
+    return await this.luaSuggester.suggest(source, filePath, prefix, index);
   }
 
 }

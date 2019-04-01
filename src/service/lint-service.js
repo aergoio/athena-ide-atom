@@ -9,9 +9,9 @@ export default class LintService {
     this.luaLinter = new LuaLinter();
   }
 
-  lint(source, filePath) {
+  async lint(source, filePath) {
     logger.debug("Resolve lint with", filePath);
-    return this.luaLinter.lint(source, filePath);
+    return await this.luaLinter.lint(source, filePath);
   }
 
 }

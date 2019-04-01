@@ -24,46 +24,42 @@ export default class AccountService {
     return Promise.resolve(identity);
   }
 
-  decryptIdentity(encryptedPrivateKey, password) {
+  async decryptIdentity(encryptedPrivateKey, password) {
     logger.debug("Decrypt private key with", encryptedPrivateKey);
 
     if (isEmpty(encryptedPrivateKey)) {
-      return Promise.reject("Encrypted private key is empty");
+      throw "Encrypted private key is empty";
     }
 
     if (isEmpty(password)) {
-      return Promise.reject("Password to decrypt is empty");
+      throw "Password to decrypt is empty";
     }
 
-    return Promise.resolve(decodePrivateKey(encryptedPrivateKey)).then(encryptedBytes => {
-      return decryptPrivateKey(encryptedBytes, password);
-    }).then(decryptedBytes => {
-      return identifyFromPrivateKey(decryptedBytes);
-    });
+    const encryptedBytes = decodePrivateKey(encryptedPrivateKey);
+    const decryptedBytes = await decryptPrivateKey(encryptedBytes, password);
+    return identifyFromPrivateKey(decryptedBytes);
   }
 
-  encryptIdentity(identity, password) {
+  async encryptIdentity(identity, password) {
     logger.debug("Encrypt identity");
     logger.debug(identity, password);
+
     if (isEmpty(identity)) {
-      return Promise.reject("Identity is empty");
+      throw "Identity is empty";
     }
 
     if (isEmpty(password)) {
-      return Promise.reject("Password to decrypt is empty");
+      throw "Password to decrypt is empty";
     }
 
-    return Promise.resolve(identity).then(identity => {
-      const rawArray = new Uint8Array(identity.privateKey.toArray());
-      return encryptPrivateKey(rawArray, password);
-    }).then(encryptedBytes => {
-      return encodePrivateKey(encryptedBytes);
-    });
+    const encryptedBytes = await encryptPrivateKey(identity.privateKey, password);
+    const encryptedEncoded = encodePrivateKey(Buffer.from(encryptedBytes));
+    return encryptedEncoded;
   }
 
-  getAccountState(accountAddress) {
+  async getAccountState(accountAddress) {
     logger.debug("Get account state of", accountAddress);
-    return this.client.getState(accountAddress).then(queriedState => {
+    return await this.client.getState(accountAddress).then(queriedState => {
       logger.debug("Quried account state:", queriedState);
       return this._buildAccount(queriedState.balance.value.toString(), queriedState.nonce);
     }).catch(err => {

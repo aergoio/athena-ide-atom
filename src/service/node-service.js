@@ -8,8 +8,8 @@ export default class NodeService {
     this.client = client;
   }
 
-  blockchainStatus() {
-   return this.client.blockchain().then(nodeStatus => {
+  async blockchainStatus() {
+   return await this.client.blockchain().then(nodeStatus => {
       logger.debug("Quried node state", nodeStatus);
       return { height: nodeStatus.bestHeight, hash: nodeStatus.bestBlockHash };
     }).catch(err => {

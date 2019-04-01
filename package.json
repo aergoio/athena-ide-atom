@@ -58,8 +58,8 @@
   "dependencies": {
     "@aergoio/athena-analysis": "0.0.1",
     "@aergoio/athena-compiler": "0.0.1",
-    "@herajs/client": "^0.5.2",
-    "@herajs/crypto": "^0.1.0",
+    "@herajs/client": "^0.8.3",
+    "@herajs/crypto": "^0.3.1",
     "atom-package-deps": "^5.0.0",
     "atom-space-pen-views": "^2.2.0",
     "lodash": "^4.17.11",
