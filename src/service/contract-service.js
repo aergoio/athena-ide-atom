@@ -145,7 +145,7 @@ export default class ContractService {
               if (contractTxSuccesses.indexOf(receipt.status) !== -1) {
                 resolve(callback(receipt));
               } else {
-                reject(receipt.status);
+                reject(receipt.result);
               }
             }
             setTimeout(waitForComplete, 30);

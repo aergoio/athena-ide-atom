@@ -1,6 +1,7 @@
 ## 0.3.0 - Apply chainIdHash
 
 * Apply chainIdHash (compatible with aergo 1.0.x)
+* Show detailed message on contract tx error
 
 ## 0.2.3 - Ui reorg & Add missing function
 
