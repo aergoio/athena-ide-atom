@@ -1,3 +1,13 @@
+## 0.2.3 - Ui reorg & Add missing function
+
+* Introduce deploy ui
+* Add constructor argument input field
+* Serialize config (nodes, contract)
+* Show confirm modal when editor is dirty
+* Add importing / removing contract
+* Fix quotes parsing bug
+* Fix bug keeping input value when contract changes
+
 ## 0.2.2 - Patch & Improvements
 
 * Add aergo snippets

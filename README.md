@@ -5,6 +5,10 @@
 
 A package for writing smart contract in aergo using atom
 
+## Compatible Aergo Version
+
+v0.12.x
+
 ## Features
 
 - [X] Syntax highlighting
@@ -28,7 +32,7 @@ $ apm install athena-ide-atom
 ## How to use
 
 * Compile current file: `f7`
-* Open Athena Ide View: `alt + shift + l`
+* Open Athena Ide View: `Alt + Shift + L`
 
 ## Build
 
