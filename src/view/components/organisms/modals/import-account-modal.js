@@ -43,12 +43,12 @@ export default class ImportAccountModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Private key' />
-                <InputBox inputRef={this.privateKeyInputRef} type='text'
+                <InputBox ref={this.privateKeyInputRef} type='text'
                     placeHolder='encrypted private key'/>
               </Row>
               <Row>
                 <Description description='Password' />
-                <InputBox inputRef={this.passwordInputRef} type='text'
+                <InputBox ref={this.passwordInputRef} type='text'
                     placeHolder='password to decrypt encrypted private key'/>
               </Row>
               <Row class='components-row-button'>

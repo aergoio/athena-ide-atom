@@ -4,24 +4,29 @@ import React from 'react'
 import PropTypes from 'prop-types';
 
 import { ComponentsHolder, Row, Title } from '../atoms';
-import { Abis } from '../molecules';
+import { AbiCalls } from '../molecules';
 
 export const ContractCall = (props) => {
   const currentAbi = props.currentAbi;
   const onAbiCall = props.onAbiCall;
+
+  // FIXME : acktsap's hack to refresh input value
+  const abiCallsRef = props.abiCallsRef;
+
   return (
     <ComponentsHolder>
       <Row>
         <Title title='Execute / Query' />
       </Row>
-      <Abis abi={currentAbi} onAbiCall={onAbiCall} />
+      <AbiCalls abi={currentAbi} onAbiCall={onAbiCall} ref={abiCallsRef}/>
     </ComponentsHolder>
   );
 }
 
 ContractCall.propTypes = {
   currentAbi: PropTypes.string,
-  onAbiCall: PropTypes.func
+  onAbiCall: PropTypes.func,
+  abiCallsRef: PropTypes.any
 }
 
 export default ContractCall;

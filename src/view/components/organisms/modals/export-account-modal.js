@@ -41,7 +41,7 @@ export default class ExportAccountModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Password' />
-                <InputBox inputRef={this.passwordInputRef} type='text'
+                <InputBox ref={this.passwordInputRef} type='text'
                     placeHolder='password to encrypt private key'/>
               </Row>
               <Row class='components-row-button'>

@@ -41,7 +41,7 @@ export default class NewNodeModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Contract' />
-                <InputBox inputRef={this.contractInputRef} type='text'
+                <InputBox ref={this.contractInputRef} type='text'
                     placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
               </Row>
               <Row class='components-row-button'>

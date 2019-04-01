@@ -41,7 +41,7 @@ export default class NewNodeModal extends React.Component {
               </Row>
               <Row>
                 <Description description='Node' />
-                <InputBox inputRef={this.nodetInputRef} type='text'
+              <InputBox ref={this.nodetInputRef} type='text'
                     placeHolder='eg. 192.168.1.168:7845'/>
               </Row>
               <Row class='components-row-button'>

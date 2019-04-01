@@ -25,9 +25,14 @@ export default class RunPanel extends React.Component {
 
     this._onContractAddressChange = this._onContractAddressChange.bind(this);
     this._onContractFunctionClicked = this._onContractFunctionClicked.bind(this);
+
+    // FIXME : acktsap's hack to refresh input value
+    this.abiCallsRef = React.createRef();
   }
 
   _onContractAddressChange(selectedContractAddress) {
+    this.abiCallsRef.current.cleanArgsValue();
+
     const contractAddress = selectedContractAddress.value;
     logger.info("Contract address change to", contractAddress);
     this.props.contractStore.changeContract(contractAddress);
@@ -61,6 +66,7 @@ export default class RunPanel extends React.Component {
         <ContractCall
           currentAbi={currentAbi}
           onAbiCall={onAbiCall}
+          abiCallsRef={this.abiCallsRef}
         />
       </Panel>
     );

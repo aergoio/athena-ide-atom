@@ -1,8 +1,8 @@
 'use babel'
 
+import AbiCalls from './abi-calls';
 import AbiSelect from './abi-select';
 import Abi from './abi';
-import Abis from './abis';
 import AccountSelect from './account-select';
 import Balance from './balance';
 import ContractConstructor from './contract-constructor';
@@ -13,9 +13,9 @@ import Payload from './payload';
 import TargetSelect from './target-select';
 
 export {
+  AbiCalls,
   AbiSelect,
   Abi,
-  Abis,
   AccountSelect,
   Balance,
   ContractConstructor,

@@ -13,24 +13,30 @@ export default class InputBox extends React.Component {
     return {
       class: PropTypes.class,
       placeHolder: PropTypes.string,
-      value: PropTypes.any,
-      type: PropTypes.string,
-      inputRef: PropTypes.string
+      type: PropTypes.string
     };
   }
 
   constructor(props) {
     super(props);
+    this.inputRef = React.createRef();
+  }
+
+  get value() {
+    return this.inputRef.current.value;
+  }
+
+  cleanValue() {
+    this.inputRef.current.value = "";
   }
 
   render() {
     return (
       <input
         className={join('inline-block', 'input-text', 'native-key-bindings', inputBoxClass, this.props.class)}
-        value={this.props.value}
         placeHolder={this.props.placeHolder}
         type={this.props.type}
-        ref={this.props.inputRef}
+        ref={this.inputRef}
       />
     );
   }
