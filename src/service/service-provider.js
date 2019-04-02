@@ -37,6 +37,7 @@ export class ServiceProvider {
   setEndpoint(endpoint) {
     logger.debug("Set endpoint as", endpoint);
     this.client.setProvider(new GrpcProvider({url: endpoint}));
+    this.client.chainIdHash = undefined;
   }
 
 }
