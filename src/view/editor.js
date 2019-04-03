@@ -38,7 +38,7 @@ export default {
   getModifiedEditorsPath() {
     return this.getModifiedEditors()
       .map(e => e.getBuffer().getPath())
-      .map(this.getRelative);
+      .map(a => this.getRelative(a));
   },
 
   getBaseDirAndRelativePath(absolutePath) {
