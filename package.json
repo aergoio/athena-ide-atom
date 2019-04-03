@@ -1,7 +1,7 @@
 {
   "name": "athena-ide-atom",
   "main": "./src/container",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A package for writing smart contract in aergo using atom ide",
   "scripts": {
     "postinstall": "npm rebuild --runtime=electron --target=2.0.0",
