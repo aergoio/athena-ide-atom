@@ -39,7 +39,7 @@ export default class AtheneIdeView {
   }
 
   getTitle() {
-    return 'Athena Ide';
+    return 'Athena IDE';
   }
 
   getPath() {

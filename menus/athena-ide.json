@@ -2,7 +2,7 @@
   "context-menu": {
     "atom-text-editor": [
       {
-        "label": "Compile smart contract",
+        "label": "Compile Smart Contract",
         "command": "athena-ide:compile"
       }
     ]
@@ -12,14 +12,14 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "Athena Ide",
+          "label": "Athena IDE",
           "submenu": [
             {
               "label": "Compile Smart Contract",
               "command": "athena-ide:compile"
             },
             {
-              "label": "Open Athena Ide Panel",
+              "label": "Open Athena IDE Panel",
               "command": "athena-ide-view:show"
             }
           ]

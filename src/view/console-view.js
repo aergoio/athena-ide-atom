@@ -26,7 +26,7 @@ export default class ConsoleView extends View {
   }
 
   getTitle() {
-    return 'Athena Ide Console';
+    return 'Athena IDE Console';
   }
 
   getPath() {
