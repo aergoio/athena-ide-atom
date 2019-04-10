@@ -12,4 +12,5 @@ function get(key)
   return system.getItem(key)
 end
 
-abi.register(libraryFunc, get, set)
+abi.register(libraryFunc, set)
+abi.register_view(get)

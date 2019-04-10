@@ -9,7 +9,8 @@ export default class AbiCalls extends React.Component {
   static get propTypes() {
     return {
       abi: PropTypes.object,
-      onAbiCall: PropTypes.func
+      onAbiExec: PropTypes.func,
+      onAbiQuery: PropTypes.func
     };
   }
 
@@ -30,7 +31,8 @@ export default class AbiCalls extends React.Component {
 
   render() {
     const abiFunctions = this.props.abi.functions;
-    const onAbiCall = this.props.onAbiCall;
+    const onAbiExec = this.props.onAbiExec;
+    const onAbiQuery = this.props.onAbiQuery;
 
     if (typeof abiFunctions === "undefined") {
       return <div></div>;
@@ -44,12 +46,19 @@ export default class AbiCalls extends React.Component {
 
         const args = abiFunction.arguments;
         const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
+
+        let buttonStyle = 'btn-warning';
+        let callback = onAbiExec;
+        if (abiFunction.view) {
+          buttonStyle = 'btn-error';
+          callback = onAbiQuery;
+        }
         return (
           <Row key={index} >
             <Button
               name={abiFunction.name}
-              class={['component-btn-runner', 'component-description', 'btn-warning']}
-              onClick={() => onAbiCall(argsRef, abiFunction.name)}
+              class={['component-btn-runner', 'component-description', buttonStyle]}
+              onClick={() => callback(argsRef, abiFunction.name)}
             />
             <InputBox type='text' class='component-inputbox-text'
               ref={argsRef}

@@ -8,7 +8,8 @@ import { AbiCalls } from '../molecules';
 
 export const ContractCall = (props) => {
   const currentAbi = props.currentAbi;
-  const onAbiCall = props.onAbiCall;
+  const onAbiExec = props.onAbiExec;
+  const onAbiQuery = props.onAbiQuery;
 
   // FIXME : acktsap's hack to refresh input value
   const abiCallsRef = props.abiCallsRef;
@@ -18,7 +19,7 @@ export const ContractCall = (props) => {
       <Row>
         <Title title='Execute / Query' />
       </Row>
-      <AbiCalls abi={currentAbi} onAbiCall={onAbiCall} ref={abiCallsRef}/>
+      <AbiCalls abi={currentAbi} onAbiExec={onAbiExec} onAbiQuery={onAbiQuery} ref={abiCallsRef}/>
     </ComponentsHolder>
   );
 }

@@ -24,7 +24,8 @@ export default class RunPanel extends React.Component {
     super(props);
 
     this._onContractAddressChange = this._onContractAddressChange.bind(this);
-    this._onContractFunctionClicked = this._onContractFunctionClicked.bind(this);
+    this._onAbiExec = this._onAbiExec.bind(this);
+    this._onAbiQuery = this._onAbiQuery.bind(this);
 
     // FIXME : acktsap's hack to refresh input value
     this.abiCallsRef = React.createRef();
@@ -38,11 +39,18 @@ export default class RunPanel extends React.Component {
     this.props.contractStore.changeContract(contractAddress);
   }
 
-  _onContractFunctionClicked(argInputRef, targetFunction) {
+  _onAbiExec(argInputRef, targetFunction) {
     logger.debug("Input ref:", argInputRef);
     const targetArgs = parseArgs(argInputRef.current.value);
     logger.info("Execute contract", targetFunction, "with args", targetArgs);
     this.props.contractStore.executeContract(targetFunction, targetArgs);
+  }
+
+  _onAbiQuery(argInputRef, targetFunction) {
+    logger.debug("Input ref:", argInputRef);
+    const targetArgs = parseArgs(argInputRef.current.value);
+    logger.info("Execute contract", targetFunction, "with args", targetArgs);
+    this.props.contractStore.queryContract(targetFunction, targetArgs);
   }
 
   render() {
@@ -53,7 +61,8 @@ export default class RunPanel extends React.Component {
 
     // execute / query
     const currentAbi = this.props.contractStore.currentAbi;
-    const onAbiCall = this._onContractFunctionClicked;
+    const onAbiExec = this._onAbiExec;
+    const onAbiQuery = this._onAbiQuery;
 
     return (
       <Panel>
@@ -65,7 +74,8 @@ export default class RunPanel extends React.Component {
         />
         <ContractCall
           currentAbi={currentAbi}
-          onAbiCall={onAbiCall}
+          onAbiExec={onAbiExec}
+          onAbiQuery={onAbiQuery}
           abiCallsRef={this.abiCallsRef}
         />
       </Panel>

@@ -99,6 +99,20 @@ export default class ContractStore {
     });
   }
 
+  @action queryContract(functionName, args) {
+    const contractAddress = this.currentContract;
+    const abi = this.currentAbi;
+    logger.debug("Query contract with", contractAddress, abi, functionName, args);
+
+    serviceProvider.contractService.query(contractAddress, abi, functionName, args).then(queryResult => {
+      this.rootStore.consoleStore.log("Query result: " + queryResult, "info");
+    }).catch(err => {
+      logger.error(err);
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Query contract failed", "error");
+    });
+  }
+
   @action changeContract(contractAddress) {
     const message = "Change contract to " + contractAddress;
     logger.debug(message);

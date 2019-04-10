@@ -4,7 +4,7 @@
   "version": "0.3.1",
   "description": "A package for writing smart contract in aergo using atom ide",
   "scripts": {
-    "postinstall": "npm rebuild --runtime=electron --target=2.0.0",
+    "postinstall": "npm rebuild --runtime=electron --target=2.0.0 && npm rebuild --runtime=node --target=8.0.0",
     "lint": "eslint --fix ./src",
     "test": "npm run lint && mocha --exit --require @babel/register --recursive"
   },
@@ -57,9 +57,9 @@
   },
   "dependencies": {
     "@aergoio/athena-analysis": "0.0.1",
-    "@aergoio/athena-compiler": "0.0.1",
-    "@herajs/client": "^0.8.3",
-    "@herajs/crypto": "^0.3.1",
+    "@aergoio/athena-compiler": "0.0.4",
+    "@herajs/client": "^0.8.6",
+    "@herajs/crypto": "^0.4.2",
     "atom-package-deps": "^5.0.0",
     "atom-space-pen-views": "^2.2.0",
     "lodash": "^4.17.11",

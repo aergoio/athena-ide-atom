@@ -115,6 +115,23 @@ export default class ContractService {
     return txReceipt;
   }
 
+  async query(contractAddress, abi, targetFunction, targetArgs) {
+    const contract = Contract.fromAbi(abi).setAddress(contractAddress);
+    logger.debug("Generatd contract object:", contract);
+
+    const targetFunctionAbi = abi.functions.filter(f => f.name === targetFunction)[0];
+    logger.debug("Abi functions:", abi.functions, "target function:", targetFunctionAbi);
+    if (typeof targetFunctionAbi === 'undefined') {
+      throw "Target function is not found in abi";
+    }
+
+    const functionCall = contract[targetFunctionAbi.name](...targetArgs);
+    logger.debug("Function call:", functionCall);
+
+    const result = await this.client.queryContract(functionCall);
+    return JSON.stringify(result);
+  }
+
   async _tryWithNonceRefresh(from, trier) {
     const nonce = await this._fetchNextNonceOf(from);
     return await trier(nonce);
