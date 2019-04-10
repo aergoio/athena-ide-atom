@@ -26,7 +26,8 @@ export const ContractCall = (props) => {
 
 ContractCall.propTypes = {
   currentAbi: PropTypes.string,
-  onAbiCall: PropTypes.func,
+  onAbiExec: PropTypes.func,
+  onAbiQuery: PropTypes.func,
   abiCallsRef: PropTypes.any
 }
 
