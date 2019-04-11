@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@aergoio/athena-analysis": "0.0.1",
-    "@aergoio/athena-compiler": "0.0.4",
+    "@aergoio/athena-compiler": "0.0.6",
     "@herajs/client": "^0.8.6",
     "@herajs/crypto": "^0.4.2",
     "atom-package-deps": "^5.0.0",

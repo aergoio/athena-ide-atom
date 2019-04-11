@@ -17,9 +17,9 @@ v1.0.x
 - [X] Compile
 - [X] Deploy smart contract
 - [X] Execute smart contract
+- [X] Query smart contract result
+- [X] Advanced autocomplete (lua specific, nested table)
 
-- [ ] Query smart contract result
-- [ ] Advanced autocomplete (lua specific, nested table)
 - [ ] Advanced linter (recommandation)
 - [ ] Simulation
 
