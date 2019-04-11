@@ -1,3 +1,13 @@
+## 0.3.2 - Query
+
+* Update compiler version to v1.0.0
+* Add query
+
+## 0.3.1 - Bug fix
+
+* Fix bug when file is mark as dirty
+* Resolve chainIdHash caching issue
+
 ## 0.3.0 - Apply chainIdHash
 
 * Apply chainIdHash (compatible with aergo 1.0.x)
