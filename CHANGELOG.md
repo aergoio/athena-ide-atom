@@ -1,3 +1,7 @@
+## 0.3.3 - Apm publishing error
+
+* Nothing has changed. Just new tag to fix apm publishing error.
+
 ## 0.3.2 - Query
 
 * Update compiler version to v1.0.0
