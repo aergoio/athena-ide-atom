@@ -13,7 +13,7 @@ export const ATOM_SUGGESTION_CLASS = "class";
 export const ATOM_SUGGESTION_TYPE = "type";
 export const ATOM_SUGGESTION_KEYWORD = "keyword";
 export const ATOM_SUGGESTION_TAG = "tag";
-export const ATOM_SUGGESTION_SNIPPETS = "snippet";
+export const ATOM_SUGGESTION_SNIPPET = "snippet";
 export const ATOM_SUGGESTION_IMPORT = "import";
 export const ATOM_SUGGESTION_REQUIRE = "require";
 

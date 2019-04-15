@@ -1,10 +1,11 @@
 'use babel';
 
 import * as atomTypes from './atom-types';
-import { SuggestionKind, luaTypes, LintKind } from '@aergoio/athena-analysis';
+import { SuggestionKind, LintKind } from '@aergoio/athena-analysis';
 
 export function adaptSuggestionToAtom(suggestion) {
   const athenaSymbolKind = suggestion.kind;
+
   let atomSymbolKind = athenaSymbolKind;
   switch (athenaSymbolKind) {
     case SuggestionKind.Variable:
@@ -17,15 +18,15 @@ export function adaptSuggestionToAtom(suggestion) {
     case SuggestionKind.Member:
       atomSymbolKind = atomTypes.ATOM_SUGGESTION_METHOD;
       break;
-    case SuggestionKind.Variable:
-      atomSymbolKind = atomTypes.ATOM_SUGGESTION_VARIABLE;
+    case SuggestionKind.Snippet:
+      atomSymbolKind = atomTypes.ATOM_SUGGESTION_SNIPPET;
       break;
   }
 
   return  {
-    text: suggestion.name,
     snippet: suggestion.snippet,
     type: atomSymbolKind,
+    leftLabel: suggestion.prefix,
     rightLabel: suggestion.type
   };
 }
