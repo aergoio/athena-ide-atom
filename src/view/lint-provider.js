@@ -30,7 +30,7 @@ export default class LintProvider {
 
     return this.lintService.lint(source, filePath).then((rawLints) => {
       logger.debug("Raw lints:", rawLints);
-      const atomLints = rawLints.map(lint => adaptor.adaptLintToAtom(lint, indexToPosition, indexToLineEndingPotision));
+      const atomLints = rawLints.map(lint => adaptor.adaptLintToAtom(filePath, lint, indexToPosition, indexToLineEndingPotision));
       logger.info("Atom lints:", atomLints);
       return atomLints;
     });
