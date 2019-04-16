@@ -38,7 +38,7 @@ export const Deployment = (props) => {
       <Row class='components-row-button'>
         <Button
           name='Compile'
-          class='btn-primary'
+          class='btn-success'
           onClick={onCompile}
         />
         <Button

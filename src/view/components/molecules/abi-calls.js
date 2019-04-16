@@ -50,7 +50,7 @@ export default class AbiCalls extends React.Component {
         let buttonStyle = 'btn-warning';
         let callback = onAbiExec;
         if (abiFunction.view) {
-          buttonStyle = 'btn-error';
+          buttonStyle = 'btn-primary';
           callback = onAbiQuery;
         }
         return (
