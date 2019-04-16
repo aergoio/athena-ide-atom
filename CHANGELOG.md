@@ -1,3 +1,10 @@
+## 0.3.4 - Aergo Mainnet
+
+* Update snippets for aergo 1.0.x
+* Add lua specific snippets
+* Add guide screenshots
+* Adjust button color
+
 ## 0.3.3 - Apm publishing error
 
 * Nothing has changed. Just new tag to fix apm publishing error.
