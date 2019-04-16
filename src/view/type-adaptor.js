@@ -3,7 +3,7 @@
 import * as atomTypes from './atom-types';
 import { SuggestionKind, LintKind } from '@aergoio/athena-analysis';
 
-export function adaptSuggestionToAtom(suggestion) {
+export function adaptSuggestionToAtom(suggestion, replacementPrefix) {
   const athenaSymbolKind = suggestion.kind;
 
   let atomSymbolKind = athenaSymbolKind;
@@ -27,7 +27,8 @@ export function adaptSuggestionToAtom(suggestion) {
     snippet: suggestion.snippet,
     type: atomSymbolKind,
     leftLabel: suggestion.prefix,
-    rightLabel: suggestion.type
+    rightLabel: suggestion.type,
+    replacementPrefix: replacementPrefix
   };
 }
 

@@ -34,9 +34,9 @@ export default class AutoCompleteProvider {
     const originPrefixStart = originPrefixStartIndex - currentLineStartIndex;
     const currentLine = textBuffer.lineForRow(cursorPosition.row);
     const prefixInfo = this._resolvePrefix(originPrefix, originPrefixStart, currentLine);
-    logger.debug("Parsed prefix:", prefixInfo);
+    logger.debug("Parsed prefix:", prefixInfo.prefix);
 
-    // resolve parsed prefix info in editor
+    // trim parsed prefix from source
     const textInIndex = (startIndex, endIndex) => {
       const range = [textBuffer.positionForCharacterIndex(startIndex), textBuffer.positionForCharacterIndex(endIndex)];
       return textBuffer.getTextInRange(range);
@@ -47,9 +47,15 @@ export default class AutoCompleteProvider {
     const source = textInIndex(0, prefixStartIndex) + textInIndex(prefixEndIndex, lastSourceIndex);
     const filePath = textBuffer.getPath();
 
+    // TODO : why only "-" cause replacement prefix malfunction
+    let replacementPrefix = originPrefix;
+    if (prefixInfo.prefix === "-") {
+      replacementPrefix = "-";
+    }
+
     return this.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
       logger.debug("Raw suggestions:", rawSuggestions);
-      const atomSuggestions = rawSuggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion));
+      const atomSuggestions = rawSuggestions.map(suggestion => adaptor.adaptSuggestionToAtom(suggestion, replacementPrefix));
       logger.info("Atom suggestions:", atomSuggestions);
       return atomSuggestions;
     });
