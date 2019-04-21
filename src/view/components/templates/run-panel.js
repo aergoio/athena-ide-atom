@@ -8,9 +8,9 @@ import logger from 'loglevel';
 import { Panel } from '../atoms';
 import { Environment, ContractSelect, ContractCall } from '../organisms';
 
-import { parseArgs } from './utils';
+import { parseArgs, runCallback } from './utils';
 
-@inject('contractStore')
+@inject('notificationStore', 'contractStore')
 @observer
 export default class RunPanel extends React.Component {
 
@@ -32,25 +32,30 @@ export default class RunPanel extends React.Component {
   }
 
   _onContractAddressChange(selectedContractAddress) {
-    this.abiCallsRef.current.cleanArgsValue();
-
-    const contractAddress = selectedContractAddress.value;
-    logger.info("Contract address change to", contractAddress);
-    this.props.contractStore.changeContract(contractAddress);
+    runCallback.call(this, () => {
+      this.abiCallsRef.current.cleanArgsValue();
+      const contractAddress = selectedContractAddress.value;
+      logger.info("Contract address change to", contractAddress);
+      this.props.contractStore.changeContract(contractAddress);
+    });
   }
 
   _onAbiExec(argInputRef, targetFunction) {
-    logger.debug("Input ref:", argInputRef);
-    const targetArgs = parseArgs(argInputRef.current.value);
-    logger.info("Execute contract", targetFunction, "with args", targetArgs);
-    this.props.contractStore.executeContract(targetFunction, targetArgs);
+    runCallback.call(this, () => {
+      logger.debug("Input ref:", argInputRef);
+      const targetArgs = parseArgs(argInputRef.current.value);
+      logger.info("Execute contract", targetFunction, "with args", targetArgs);
+      this.props.contractStore.executeContract(targetFunction, targetArgs);
+    })
   }
 
   _onAbiQuery(argInputRef, targetFunction) {
-    logger.debug("Input ref:", argInputRef);
-    const targetArgs = parseArgs(argInputRef.current.value);
-    logger.info("Execute contract", targetFunction, "with args", targetArgs);
-    this.props.contractStore.queryContract(targetFunction, targetArgs);
+    runCallback.call(this, () => {
+      logger.debug("Input ref:", argInputRef);
+      const targetArgs = parseArgs(argInputRef.current.value);
+      logger.info("Query contract", targetFunction, "with args", targetArgs);
+      this.props.contractStore.queryContract(targetFunction, targetArgs);
+    });
   }
 
   render() {

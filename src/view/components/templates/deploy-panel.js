@@ -9,9 +9,9 @@ import { Panel } from '../atoms';
 import { Environment, Deployment, CompileResult } from '../organisms';
 import { editor, SaveConfirmView } from '../../';
 
-import { parseArgs } from './utils';
+import { parseArgs, runCallback } from './utils';
 
-@inject('compileStore', 'contractStore', 'deployTargetStore')
+@inject('notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class DeployPanel extends React.Component {
 
@@ -32,31 +32,39 @@ export default class DeployPanel extends React.Component {
   }
 
   _onFileChange(selectedOption) {
-    logger.debug("Compiled file change", selectedOption);
-    this.props.deployTargetStore.changeTarget(selectedOption.value);
+    runCallback.call(this, () => {
+      logger.debug("Compiled file change", selectedOption);
+      this.props.deployTargetStore.changeTarget(selectedOption.value);
+    });
   }
 
   _onCompileButtonClicked() {
-    logger.debug("Compile contract");
-    if (editor.isAnyEditorDirty()) {
-      new SaveConfirmView(() => this._compile()).show();
-    } else {
-      this._compile();
-    }
+    runCallback.call(this, () => {
+      logger.debug("Compile contract");
+      if (editor.isAnyEditorDirty()) {
+        new SaveConfirmView(() => this._compile()).show();
+      } else {
+        this._compile();
+      }
+    });
   }
 
   _compile() {
-    this.props.compileStore.compileCurrentTarget();
+    runCallback.call(this, () => {
+      this.props.compileStore.compileCurrentTarget();
+    });
   }
 
   _onDeployButtonClicked(argInputRef) {
-    logger.debug("Deploy contract");
-    logger.debug("Input ref:", argInputRef);
-    let constructorArgs = [];
-    if (argInputRef.current) {
-      constructorArgs = parseArgs(argInputRef.current.value);
-    }
-    this.props.contractStore.deployContract(constructorArgs);
+    runCallback.call(this, () => {
+      logger.debug("Deploy contract");
+      logger.debug("Input ref:", argInputRef);
+      let constructorArgs = [];
+      if (argInputRef.current) {
+        constructorArgs = parseArgs(argInputRef.current.value);
+      }
+      this.props.contractStore.deployContract(constructorArgs);
+    });
   }
 
   render() {

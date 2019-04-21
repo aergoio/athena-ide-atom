@@ -1,9 +1,9 @@
 'use babel';
 
 import React from 'react';
-import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-import {DeployPanel, RunPanel} from './templates';
+import { DeployPanel, RunPanel } from './templates';
 
 export default class AthenaIdeViewRoot extends React.Component {
 

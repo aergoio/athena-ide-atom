@@ -1,10 +1,25 @@
 'use babel';
 
-export const parseArgs = (rawArgs) => {
-  return rawArgs.split(',')
-    .map(arg => arg.trim())
-    .map(arg => {
-    const asNumber = Number(arg);
-    return Number.isNaN(asNumber) ? arg.replace(/['"]+/g, '') : asNumber;
-  });
+import logger from 'loglevel';
+
+export function parseArgs(rawArgs) {
+  const trimmed = rawArgs.trim();
+  try {
+    if ("[" === trimmed[0]) {
+      return JSON.parse(trimmed);
+    } else {
+      return JSON.parse("[" + trimmed + "]");
+    }
+  } catch (err) {
+    throw "Parsing error in arguments";
+  }
+}
+
+export function runCallback(callback) {
+  try {
+    return callback();
+  } catch (error) {
+    logger.error(error);
+    this.props.notificationStore.notify(error, "error");
+  }
 }
