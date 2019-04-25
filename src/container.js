@@ -2,8 +2,14 @@
 
 /* eslint-disable */
 
-import {CompositeDisposable, TextEditor} from 'atom';
-import {install} from 'atom-package-deps';
+import fs from 'fs';
+import os from 'os';
+
+import { CompositeDisposable, TextEditor } from 'atom';
+import { install } from 'atom-package-deps';
+import uuidv4 from 'uuid/v4';
+import isUUID from 'validator/lib/isUUID';
+import ua from 'universal-analytics';
 import logger from 'loglevel';
 
 import RootStore from './store';
@@ -11,6 +17,12 @@ import {
   AthenaIdeView, AutoCompleteProvider, ConsoleView, LintProvider, NotificationView, SaveConfirmView
 } from './view';
 import { editor } from './view';
+
+const ACCOUNT_ID = "UA-139075431-1";
+const AERGO_TOOLS_DIR = "/.aergo_tools";
+const ATHENA_USER_ID = "athena_userid";
+
+const packageVersion = require("../package.json").version;
 
 export default {
 
@@ -21,15 +33,31 @@ export default {
   autoCompleteProvider: new AutoCompleteProvider(),
   lintProvider: new LintProvider(),
 
+  googleAnalytics: null,
+
+  config: {
+    enableGoogleAnalytics: {
+      title: "Enable google analytics",
+      description: "Send anonymous usage statistics for improvement.",
+      type: "boolean",
+      default: true,
+      order: 1
+    }
+  },
+
   activate(state) {
     install('athena-ide-atom').then(() => {
       logger.info("All dependeicies are installed");
     }).catch(err => {
       logger.error(err);
     });
+
     this.rootStore = new RootStore();
     this.views = this._buildViews(this.rootStore);
     this.subscriptions = this._buildSubscriptions();
+
+    this._setupGoogleAnalytics();
+
     if (state) {
       atom.deserializers.deserialize(state);
     }
@@ -108,6 +136,38 @@ export default {
   _show() {
     this.views.athenaIdeView.show();
     this.views.consoleView.show();
+  },
+
+  _setupGoogleAnalytics() {
+    let isEnabled = atom.config.get("athena-ide-atom.enableGoogleAnalytics");
+    if (isEnabled) {
+      logger.info("Google analytics is enabled");
+      const aergoToolsDir = os.homedir() + AERGO_TOOLS_DIR;
+      const athenaUserId = aergoToolsDir + "/" + ATHENA_USER_ID;
+
+      fs.exists(aergoToolsDir, (existance) => {
+        if (!existance) {
+          fs.mkdirSync(aergoToolsDir);
+        }
+
+        if (!fs.existsSync(athenaUserId)) {
+          fs.writeFileSync(athenaUserId, new Buffer(uuidv4()));
+        }
+
+        let uuid = fs.readFileSync(athenaUserId).toString('utf-8');
+        if (!isUUID(uuid)) {
+          logger.info("uuid", uuid, "is invalid. creating new one");
+          uuid = uuidv4();
+          fs.writeFileSync(athenaUserId, new Buffer(uuid));
+        }
+
+        logger.info("Athena user uuid", uuid);
+        this.googleAnalytics = ua(ACCOUNT_ID, uuid);
+
+        logger.info("Package version", packageVersion);
+        this.googleAnalytics.event("Athena IDE Atom", "Open", packageVersion).send();
+      });
+    }
   },
 
   deserializeStores(data) {
