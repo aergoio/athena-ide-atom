@@ -1,5 +1,3 @@
-'use babel'
-
 import logger from 'loglevel';
 
 import AccountStore from './account-store';

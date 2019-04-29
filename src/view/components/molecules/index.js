@@ -1,5 +1,3 @@
-'use babel'
-
 import AbiCalls from './abi-calls';
 import AbiSelect from './abi-select';
 import Abi from './abi';

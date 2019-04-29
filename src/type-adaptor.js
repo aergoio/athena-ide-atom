@@ -1,7 +1,5 @@
-'use babel';
-
-import * as atomTypes from './atom-types';
-import { SuggestionKind, LintKind } from '@aergoio/athena-analysis';
+import * as atomTypes from './view/atom-types';
+import { SuggestionKind, LintKind } from '@aergo/athena-analysis';
 
 export function adaptSuggestionToAtom(suggestion, replacementPrefix) {
   const athenaSymbolKind = suggestion.kind;

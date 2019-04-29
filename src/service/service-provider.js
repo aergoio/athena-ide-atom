@@ -1,6 +1,4 @@
-'use babel'
-
-import {AergoClient, GrpcProvider} from '@herajs/client';
+import { AergoClient, GrpcProvider } from '@herajs/client';
 import logger from 'loglevel';
 
 import AccountService from './account-service';

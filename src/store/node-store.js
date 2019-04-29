@@ -1,5 +1,3 @@
-'use babel';
-
 import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 import serviceProvider from '../service';

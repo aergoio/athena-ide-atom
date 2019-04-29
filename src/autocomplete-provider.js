@@ -1,8 +1,6 @@
-'use babel';
-
 import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
-import {AutoCompleteService} from '../service';
+import { AutoCompleteService } from './service';
 
 const prefixParsingEnd = [";", "(", ")", "{", "}"];
 

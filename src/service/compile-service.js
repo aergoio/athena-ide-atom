@@ -1,9 +1,7 @@
-'use babel';
-
 import fs from 'fs';
 import logger from 'loglevel';
 
-import {CompilerType, CompilerFactory} from '@aergoio/athena-compiler';
+import { CompilerType, CompilerFactory } from '@aergo/athena-compiler';
 
 export default class CompileService {
 

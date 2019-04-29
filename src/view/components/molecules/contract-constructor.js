@@ -1,5 +1,3 @@
-'use babel';
-
 import React from 'react'
 import PropTypes from 'prop-types';
 import { Row, Description, InputBox } from '../atoms';

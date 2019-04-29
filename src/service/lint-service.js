@@ -1,6 +1,4 @@
-'use babel';
-
-import { LuaAnalyzer, LuaLinter } from '@aergoio/athena-analysis';
+import { LuaAnalyzer, LuaLinter } from '@aergo/athena-analysis';
 import logger from 'loglevel';
 
 export default class LintService {

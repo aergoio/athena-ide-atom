@@ -1,11 +1,9 @@
-'use babel'
-
 import {observable, action} from 'mobx';
 import logger from 'loglevel';
 
 export default class ConsoleStore {
 
-  @observable recent = { message: "Athena ide package launched", level: "info" };
+  @observable recent = { message: "", level: "info" };
 
   constructor(rootStore) {
     this.rootStore = rootStore;

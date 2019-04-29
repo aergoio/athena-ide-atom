@@ -1,5 +1,3 @@
-'use babel';
-
 /* eslint-disable */
 
 import editor from './editor';

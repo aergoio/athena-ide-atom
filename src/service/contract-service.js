@@ -1,12 +1,10 @@
-'use babel';
-
-import {signTransaction, hashTransaction} from '@herajs/crypto';
-import {Address, Contract} from '@herajs/client';
+import { signTransaction, hashTransaction } from '@herajs/crypto';
+import { Address, Contract } from '@herajs/client';
 
 import _ from 'lodash';
 import logger from 'loglevel';
 
-import {isEmpty} from './utils';
+import { isEmpty } from './utils';
 
 const contractTxSuccesses = ["CREATED", "SUCCESS"];
 
@@ -90,7 +88,7 @@ export default class ContractService {
     }
 
     const functionCall = contract[targetFunctionAbi.name](...targetArgs);
-    logger.debug("Function call:", functionCall, ", tx form:", functionCallTx);
+    logger.debug("Function call:", functionCall);
 
     const chainIdHash = await this.client.getChainIdHash();
     const functionCallTx = functionCall.asTransaction({
@@ -98,6 +96,7 @@ export default class ContractService {
       from: accountAddress,
       amount: "0"
     });
+    logger.debug("Tx form:", functionCallTx);
 
     const trier = (nonce) => {
       const rawTx = _.cloneDeep(functionCallTx);

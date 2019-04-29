@@ -1,6 +1,4 @@
-'use babel';
-
-import { LuaAnalyzer, LuaSuggester } from '@aergoio/athena-analysis';
+import { LuaAnalyzer, LuaSuggester } from '@aergo/athena-analysis';
 import logger from 'loglevel';
 
 export default class AutoCompleteService {

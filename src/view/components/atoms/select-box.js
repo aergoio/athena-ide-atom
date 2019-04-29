@@ -1,5 +1,3 @@
-'use babel';
-
 import React from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/lib/Creatable';

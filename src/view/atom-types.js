@@ -1,5 +1,3 @@
-'use babel'
-
 // atom provider suggestion types
 // see also https://github.com/atom/autocomplete-plus/wiki/Provider-API
 

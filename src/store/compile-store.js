@@ -1,5 +1,3 @@
-'use babel'
-
 import path from 'path';
 import {action} from 'mobx';
 import logger from 'loglevel';

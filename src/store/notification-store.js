@@ -1,5 +1,3 @@
-'use babel'
-
 import {observable, action} from 'mobx';
 import logger from 'loglevel';
 

@@ -1,5 +1,3 @@
-'use babel'
-
 import Account from './account';
 import CompileResult from './compile-result';
 import ContractCall from './contract-call';

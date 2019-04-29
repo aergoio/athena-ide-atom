@@ -1,5 +1,3 @@
-'use babel';
-
 import Button from './button';
 import ComponentsHolder from './components-holder';
 import Description from './description';

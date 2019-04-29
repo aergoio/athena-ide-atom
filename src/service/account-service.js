@@ -1,5 +1,3 @@
-'use babel';
-
 import {
   createIdentity,
   identifyFromPrivateKey,

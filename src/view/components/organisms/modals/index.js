@@ -1,5 +1,3 @@
-'use babel';
-
 import ExportAccountModal from './export-account-modal';
 import ImportAccountModal from './import-account-modal';
 import ImportContractModal from './import-contract-modal';

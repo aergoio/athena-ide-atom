@@ -1,8 +1,6 @@
-'use babel';
-
 import logger from 'loglevel';
 import * as adaptor from './type-adaptor';
-import {LintService} from '../service';
+import { LintService } from './service';
 
 export default class LintProvider {
 

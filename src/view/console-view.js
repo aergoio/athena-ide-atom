@@ -1,5 +1,3 @@
-'use babel';
-
 /* eslint-disable */
 
 import {$$, View} from 'atom-space-pen-views';

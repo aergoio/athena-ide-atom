@@ -1,11 +1,10 @@
-'use babel';
-
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { Node, Account } from '.';
+import Account from './account';
+import Node from './node';
 
 @inject('accountStore', 'nodeStore')
 @observer
