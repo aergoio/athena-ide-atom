@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 
 import {join} from './utils';
 
+const buttonClass = 'component-btn';
+
 export const Button = (props) => {
   return (
-    <div className={join('btn', 'inline-block', props.class)} onClick={props.onClick}>
+    <div className={join('inline-block', buttonClass, props.class)} onClick={props.onClick}>
       {props.name}
     </div>
   );

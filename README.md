@@ -146,6 +146,18 @@ Run test (including lint)
 $ npm run test
 ```
 
+Run dev
+
+```sh
+$ npm run dev
+```
+
+Build
+
+```sh
+$ npm run build
+```
+
 Link to local atom package
 
 ```sh

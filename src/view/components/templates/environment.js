@@ -3,8 +3,7 @@ import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import Account from './account';
-import Node from './node';
+import { Account, Node } from '../organisms';
 
 @inject('accountStore', 'nodeStore')
 @observer

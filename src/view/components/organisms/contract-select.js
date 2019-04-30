@@ -16,8 +16,8 @@ export const ContractCall = (props) => {
       </Row>
       <AbiSelect currentContract={currentContract} contracts={contracts} onChange={onContractChange} />
       <Row class='components-row-button'>
-        <ImportContractModal trigger={<Button name='Import' />} />
         <RemoveContractModal trigger={<Button name='Remove' />} />
+        <ImportContractModal trigger={<Button name='Import' class='component-btn-rightmost' />} />
       </Row>
     </ComponentsHolder>
   );

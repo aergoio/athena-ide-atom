@@ -38,8 +38,8 @@ export default class RemoveContractModal extends React.Component {
                 <Title title='Do you want to remove current contract?' />
               </Row>
               <Row class='components-row-button'>
-                <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
+                <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
               </Row>
             </div>
           </atom-panel>

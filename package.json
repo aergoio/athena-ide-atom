@@ -7,6 +7,7 @@
     "postinstall": "npm rebuild --runtime=electron --target=2.0.0",
     "lint": "eslint --fix ./src",
     "test": "npm run lint && mocha --exit --require @babel/register --recursive",
+    "dev": "rollup -c ./scripts/rollup.config.js -w",
     "build": "npm run test && rollup -c ./scripts/rollup.config.js --environment BUILD:production"
   },
   "repository": "https://github.com/aergoio/athena-ide-atom",

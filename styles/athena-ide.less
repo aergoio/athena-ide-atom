@@ -11,21 +11,24 @@
 
   .react-tabs {
     .react-tabs__tab-list {
-      padding-left: 0em;
-      border-bottom: 0.1em solid gray;
+      display: flex;
+      list-style: none;
+      margin: 0em;
+      padding: 0em;
     }
 
     .react-tabs__tab {
-      list-style: none;
-      display: inline;
-      padding-left: 0.6em;
-      padding-right: 0.6em;
+      width: 100%;
+      color: #9da5b3;
+      padding: 0.5em 0em;
+      text-align: center;
+      background-color: #292c35;
     }
 
     .react-tabs__tab--selected {
       color: white;
-      background-color: #21252b;
-      background-image: linear-gradient(#2c313a, #21252b);
+      background-color: #131621;
+      box-shadow: inset 0 -2px 0 0 #7b87f0;
     }
   }
 
@@ -53,7 +56,7 @@
 
   .component-title {
     justify-content: center;
-    font-weight: 700;
+    font-weight: bold;
   }
 
   .component-icon {
@@ -61,10 +64,10 @@
   }
 
   .component-description {
-    width: 6em;
+    width: 7em;
     padding: 0.3em 0em;
     height: 100%;
-    text-align: center;
+    color: rgba(157, 165, 179, 0.65);
   }
 
   .component-selectbox {
@@ -122,16 +125,59 @@
     overflow: auto;
     word-wrap: break-word;
     max-height: 8em;
+    text-align: right;
+    color: rgba(157, 165, 179, 0.65);
     background-color: @input-background-color;
     padding: 0.3em;
   }
 
-  .component-textbox-abi {
-    max-height: 25em;
+  .component-textbox-compile-result {
+    text-align: left;
   }
 
-  .component-textbox-number {
-    text-align: right;
+  .component-btn {
+    border-radius: 3px;
+    color: #ffffff;
+    background-color: #4e5665;
+    padding: 0.35em 0.85em;
+    cursor: pointer;
+  }
+
+  .component-btn:hover {
+    background-color: #788295;
+  }
+
+  .component-btn:active {
+    background-color: #1f2228;
+  }
+
+  .component-btn-disabled {
+    background-color: #3a3f4b;
+    cursor: not-allowed;
+  }
+
+  .component-btn-rightmost {
+    background-color: dodgerblue;
+  }
+
+  .component-btn-rightmost:hover {
+    background-color: #67b1ff;
+  }
+
+  .component-btn-rightmost:active {
+    background-color: #102a44;
+  }
+
+  .component-btn-transaction {
+    background-color: #7741f9;
+  }
+
+  .component-btn-transaction:hover {
+    background-color: #9a67ff;
+  }
+
+  .component-btn-transaction:active {
+    background-color: #281c44;
   }
 
   .component-btn-runner {
@@ -155,15 +201,12 @@
     .component-description {
       width: 8em;
     }
-
-    .components-row-button {
-      justify-content: center;
-    }
   }
 
   atom-panel.modal {
     max-width: unset;
     background: unset;
+    padding: 0.4em;
   }
 }
 

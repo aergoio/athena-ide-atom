@@ -45,23 +45,23 @@ export default class AbiCalls extends React.Component {
         const args = abiFunction.arguments;
         const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
 
-        let buttonStyle = 'btn-warning';
+        let buttonStyle = 'component-btn-transaction';
         let callback = onAbiExec;
         if (abiFunction.view) {
-          buttonStyle = 'btn-primary';
+          buttonStyle = '';
           callback = onAbiQuery;
         }
         return (
           <Row key={index} >
-            <Button
-              name={abiFunction.name}
-              class={['component-btn-runner', 'component-description', buttonStyle]}
-              onClick={() => callback(argsRef, abiFunction.name)}
-            />
-            <InputBox type='text' class='component-inputbox-text'
+            <InputBox type='text'
               ref={argsRef}
               defaultValue=""
               placeHolder={inputPlaceHolder}
+            />
+            <Button
+              name={abiFunction.name}
+              class={buttonStyle}
+              onClick={() => callback(argsRef, abiFunction.name)}
             />
           </Row>
         );

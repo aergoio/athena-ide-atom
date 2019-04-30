@@ -50,8 +50,8 @@ export default class ImportAccountModal extends React.Component {
                     placeHolder='password to decrypt encrypted private key'/>
               </Row>
               <Row class='components-row-button'>
-                <Button name='Ok' onClick={() => { this._onConfirm(); close(); }} />
                 <Button name='Cancel' onClick={close}/>
+                <Button class='component-btn-rightmost' name='Ok' onClick={() => { this._onConfirm(); close(); }} />
               </Row>
             </div>
           </atom-panel>

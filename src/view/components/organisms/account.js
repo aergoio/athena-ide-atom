@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { ComponentsHolder, Row, Title, SyncIcon, Button } from '../atoms';
 import { AccountSelect, Balance, Nonce } from '../molecules';
-import { NewAccountModal, ImportAccountModal, ExportAccountModal } from './modals';
+import { ImportAccountModal, ExportAccountModal, NewAccountModal } from './modals';
 
 export const Account = (props) => {
   const onSyncAccount= props.onSyncAccount;
@@ -23,9 +23,9 @@ export const Account = (props) => {
       <Balance balance={balance} />
       <Nonce nonce={nonce} />
       <Row class='components-row-button'>
-        <NewAccountModal trigger={<Button name='New' />} />
         <ImportAccountModal trigger={<Button name='Import' />} />
         <ExportAccountModal trigger={<Button name='Export' />} />
+        <NewAccountModal trigger={<Button name='New' class='component-btn-rightmost' />} />
       </Row>
     </ComponentsHolder>
   );

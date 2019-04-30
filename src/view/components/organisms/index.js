@@ -3,7 +3,6 @@ import CompileResult from './compile-result';
 import ContractCall from './contract-call';
 import ContractSelect from './contract-select';
 import Deployment from './deployment';
-import Environment from './environment';
 import Node from './node';
 
 export {
@@ -12,6 +11,5 @@ export {
   ContractCall,
   ContractSelect,
   Deployment,
-  Environment,
   Node
 };

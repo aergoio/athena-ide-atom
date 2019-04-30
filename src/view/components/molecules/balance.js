@@ -6,7 +6,7 @@ export const Balance = (props) => {
   return (
     <Row>
       <Description description='Balance' />
-      <TextBox class='component-textbox-number' text={props.balance} />
+      <TextBox text={props.balance} />
     </Row>
   );
 };

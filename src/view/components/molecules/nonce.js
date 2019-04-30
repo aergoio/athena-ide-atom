@@ -6,7 +6,7 @@ export const Nonce = (props) => {
   return (
     <Row>
       <Description description='Nonce' />
-      <TextBox class='component-textbox-number' text={props.nonce} />
+      <TextBox text={props.nonce} />
     </Row>
   );
 };

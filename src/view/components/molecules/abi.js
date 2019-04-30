@@ -6,7 +6,7 @@ export const Abi = (props) => {
   return (
     <Row>
       <Description description="ABI" />
-      <TextBox class='component-textbox-abi' text={props.abi} />
+      <TextBox class='component-textbox-compile-result' text={props.abi} />
     </Row>
   );
 }

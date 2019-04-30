@@ -35,14 +35,14 @@ export const Deployment = (props) => {
       <ConstructorOrNot />
       <Row class='components-row-button'>
         <Button
-          name='Compile'
-          class='btn-success'
-          onClick={onCompile}
+          name='Deploy'
+          class='component-btn-transaction'
+          onClick={() => onDeploy(argsRef)}
         />
         <Button
-          name='Deploy'
-          class='btn-warning'
-          onClick={() => onDeploy(argsRef)}
+          name='Compile'
+          class='component-btn-rightmost'
+          onClick={onCompile}
         />
       </Row>
     </ComponentsHolder>

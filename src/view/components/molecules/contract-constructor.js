@@ -11,7 +11,7 @@ const ContractConstructor = (props) => {
       <Description
         description="Args"
       />
-      <InputBox type='text' class='component-inputbox-text'
+      <InputBox type='text'
         ref={argsRef}
         placeHolder={inputPlaceHolder}
       />

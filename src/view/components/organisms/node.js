@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types';
 
 import { ComponentsHolder, Row, Title, SyncIcon, Button } from '../atoms';
-import { NodeSelect, NodeHeight } from '../molecules';
-import { NewNodeModal, RemoveNodeModal } from './modals';
+import { NodeSelect, Height } from '../molecules';
+import { RemoveNodeModal, NewNodeModal } from './modals';
 
 export const Node = (props) => {
   const onSyncNode = props.onSyncNode;
@@ -18,10 +18,10 @@ export const Node = (props) => {
         <SyncIcon onClick={onSyncNode} />
       </Row>
       <NodeSelect node={node} nodes={nodes} onChange={onNodeChange} />
-      <NodeHeight height={height} />
+      <Height height={height} />
       <Row class='components-row-button'>
-        <NewNodeModal trigger={<Button name='New' />} />
         <RemoveNodeModal trigger={<Button name='Remove' />} />
+        <NewNodeModal trigger={<Button name='New' class='component-btn-rightmost' />} />
       </Row>
     </ComponentsHolder>
   );

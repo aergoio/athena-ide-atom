@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Environment, ContractSelect, ContractCall } from '../organisms';
+import { ContractSelect, ContractCall } from '../organisms';
 
+import Environment from './environment';
 import { parseArgs, runCallback } from './utils';
 
 @inject('notificationStore', 'contractStore')

@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Environment, Deployment, CompileResult } from '../organisms';
+import { Deployment, CompileResult } from '../organisms';
 import { editor, SaveConfirmView } from '../../';
 
+import Environment from './environment';
 import { parseArgs, runCallback } from './utils';
 
 @inject('notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')

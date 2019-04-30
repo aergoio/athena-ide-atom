@@ -6,7 +6,7 @@ export const Payload = (props) => {
   return (
     <Row>
       <Description description="Payload" />
-      <TextBox text={props.payload} />
+      <TextBox class='component-textbox-compile-result' text={props.payload} />
     </Row>
   );
 }

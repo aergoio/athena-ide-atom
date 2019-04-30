@@ -2,17 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { Row, Description, TextBox } from '../atoms';
 
-export const NodeHeight = (props) => {
+export const Height = (props) => {
   return (
     <Row>
       <Description description='Height' />
-      <TextBox class='component-textbox-number' text={props.height} />
+      <TextBox text={props.height} />
     </Row>
   );
 }
 
-NodeHeight.propTypes = {
+Height.propTypes = {
   height: PropTypes.string
 }
 
-export default NodeHeight;
+export default Height;
