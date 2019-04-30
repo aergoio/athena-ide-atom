@@ -36,9 +36,8 @@
     margin: 0.5em;
   }
 
-  .components-row:first-child {
-    padding-bottom: 10px;
-    justify-content: space-between;
+  .components-holder-sync {
+    background-color: transparent;
   }
 
   .components-row {
@@ -46,11 +45,19 @@
     display: flex;
   }
 
+  .components-row:first-child {
+    padding-bottom: 10px;
+  }
+
   .components-row:last-child {
     padding-bottom: 10px;
   }
 
-  .components-row-button {
+  .components-row:only-child {
+    padding: 0em;
+  }
+
+  .components-row-sync, .components-row-button {
     justify-content: flex-end;
   }
 

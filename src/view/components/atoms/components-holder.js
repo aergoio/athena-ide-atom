@@ -7,13 +7,14 @@ const componentsHolderClass = 'components-holder';
 
 export const ComponentsHolder = (props) => {
   return (
-    <div className={join('inset-panel', componentsHolderClass)}>
+    <div className={join('inset-panel', componentsHolderClass, props.class)}>
       {props.children}
     </div>
   );
 };
 
 ComponentsHolder.propTypes = {
+  class: PropTypes.class,
   children: PropTypes.element.isRequired
 }
 

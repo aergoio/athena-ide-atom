@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, Title, SyncIcon, Button } from '../atoms';
+import { ComponentsHolder, Row, Title, Button } from '../atoms';
 import { AccountSelect, Balance, Nonce } from '../molecules';
 import { ImportAccountModal, ExportAccountModal, NewAccountModal } from './modals';
 
 export const Account = (props) => {
-  const onSyncAccount= props.onSyncAccount;
   const address = props.address;
   const addresses = props.addresses;
   const onAddressChange = props.onAddressChange;
@@ -17,7 +16,6 @@ export const Account = (props) => {
     <ComponentsHolder>
       <Row>
         <Title title='Account'/>
-        <SyncIcon onClick={onSyncAccount} />
       </Row>
       <AccountSelect address={address} addresses={addresses} onChange={onAddressChange} />
       <Balance balance={balance} />
@@ -32,7 +30,6 @@ export const Account = (props) => {
 };
 
 Account.propTypes = {
-  onSyncAccount: PropTypes.func,
   address: PropTypes.string,
   addresses: PropTypes.array,
   onAddressChange: PropTypes.func,

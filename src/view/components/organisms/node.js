@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, Title, SyncIcon, Button } from '../atoms';
+import { ComponentsHolder, Row, Title, Button } from '../atoms';
 import { NodeSelect, Height } from '../molecules';
 import { RemoveNodeModal, NewNodeModal } from './modals';
 
 export const Node = (props) => {
-  const onSyncNode = props.onSyncNode;
   const node = props.node;
   const nodes = props.nodes;
   const height = props.height;
@@ -15,7 +14,6 @@ export const Node = (props) => {
     <ComponentsHolder>
       <Row>
         <Title title='Node'/>
-        <SyncIcon onClick={onSyncNode} />
       </Row>
       <NodeSelect node={node} nodes={nodes} onChange={onNodeChange} />
       <Height height={height} />
@@ -28,7 +26,6 @@ export const Node = (props) => {
 }
 
 Node.propTypes = {
-  onSyncNode: PropTypes.func,
   node: PropTypes.string,
   nodes: PropTypes.array,
   height: PropTypes.number,
