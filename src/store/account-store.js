@@ -2,11 +2,13 @@ import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
+import { formatInteger, formatAergoBalance } from '../utils';
 
 export default class AccountStore {
 
   @observable currentAddress = "";
   @observable currentBalance = "";
+  @observable currentBalanceWithUnit = "";
   @observable currentNonce = "";
   @observable address2Identity = new Map();
 
@@ -76,7 +78,8 @@ export default class AccountStore {
     }
 
     serviceProvider.accountService.getAccountState(this.currentAddress).then(state => {
-      this.currentBalance = state.balance;
+      this.currentBalance = "unknown" === state.balance ? state.balance : formatInteger(state.balance);
+      this.currentBalanceWithUnit = "unknown" === state.balance ? state.balance : formatAergoBalance(state.balance);
       this.currentNonce = state.nonce;
     });
   }

@@ -8,7 +8,7 @@ import {
 } from '@herajs/crypto';
 import logger from 'loglevel';
 
-import {isEmpty} from './utils';
+import { isEmpty } from '../utils';
 
 export default class AccountService {
 
@@ -59,7 +59,9 @@ export default class AccountService {
     logger.debug("Get account state of", accountAddress);
     return await this.client.getState(accountAddress).then(queriedState => {
       logger.debug("Quried account state:", queriedState);
-      return this._buildAccount(queriedState.balance.value.toString(), queriedState.nonce);
+      const jsbiBalance = queriedState.balance.value;
+      const balance = jsbiBalance.length === 0 ? 0 : jsbiBalance.toString();
+      return this._buildAccount(balance, queriedState.nonce);
     }).catch(err => {
       logger.debug(err);
       return this._buildAccount("unknown", "unknown");

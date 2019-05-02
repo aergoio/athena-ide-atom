@@ -7,7 +7,7 @@ import { Panel } from '../atoms';
 import { ContractSelect, ContractCall } from '../organisms';
 
 import Environment from './environment';
-import { parseArgs, runCallback } from './utils';
+import { parseArgs, runWithCallback } from '../../../utils';
 
 @inject('notificationStore', 'contractStore')
 @observer
@@ -15,6 +15,7 @@ export default class RunPanel extends React.Component {
 
   static get propTypes() {
     return {
+      notificationStore: PropTypes.any,
       contractStore: PropTypes.any
     };
   }
@@ -25,36 +26,42 @@ export default class RunPanel extends React.Component {
     this._onContractAddressChange = this._onContractAddressChange.bind(this);
     this._onAbiExec = this._onAbiExec.bind(this);
     this._onAbiQuery = this._onAbiQuery.bind(this);
+    this._onError = this._onError.bind(this);
 
     // FIXME : acktsap's hack to refresh input value
     this.abiCallsRef = React.createRef();
   }
 
   _onContractAddressChange(selectedContractAddress) {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       this.abiCallsRef.current.cleanArgsValue();
       const contractAddress = selectedContractAddress.value;
       logger.info("Contract address change to", contractAddress);
       this.props.contractStore.changeContract(contractAddress);
-    });
+    }, this._onError);
   }
 
   _onAbiExec(argInputRef, targetFunction) {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       logger.debug("Input ref:", argInputRef);
       const targetArgs = parseArgs(argInputRef.current.value);
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
       this.props.contractStore.executeContract(targetFunction, targetArgs);
-    })
+    }, this._onError);
   }
 
   _onAbiQuery(argInputRef, targetFunction) {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       logger.debug("Input ref:", argInputRef);
       const targetArgs = parseArgs(argInputRef.current.value);
       logger.info("Query contract", targetFunction, "with args", targetArgs);
       this.props.contractStore.queryContract(targetFunction, targetArgs);
-    });
+    }, this._onError);
+  }
+
+  _onError(error) {
+    logger.error(error);
+    this.props.notificationStore.notify(error, "error");
   }
 
   render() {

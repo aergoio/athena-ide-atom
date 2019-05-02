@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { Sync, Account, Node } from '../organisms';
+import { Summary, Sync, Account, Node } from '../organisms';
 
 @inject('accountStore', 'nodeStore')
 @observer
@@ -43,35 +43,49 @@ export default class Enviroment extends React.Component {
   }
 
   render() {
+    // summary
+    const node = this.props.nodeStore.currentNode;
+    const address = this.props.accountStore.currentAddress;
+    const height = this.props.nodeStore.currentHeight;
+    const balanceWithUnit = this.props.accountStore.currentBalanceWithUnit;
+    const nonce = this.props.accountStore.currentNonce;
+
     // sync
     const onSync= this._onSync
 
     // node
-    const currentNode = this.props.nodeStore.currentNode;
+    // const node = this.props.nodeStore.currentNode;
     const nodes = this.props.nodeStore.nodes;
-    const height = this.props.nodeStore.currentHeight;
+    // const height = this.props.nodeStore.currentHeight;
     const onNodeChange = this._onNodeUrlChange;
 
     // address
-    const currentAddress = this.props.accountStore.currentAddress;
+    // const accountAddress = this.props.accountStore.currentAddress;
     const addresses = this.props.accountStore.addresses;
     const onAddressChange = this._onAddressChange;
     const balance = this.props.accountStore.currentBalance;
-    const nonce = this.props.accountStore.currentNonce;
+    // const nonce = this.props.accountStore.currentNonce;
 
     return (
       <div>
+        <Summary
+          node={node}
+          address={address}
+          height={height}
+          balanceWithUnit={balanceWithUnit}
+          nonce={nonce}
+        />
         <Sync
           onSync={onSync}
         />
         <Node
-          node={currentNode}
+          node={node}
           nodes={nodes}
           height={height}
           onNodeChange={onNodeChange}
         />
         <Account
-          address={currentAddress}
+          address={address}
           addresses={addresses}
           onAddressChange={onAddressChange}
           balance={balance}

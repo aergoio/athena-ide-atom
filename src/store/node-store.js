@@ -1,11 +1,14 @@
 import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
+
 import serviceProvider from '../service';
+import { formatInteger } from '../utils';
 
 export default class NodeStore {
 
   @observable currentNode = "localhost:7845";
   @observable currentHeight = "unknown";
+  @observable bestHash = "unknown";
   @observable nodeSet = new Set(["localhost:7845", "testnet.aergo.io:7845"]);
 
   constructor(rootStore) {
@@ -53,7 +56,8 @@ export default class NodeStore {
   @action updateNodeState() {
     logger.debug("Update node state of", this.currentNode);
     serviceProvider.nodeService.blockchainStatus().then(status => {
-      this.currentHeight = status.height;
+      this.currentHeight = "unknown" === status.height ? status.height : formatInteger(status.height);
+      this.bestHash = status.hash;
     })
     this.rootStore.accountStore.updateAccountState();
   }

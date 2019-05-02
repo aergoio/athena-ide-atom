@@ -4,7 +4,7 @@ import { Address, Contract } from '@herajs/client';
 import _ from 'lodash';
 import logger from 'loglevel';
 
-import { isEmpty } from './utils';
+import { isEmpty } from '../utils';
 
 const contractTxSuccesses = ["CREATED", "SUCCESS"];
 

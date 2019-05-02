@@ -8,6 +8,7 @@ import Height from './height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
 import Payload from './payload';
+import Star from './star';
 import TargetSelect from './target-select';
 
 export {
@@ -21,5 +22,6 @@ export {
   NodeSelect,
   Nonce,
   Payload,
+  Star,
   TargetSelect,
 };

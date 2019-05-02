@@ -32,6 +32,54 @@
     }
   }
 
+  .void {
+    background-color: #131621;
+    padding: 0.5em;
+    width: 100%;
+  }
+
+  .stars {
+    color: white;
+    font-size: 9px;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .stars-row {
+    display: table-row;
+  }
+
+  .star-cell {
+    display: table-cell;
+    padding: 0.5em 1.5em;
+    white-space: nowrap;
+  }
+
+  .star-cell:first-child {
+    padding-left: 0.5em;
+  }
+
+  .star-cell:last-child {
+    padding-right: 0.5em;
+  }
+
+  .star-title {
+    float: left;
+    width: 6em;
+  }
+
+  .star-content {
+    width: 100%;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .star {
+    display: flex;
+  }
+
   .components-holder {
     margin: 0.5em;
   }

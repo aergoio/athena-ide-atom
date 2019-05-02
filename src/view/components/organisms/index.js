@@ -4,6 +4,7 @@ import ContractCall from './contract-call';
 import ContractSelect from './contract-select';
 import Deployment from './deployment';
 import Node from './node';
+import Summary from './summary';
 import Sync from './sync';
 
 export {
@@ -13,5 +14,6 @@ export {
   ContractSelect,
   Deployment,
   Node,
+  Summary,
   Sync
 };

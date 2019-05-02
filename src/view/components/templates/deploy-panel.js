@@ -8,7 +8,7 @@ import { Deployment, CompileResult } from '../organisms';
 import { editor, SaveConfirmView } from '../../';
 
 import Environment from './environment';
-import { parseArgs, runCallback } from './utils';
+import { parseArgs, runWithCallback } from '../../../utils';
 
 @inject('notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
 @observer
@@ -16,6 +16,7 @@ export default class DeployPanel extends React.Component {
 
   static get propTypes() {
     return {
+      notificationStore: PropTypes.any,
       compileStore: PropTypes.any,
       contractStore: PropTypes.any,
       deployTargetStore: PropTypes.any
@@ -28,34 +29,35 @@ export default class DeployPanel extends React.Component {
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
     this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
+    this._onError = this._onError.bind(this);
   }
 
   _onFileChange(selectedOption) {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       logger.debug("Compiled file change", selectedOption);
       this.props.deployTargetStore.changeTarget(selectedOption.value);
-    });
+    }, this._onError);
   }
 
   _onCompileButtonClicked() {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       logger.debug("Compile contract");
       if (editor.isAnyEditorDirty()) {
         new SaveConfirmView(() => this._compile()).show();
       } else {
         this._compile();
       }
-    });
+    }, this._onError);
   }
 
   _compile() {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       this.props.compileStore.compileCurrentTarget();
-    });
+    }, this._onError);
   }
 
   _onDeployButtonClicked(argInputRef) {
-    runCallback.call(this, () => {
+    runWithCallback.call(this, () => {
       logger.debug("Deploy contract");
       logger.debug("Input ref:", argInputRef);
       let constructorArgs = [];
@@ -63,7 +65,12 @@ export default class DeployPanel extends React.Component {
         constructorArgs = parseArgs(argInputRef.current.value);
       }
       this.props.contractStore.deployContract(constructorArgs);
-    });
+    }, this._onError);
+  }
+
+  _onError(error) {
+    logger.error(error);
+    this.props.notificationStore.notify(error, "error");
   }
 
   render() {

@@ -3,7 +3,7 @@ import Select from 'react-select';
 import CreatableSelect from 'react-select/lib/Creatable';
 import PropTypes from 'prop-types';
 
-import {join} from './utils';
+import {join} from '../../../utils';
 
 const selectBoxClass = 'component-selectbox';
 
