@@ -1,3 +1,5 @@
+import { Amount } from '@herajs/client';
+
 export function join() {
   return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
 }
@@ -41,30 +43,19 @@ export function runWithCallback(invoke, onError) {
 }
 
 const units = [
-  { basis: 1e18, unit: "aergo" },
-  { basis: 1e9, unit: "gaer" },
-  { basis: 1, unit: "aer" },
+  new Amount("1", "aergo"),
+  new Amount("1", "gaer"),
+  new Amount("1", "aer"),
 ];
 
 export function formatAergoBalance(balance) {
-  if (Number.isNaN(balance)) {
-    throw balance + " is not an number";
-  }
-
-  const balanceInNumber = Number.parseInt(balance);
-  if (0 === balanceInNumber) {
-    return "0 aergo";
-  }
-
-  let amount = "";
-  let unit = "";
+  const amount = new Amount(balance, "aer");
+  let unit = "aergo";
   for (let i = 0; i < units.length; ++i) {
-    if (units[i].basis <= balanceInNumber) {
-      amount = balanceInNumber / units[i].basis;
+    if (units[i].compare(amount) === -1) {
       unit = units[i].unit;
       break;
     }
   }
-
-  return amount + " " + unit;
+  return amount.toUnit(unit).toString();
 }
