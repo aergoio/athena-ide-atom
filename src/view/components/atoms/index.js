@@ -1,9 +1,10 @@
 import Button from './button';
-import ComponentsHolder from './components-holder';
+import CardRow from './card-row';
+import Card from './card';
 import Description from './description';
+import Foldable from './foldable';
 import InputBox from './input-box';
 import Panel from './panel';
-import Row from './row';
 import SelectBox from './select-box';
 import StarCell from './star-cell';
 import StarContent from './star-content';
@@ -17,11 +18,12 @@ import Void from './void';
 
 export {
   Button,
-  ComponentsHolder,
+  CardRow,
+  Card,
   Description,
+  Foldable,
   InputBox,
   Panel,
-  Row,
   SelectBox,
   StarCell,
   StarContent,

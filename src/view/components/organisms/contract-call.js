@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, Title } from '../atoms';
-import { AbiCalls } from '../molecules';
+import { CardRow, Title } from '../atoms';
+import { FoldableCard, AbiCalls } from '../molecules';
 
 export const ContractCall = (props) => {
   const currentAbi = props.currentAbi;
@@ -12,13 +12,15 @@ export const ContractCall = (props) => {
   // FIXME : acktsap's hack to refresh input value
   const abiCallsRef = props.abiCallsRef;
 
+  const trigger = (
+    <CardRow>
+      <Title title='Execute / Query' />
+    </CardRow>
+  );
   return (
-    <ComponentsHolder>
-      <Row>
-        <Title title='Execute / Query' />
-      </Row>
+    <FoldableCard trigger={trigger}>
       <AbiCalls abi={currentAbi} onAbiExec={onAbiExec} onAbiQuery={onAbiQuery} ref={abiCallsRef}/>
-    </ComponentsHolder>
+    </FoldableCard>
   );
 }
 

@@ -1,20 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, Title } from '../atoms';
-import { Payload, Abi } from '../molecules';
+import { CardRow, Title } from '../atoms';
+import { FoldableCard, Payload, Abi } from '../molecules';
 
 export const CompileResult = (props) => {
   const payload = props.payload;
   const abi = props.abi;
+
+  const trigger = (
+    <CardRow>
+      <Title title='Compile Result'/>
+    </CardRow>
+  );
   return (
-    <ComponentsHolder>
-      <Row>
-        <Title title='Contract Info'/>
-      </Row>
+    <FoldableCard trigger={trigger}>
       <Payload payload={payload} />
       <Abi abi={abi} />
-    </ComponentsHolder>
+    </FoldableCard>
   );
 }
 

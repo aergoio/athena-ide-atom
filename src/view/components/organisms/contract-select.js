@@ -1,25 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, Title, Button } from '../atoms';
-import { AbiSelect } from '../molecules';
+import { CardRow, Title, Button } from '../atoms';
+import { FoldableCard, AbiSelect } from '../molecules';
 import { ImportContractModal, RemoveContractModal } from './modals';
 
 export const ContractCall = (props) => {
   const currentContract = props.currentContract;
   const contracts = props.contracts;
   const onContractChange = props.onContractChange;
+
+  const trigger = (
+    <CardRow>
+      <Title title='Contract' />
+    </CardRow>
+  );
   return (
-    <ComponentsHolder>
-      <Row>
-        <Title title='Contract' />
-      </Row>
+    <FoldableCard trigger={trigger}>
       <AbiSelect currentContract={currentContract} contracts={contracts} onChange={onContractChange} />
-      <Row class='components-row-button'>
+      <CardRow class='card-row-button'>
         <RemoveContractModal trigger={<Button name='Remove' />} />
         <ImportContractModal trigger={<Button name='Import' class='component-btn-rightmost' />} />
-      </Row>
-    </ComponentsHolder>
+      </CardRow>
+    </FoldableCard>
   );
 }
 

@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Row, Description, TextBox } from '../atoms';
+import { CardRow, Description, TextBox } from '../atoms';
 
 export const Abi = (props) => {
   return (
-    <Row>
+    <CardRow>
       <Description description="ABI" />
       <TextBox class='component-textbox-compile-result' text={props.abi} />
-    </Row>
+    </CardRow>
   );
 }
 

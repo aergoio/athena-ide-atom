@@ -4,6 +4,7 @@ import Abi from './abi';
 import AccountSelect from './account-select';
 import Balance from './balance';
 import ContractConstructor from './contract-constructor';
+import FoldableCard from './foldable-card';
 import Height from './height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
@@ -18,6 +19,7 @@ export {
   AccountSelect,
   Balance,
   ContractConstructor,
+  FoldableCard,
   Height,
   NodeSelect,
   Nonce,

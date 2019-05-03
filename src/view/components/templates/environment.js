@@ -43,6 +43,7 @@ export default class Enviroment extends React.Component {
   }
 
   render() {
+    logger.info("Update enviroment");
     // summary
     const node = this.props.nodeStore.currentNode;
     const address = this.props.accountStore.currentAddress;

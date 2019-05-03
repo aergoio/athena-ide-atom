@@ -78,6 +78,7 @@
     "mobx": "^5.9.4",
     "mobx-react": "^5.4.3",
     "react": "^16.8.2",
+    "react-collapsible": "^2.6.0",
     "react-dom": "^16.8.2",
     "react-select": "^2.4.1",
     "react-tabs": "^3.0.0",

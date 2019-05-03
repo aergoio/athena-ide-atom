@@ -1,16 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { ComponentsHolder, Row, SyncIcon } from '../atoms';
+import { Card, CardRow, SyncIcon } from '../atoms';
 
 export const Sync = (props) => {
   const onSync = props.onSync;
   return (
-    <ComponentsHolder class='components-holder-sync'>
-      <Row class='components-row-sync'>
+    <Card class='transparent-background'>
+      <CardRow class='card-row-sync'>
         <SyncIcon onClick={onSync} />
-      </Row>
-    </ComponentsHolder>
+      </CardRow>
+    </Card>
   );
 }
 

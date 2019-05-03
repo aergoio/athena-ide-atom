@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 
 import {join} from '../../../utils';
 
-const rowClass = 'components-row';
+const rowClass = 'card-row';
 
-export const Row = (props) => {
+export const CardRow = (props) => {
   return (
     <div className={join(rowClass, props.class)}>
       {props.children}
@@ -13,9 +13,9 @@ export const Row = (props) => {
   );
 };
 
-Row.propTypes = {
+CardRow.propTypes = {
   children: PropTypes.element.isRequired,
   class: PropTypes.class
 };
 
-export default Row;
+export default CardRow;

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Row, Button, InputBox } from '../atoms';
+import { CardRow, Button, InputBox } from '../atoms';
 
 export default class AbiCalls extends React.Component {
 
@@ -52,7 +52,7 @@ export default class AbiCalls extends React.Component {
           callback = onAbiQuery;
         }
         return (
-          <Row key={index} >
+          <CardRow key={index} >
             <InputBox type='text'
               ref={argsRef}
               defaultValue=""
@@ -63,7 +63,7 @@ export default class AbiCalls extends React.Component {
               class={buttonStyle}
               onClick={() => callback(argsRef, abiFunction.name)}
             />
-          </Row>
+          </CardRow>
         );
       });
   }

@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Row, Description, InputBox } from '../atoms';
+import { CardRow, Description, InputBox } from '../atoms';
 
 const ContractConstructor = (props) => {
   const args = props.args;
   const argsRef = props.argsRef;
   const inputPlaceHolder = args.length === 0 ? "No argument" : args.join(", ");
   return (
-    <Row>
+    <CardRow>
       <Description
         description="Args"
       />
@@ -15,7 +15,7 @@ const ContractConstructor = (props) => {
         ref={argsRef}
         placeHolder={inputPlaceHolder}
       />
-    </Row>
+    </CardRow>
   );
 }
 

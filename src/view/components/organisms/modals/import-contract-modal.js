@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {Row, Title, Description, InputBox, Button} from '../../atoms';
+import {CardRow, Title, Description, InputBox, Button} from '../../atoms';
 
 @inject('contractStore')
 @observer
@@ -34,18 +34,18 @@ export default class NewNodeModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <Row>
+              <CardRow>
                 <Title title='Enter contract address' />
-              </Row>
-              <Row>
+              </CardRow>
+              <CardRow>
                 <Description description='Contract' />
                 <InputBox ref={this.contractInputRef} type='text'
                     placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
-              </Row>
-              <Row class='components-row-button'>
+              </CardRow>
+              <CardRow class='card-row-button'>
                 <Button name='Cancel' onClick={close}/>
                 <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
-              </Row>
+              </CardRow>
             </div>
           </atom-panel>
         }
