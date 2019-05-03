@@ -1,3 +1,8 @@
+## 0.3.6 - Apply UI Design
+
+* Parse lua table arguments (in json)
+* Apply new design
+
 ## 0.3.4 - Aergo Mainnet
 
 * Update snippets for aergo 1.0.x
