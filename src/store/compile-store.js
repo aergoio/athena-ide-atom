@@ -33,6 +33,7 @@ export default class CompileStore {
       this.rootStore.deployTargetStore.addTargetResult(target, compileResult);
       this.rootStore.consoleStore.log("Compile success", "info");
       this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
+      this.rootStore.consoleStore.log("abi: \n" + compileResult.abi, "info");
       this.rootStore.notificationStore.notify("Compiled successfully", "success");
     }).catch(err => {
       logger.error(err);

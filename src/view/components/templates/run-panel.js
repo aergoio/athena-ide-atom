@@ -4,25 +4,31 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { ContractSelect, ContractCall } from '../organisms';
+import { Deployment, ContractSelect, ContractCall } from '../organisms';
+import { editor, SaveConfirmView } from '../..';
 
 import Environment from './environment';
 import { parseArgs, runWithCallback } from '../../../utils';
 
-@inject('notificationStore', 'contractStore')
+@inject('notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class RunPanel extends React.Component {
 
   static get propTypes() {
     return {
       notificationStore: PropTypes.any,
-      contractStore: PropTypes.any
+      compileStore: PropTypes.any,
+      contractStore: PropTypes.any,
+      deployTargetStore: PropTypes.any
     };
   }
 
   constructor(props) {
     super(props);
 
+    this._onFileChange = this._onFileChange.bind(this);
+    this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
+    this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
     this._onContractAddressChange = this._onContractAddressChange.bind(this);
     this._onAbiExec = this._onAbiExec.bind(this);
     this._onAbiQuery = this._onAbiQuery.bind(this);
@@ -30,6 +36,42 @@ export default class RunPanel extends React.Component {
 
     // FIXME : acktsap's hack to refresh input value
     this.abiCallsRef = React.createRef();
+  }
+
+  _onFileChange(selectedOption) {
+    runWithCallback.call(this, () => {
+      logger.debug("Compiled file change", selectedOption);
+      this.props.deployTargetStore.changeTarget(selectedOption.value);
+    }, this._onError);
+  }
+
+  _onCompileButtonClicked() {
+    runWithCallback.call(this, () => {
+      logger.debug("Compile contract");
+      if (editor.isAnyEditorDirty()) {
+        new SaveConfirmView(() => this._compile()).show();
+      } else {
+        this._compile();
+      }
+    }, this._onError);
+  }
+
+  _compile() {
+    runWithCallback.call(this, () => {
+      this.props.compileStore.compileCurrentTarget();
+    }, this._onError);
+  }
+
+  _onDeployButtonClicked(argInputRef) {
+    runWithCallback.call(this, () => {
+      logger.debug("Deploy contract");
+      logger.debug("Input ref:", argInputRef);
+      let constructorArgs = [];
+      if (argInputRef.current) {
+        constructorArgs = parseArgs(argInputRef.current.value);
+      }
+      this.props.contractStore.deployContract(constructorArgs);
+    }, this._onError);
   }
 
   _onContractAddressChange(selectedContractAddress) {
@@ -65,6 +107,14 @@ export default class RunPanel extends React.Component {
   }
 
   render() {
+    // deployment target
+    const currentTarget = this.props.deployTargetStore.currentTarget;
+    const targets = this.props.deployTargetStore.targets;
+    const onChangeTarget = this._onFileChange;
+    const onCompile = this._onCompileButtonClicked;
+    const onDeploy = this._onDeployButtonClicked;
+    const constructorArgs = this.props.deployTargetStore.constructorArgs;
+
     // contract select
     const onContractChange = this._onContractAddressChange;
     const currentContract = this.props.contractStore.currentContract;
@@ -78,6 +128,14 @@ export default class RunPanel extends React.Component {
     return (
       <Panel>
         <Environment />
+        <Deployment
+          currentTarget={currentTarget}
+          targets={targets}
+          onChangeTarget={onChangeTarget}
+          onCompile={onCompile}
+          onDeploy={onDeploy}
+          constructorArgs={constructorArgs}
+        />
         <ContractSelect
           onContractChange={onContractChange}
           currentContract={currentContract}
@@ -89,7 +147,7 @@ export default class RunPanel extends React.Component {
           onAbiQuery={onAbiQuery}
           abiCallsRef={this.abiCallsRef}
         />
-      </Panel>
+     </Panel>
     );
   }
 
