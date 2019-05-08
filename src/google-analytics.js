@@ -16,25 +16,23 @@ class GoogleAnalytics {
     const aergoToolsDir = os.homedir() + AERGO_TOOLS_DIR;
     const athenaUserId = aergoToolsDir + "/" + ATHENA_USER_ID;
 
-    fs.exists(aergoToolsDir, (existance) => {
-      if (!existance) {
-        fs.mkdirSync(aergoToolsDir);
-      }
+    if (!fs.existsSync(aergoToolsDir)) {
+      fs.mkdirSync(aergoToolsDir);
+    }
 
-      if (!fs.existsSync(athenaUserId)) {
-        fs.writeFileSync(athenaUserId, new Buffer(uuidv4()));
-      }
+    if (!fs.existsSync(athenaUserId)) {
+      fs.writeFileSync(athenaUserId, new Buffer(uuidv4()));
+    }
 
-      let uuid = fs.readFileSync(athenaUserId).toString('utf-8');
-      if (!isUUID(uuid)) {
-        logger.info("uuid", uuid, "is invalid. creating new one");
-        uuid = uuidv4();
-        fs.writeFileSync(athenaUserId, new Buffer(uuid));
-      }
+    let uuid = fs.readFileSync(athenaUserId).toString('utf-8');
+    if (!isUUID(uuid)) {
+      logger.info("uuid", uuid, "is invalid. creating new one");
+      uuid = uuidv4();
+      fs.writeFileSync(athenaUserId, new Buffer(uuid));
+    }
 
-      logger.info("Athena user uuid", uuid);
-      this.visitor = ua(ACCOUNT_ID, uuid);
-    });
+    logger.info("Athena user uuid", uuid);
+    this.visitor = ua(ACCOUNT_ID, uuid);
   }
 
   event(category, action, label) {
