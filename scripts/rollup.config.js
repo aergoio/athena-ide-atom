@@ -13,7 +13,9 @@ const extentions = [
 const nodeExternals = [
   'atom',
   'os',
-  'fs'
+  'fs',
+  'path',
+  'crypto'
 ]
 
 const externals = Object.keys(pkg.dependencies).concat(...nodeExternals);
