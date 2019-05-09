@@ -1,6 +1,8 @@
+import AddIcon from './add-icon';
 import Button from './button';
 import CardRow from './card-row';
 import Card from './card';
+import CopyIcon from './copy-icon';
 import Description from './description';
 import Foldable from './foldable';
 import InputBox from './input-box';
@@ -14,12 +16,15 @@ import Stars from './stars';
 import SyncIcon from './sync-icon';
 import TextBox from './text-box';
 import Title from './title';
+import TrashIcon from './trash-icon';
 import Void from './void';
 
 export {
+  AddIcon,
   Button,
   CardRow,
   Card,
+  CopyIcon,
   Description,
   Foldable,
   InputBox,
@@ -33,5 +38,6 @@ export {
   SyncIcon,
   TextBox,
   Title,
+  TrashIcon,
   Void
 };

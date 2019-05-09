@@ -4,7 +4,8 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {CardRow, Title, Button} from '../../atoms';
+import { CardRow, Button } from '../../atoms';
+import { CardTitle } from '../../molecules';
 
 @inject('accountStore')
 @observer
@@ -33,9 +34,7 @@ export default class NewAccountModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardRow>
-                <Title title='Do you want to make a new account?' />
-              </CardRow>
+              <CardTitle title='Do you want to make a new account?' />
               <CardRow class='card-row-button'>
                 <Button name='Cancel' onClick={close}/>
                 <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />

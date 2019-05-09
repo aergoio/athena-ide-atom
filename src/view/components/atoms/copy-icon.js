@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 
 import {join} from '../../../utils';
 
-export const SyncIcon = (props) => {
+export const CopyIcon = (props) => {
   return (
     <div
-      className={join('inline-block', 'icon-sync', 'component-icon')}
+      className={join('inline-block', 'icon-clippy', 'component-icon')}
       onClick={props.onClick}>
     </div>
   );
 };
 
-SyncIcon.propTypes = {
+CopyIcon.propTypes = {
   onClick: PropTypes.func
 };
 
-export default SyncIcon;
+export default CopyIcon;

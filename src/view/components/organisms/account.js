@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { CardRow, Title, Button } from '../atoms';
-import { FoldableCard, AccountSelect, Balance, Nonce } from '../molecules';
+import { CardRow, Button } from '../atoms';
+import { FoldableCard, CardTitle, AccountSelect, Balance, Nonce } from '../molecules';
 import { ImportAccountModal, ExportAccountModal, NewAccountModal } from './modals';
 
 export const Account = (props) => {
@@ -12,14 +12,8 @@ export const Account = (props) => {
   const balance = props.balance;
   const nonce = props.nonce;
 
-  const trigger = (
-    <CardRow>
-      <Title title='Account'/>
-    </CardRow>
-  );
-
   return (
-    <FoldableCard trigger={trigger}>
+    <FoldableCard trigger={<CardTitle title='Account' />}>
       <AccountSelect address={address} addresses={addresses} onChange={onAddressChange} />
       <Balance balance={balance} />
       <Nonce nonce={nonce} />

@@ -4,8 +4,8 @@ import { Card, Foldable } from '../atoms';
 
 export const FoldableCard = (props) => {
   return (
-    <Card>
-      <Foldable trigger={props.trigger}>
+    <Card class={props.class}>
+      <Foldable trigger={props.trigger} isOpen={props.isOpen} transitionTime={props.transitionTime}>
         {props.children}
       </Foldable>
     </Card>
@@ -13,8 +13,11 @@ export const FoldableCard = (props) => {
 };
 
 FoldableCard.propTypes = {
+  class: PropTypes.class,
   trigger: PropTypes.element.isRequired,
-  children: PropTypes.element.isRequired
+  children: PropTypes.element.isRequired,
+  isOpen: PropTypes.bool,
+  transitionTime: PropTypes.number,
 }
 
 export default FoldableCard;

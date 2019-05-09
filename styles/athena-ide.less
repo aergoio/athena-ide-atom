@@ -105,10 +105,23 @@
 
   .card {
     margin: 0.5em;
+    height: 100%;
+  }
+
+  .inner-card {
+    border: 0.1em solid;
+  }
+
+  .inner-card:last-child {
+    margin-bottom: 5px;
   }
 
   .transparent-background {
     background-color: transparent;
+  }
+
+  .card-title {
+    margin-right: 1.5em;
   }
 
   .card-row {
@@ -123,6 +136,15 @@
   .component-title {
     justify-content: center;
     font-weight: bold;
+  }
+
+  .component-inner-title {
+    justify-content: center;
+    color: rgba(157, 165, 179, 0.65);
+    max-width: 40em;
+    text-overflow: ellipsis;
+    overflow: auto;
+    font-weight: normal;
   }
 
   .component-icon {

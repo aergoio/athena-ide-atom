@@ -1,10 +1,11 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
-import {inject, observer} from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {CardRow, Title, Description, InputBox, Button} from '../../atoms';
+import { CardRow, Description, InputBox, Button } from '../../atoms';
+import { CardTitle } from '../../molecules';
 
 @inject('contractStore')
 @observer
@@ -34,9 +35,7 @@ export default class NewNodeModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardRow>
-                <Title title='Enter contract address' />
-              </CardRow>
+              <CardTitle title='Enter contract address' />
               <CardRow>
                 <Description description='Contract' />
                 <InputBox ref={this.contractInputRef} type='text'

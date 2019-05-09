@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { CardRow, Title, Button } from '../atoms';
-import { FoldableCard, NodeSelect, Height } from '../molecules';
+import { CardRow, Button } from '../atoms';
+import { CardTitle, FoldableCard, NodeSelect, Height } from '../molecules';
 import { RemoveNodeModal, NewNodeModal } from './modals';
 
 export const Node = (props) => {
@@ -11,13 +11,8 @@ export const Node = (props) => {
   const height = props.height;
   const onNodeChange = props.onNodeChange;
 
-  const trigger = (
-    <CardRow>
-      <Title title='Node'/>
-    </CardRow>
-  );
   return (
-    <FoldableCard trigger={trigger}>
+    <FoldableCard trigger={<CardTitle title='Node' />}>
       <NodeSelect node={node} nodes={nodes} onChange={onNodeChange} />
       <Height height={height} />
       <CardRow class='card-row-button'>

@@ -1,46 +1,32 @@
-import {observable, action, computed} from 'mobx';
+import { observable, action, computed } from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
 
 export default class ContractStore {
 
-  @observable currentContract = "";
-  @observable contract2Abi = new Map();
+  @observable observableContractAddress2Abi = new Map();
 
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
 
-  @computed get currentAbi() {
-    return this.contract2Abi.has(this.currentContract) ? 
-      this.contract2Abi.get(this.currentContract) : {};
-  }
-
-  @computed get contracts() {
-    return Array.from(this.contract2Abi.keys());
-  }
-
   serialize() {
-    return {
-      currentContract: this.currentContract,
-      contract2Abi: JSON.stringify([...this.contract2Abi])
-    };
+    return {};
+  }
+
+  @computed get contractAddress2Abi() {
+    return this.observableContractAddress2Abi.toJS();
   }
 
   @action deserialize(data) {
     logger.debug("Deserialize", data);
-    if (data) {
-      this.currentContract = data.currentContract,
-      this.contract2Abi = new Map(JSON.parse(data.contract2Abi));
-    }
   }
 
   @action addContract(contract) {
     logger.debug("Add contract", contract);
     serviceProvider.contractService.getABI(contract).then(abi => {
-      this.contract2Abi.set(contract, abi);
-      this.changeContract(contract);
+      this.observableContractAddress2Abi.set(contract, abi);
       const message = "Successfully imported contract " + contract;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
@@ -63,12 +49,11 @@ export default class ContractStore {
       logger.debug("Deploy result:", deployResult);
       const contractAddress = deployResult.contractAddress;
       const abi = deployResult.abi;
-      this.contract2Abi.set(contractAddress, abi);
+      this.observableContractAddress2Abi.set(contractAddress, abi);
 
       this.rootStore.accountStore.updateAccountState();
       this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
       this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
-      this.changeContract(contractAddress);
     }).catch(err => {
       this.rootStore.accountStore.updateAccountState();
       logger.error(err);
@@ -77,10 +62,8 @@ export default class ContractStore {
     });
   }
 
-  @action executeContract(functionName, args) {
+  @action executeContract(contractAddress, abi, functionName, args) {
     const identity = this.rootStore.accountStore.currentIdentity;
-    const contractAddress = this.currentContract;
-    const abi = this.currentAbi;
     const price = this.rootStore.feeStore.price;
     const limit = this.rootStore.feeStore.limit;
     logger.debug("Execute contract with", functionName, args, contractAddress, abi, price, limit);
@@ -97,9 +80,7 @@ export default class ContractStore {
     });
   }
 
-  @action queryContract(functionName, args) {
-    const contractAddress = this.currentContract;
-    const abi = this.currentAbi;
+  @action queryContract(contractAddress, abi, functionName, args) {
     logger.debug("Query contract with", contractAddress, abi, functionName, args);
 
     serviceProvider.contractService.query(contractAddress, abi, functionName, args).then(queryResult => {
@@ -111,21 +92,12 @@ export default class ContractStore {
     });
   }
 
-  @action changeContract(contractAddress) {
-    const message = "Change contract to " + contractAddress;
-    logger.debug(message);
-    this.rootStore.consoleStore.log(message, "info");
-    this.currentContract = contractAddress;
-  }
-
-  @action removeContract(contract) {
-    logger.debug("Remove contract", contract);
-    if (!this.contract2Abi.has(contract)) {
+  @action removeContract(contractAddress) {
+    logger.debug("Remove contract", contractAddress);
+    if (!this.observableContractAddress2Abi.has(contractAddress)) {
       return;
     }
-
-    this.contract2Abi.delete(contract);
-    this.changeContract("");
+    this.observableContractAddress2Abi.delete(contractAddress);
   }
 
 }

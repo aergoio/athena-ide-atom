@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {join} from '../../../utils';
+import { join } from '../../../utils';
 
 const rowClass = 'card-row';
 

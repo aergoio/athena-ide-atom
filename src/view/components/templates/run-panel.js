@@ -1,10 +1,11 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
+import clipboardy from 'clipboardy';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Deployment, ContractSelect, ContractCall } from '../organisms';
+import { Deployment, Contract } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
 
 import Environment from './environment';
@@ -29,9 +30,10 @@ export default class RunPanel extends React.Component {
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
     this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
-    this._onContractAddressChange = this._onContractAddressChange.bind(this);
     this._onAbiExec = this._onAbiExec.bind(this);
     this._onAbiQuery = this._onAbiQuery.bind(this);
+    this._onCopyContract = this._onCopyContract.bind(this);
+    this._onRemoveContract = this._onRemoveContract.bind(this);
     this._onError = this._onError.bind(this);
 
     // FIXME : acktsap's hack to refresh input value
@@ -74,30 +76,35 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onContractAddressChange(selectedContractAddress) {
-    runWithCallback.call(this, () => {
-      this.abiCallsRef.current.cleanArgsValue();
-      const contractAddress = selectedContractAddress.value;
-      logger.info("Contract address change to", contractAddress);
-      this.props.contractStore.changeContract(contractAddress);
-    }, this._onError);
-  }
-
-  _onAbiExec(argInputRef, targetFunction) {
+  _onAbiExec(contractAddress, abi, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Input ref:", argInputRef);
       const targetArgs = parseArgs(argInputRef.current.value);
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(targetFunction, targetArgs);
+      this.props.contractStore.executeContract(contractAddress, abi, targetFunction, targetArgs);
     }, this._onError);
   }
 
-  _onAbiQuery(argInputRef, targetFunction) {
+  _onAbiQuery(contractAddress, abi, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Input ref:", argInputRef);
       const targetArgs = parseArgs(argInputRef.current.value);
       logger.info("Query contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.queryContract(targetFunction, targetArgs);
+      this.props.contractStore.queryContract(contractAddress, abi, targetFunction, targetArgs);
+    }, this._onError);
+  }
+
+  _onCopyContract(contractAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Copy contract", contractAddress);
+      clipboardy.writeSync(contractAddress);
+    }, this._onError);
+  }
+
+  _onRemoveContract(contractAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Remove contract", contractAddress);
+      this.props.contractStore.removeContract(contractAddress);
     }, this._onError);
   }
 
@@ -115,15 +122,12 @@ export default class RunPanel extends React.Component {
     const onDeploy = this._onDeployButtonClicked;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
 
-    // contract select
-    const onContractChange = this._onContractAddressChange;
-    const currentContract = this.props.contractStore.currentContract;
-    const contracts = this.props.contractStore.contracts;
-
-    // execute / query
-    const currentAbi = this.props.contractStore.currentAbi;
+    // contract
+    const contractAddress2Abi = this.props.contractStore.contractAddress2Abi;
     const onAbiExec = this._onAbiExec;
     const onAbiQuery = this._onAbiQuery;
+    const onCopyContract = this._onCopyContract
+    const onRemoveContract = this._onRemoveContract
 
     return (
       <Panel>
@@ -136,16 +140,12 @@ export default class RunPanel extends React.Component {
           onDeploy={onDeploy}
           constructorArgs={constructorArgs}
         />
-        <ContractSelect
-          onContractChange={onContractChange}
-          currentContract={currentContract}
-          contracts={contracts}
-        />
-        <ContractCall
-          currentAbi={currentAbi}
+        <Contract
+          contractAddress2Abi={contractAddress2Abi}
           onAbiExec={onAbiExec}
           onAbiQuery={onAbiQuery}
-          abiCallsRef={this.abiCallsRef}
+          onCopyContract={onCopyContract}
+          onRemoveContract={onRemoveContract}
         />
      </Panel>
     );

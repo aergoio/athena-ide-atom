@@ -10,14 +10,15 @@ export const Foldable = (props) => {
   const trigger = props.trigger;
   const children = props.children;
   const open = typeof props.isOpen === "undefined" ? true : props.isOpen;
+  const transitionTime = typeof props.transitionTime === "undefined" ? 100 : props.transitionTime;
   const onOpen = props.onOpen;
   const onClose = props.onClose;
   return (
     <Collapsible
       className={join(foldableClass)}
-      transitionTime={100} // ms
       trigger={trigger}
       open={open}
+      transitionTime={transitionTime} // ms
       onOpen={onOpen}
       onClose={onClose}
     >
@@ -30,6 +31,7 @@ Foldable.propTypes = {
   trigger: PropTypes.any.isRequired,
   children: PropTypes.element.isRequired,
   isOpen: PropTypes.bool,
+  transitionTime: PropTypes.number,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
 }

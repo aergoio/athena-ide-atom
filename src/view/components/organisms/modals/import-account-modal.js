@@ -1,10 +1,11 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
-import {inject, observer} from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import {CardRow, Title, Description, InputBox, Button} from '../../atoms';
+import { CardRow, Description, InputBox, Button } from '../../atoms';
+import { CardTitle } from '../../molecules';
 
 @inject('accountStore')
 @observer
@@ -36,9 +37,7 @@ export default class ImportAccountModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardRow>
-                <Title title='Import account with encrypted private key' />
-              </CardRow>
+              <CardTitle title='Import account with encrypted private key' />
               <CardRow>
                 <Description description='Private key' />
                 <InputBox ref={this.privateKeyInputRef} type='text'

@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { CardRow, Title, Button } from '../atoms';
-import { FoldableCard, ContractConstructor, TargetSelect } from '../molecules';
+import { CardRow, Button } from '../atoms';
+import { CardTitle, FoldableCard, ContractConstructor, TargetSelect } from '../molecules';
 
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
@@ -22,13 +22,8 @@ export const Deployment = (props) => {
     ConstructorOrNot = () => <div></div>;
   }
 
-  const trigger = (
-    <CardRow>
-      <Title title='Deploy'/>
-    </CardRow>
-  );
   return (
-    <FoldableCard trigger={trigger}>
+    <FoldableCard trigger={<CardTitle title='Deploy' />}>
       <TargetSelect
         target={currentTarget}
         targets={targets}
