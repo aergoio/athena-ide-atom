@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { CardRow, Button } from '../atoms';
+import { CardRow } from '../atoms';
 import { FoldableCard, CardTitle, AccountSelect, Balance, Nonce } from '../molecules';
-import { ImportAccountModal, ExportAccountModal, NewAccountModal } from './modals';
+import { RemoveAccountModal, ImportAccountModal, ExportAccountModal, NewAccountModal } from './modals';
 
 export const Account = (props) => {
   const address = props.address;
@@ -18,9 +18,10 @@ export const Account = (props) => {
       <Balance balance={balance} />
       <Nonce nonce={nonce} />
       <CardRow class='card-row-button'>
-        <ImportAccountModal trigger={<Button name='Import' />} />
-        <ExportAccountModal trigger={<Button name='Export' />} />
-        <NewAccountModal trigger={<Button name='New' class='component-btn-rightmost' />} />
+        <RemoveAccountModal />
+        <ImportAccountModal />
+        <ExportAccountModal />
+        <NewAccountModal />
       </CardRow>
     </FoldableCard>
   );

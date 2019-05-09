@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { CardRow, Button } from '../atoms';
+import { CardRow } from '../atoms';
 import { CardTitle, FoldableCard, NodeSelect, Height } from '../molecules';
 import { RemoveNodeModal, NewNodeModal } from './modals';
 
@@ -16,8 +16,8 @@ export const Node = (props) => {
       <NodeSelect node={node} nodes={nodes} onChange={onNodeChange} />
       <Height height={height} />
       <CardRow class='card-row-button'>
-        <RemoveNodeModal trigger={<Button name='Remove' />} />
-        <NewNodeModal trigger={<Button name='New' class='component-btn-rightmost' />} />
+        <RemoveNodeModal />
+        <NewNodeModal />
       </CardRow>
     </FoldableCard>
   );

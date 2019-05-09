@@ -3,6 +3,7 @@ import ImportAccountModal from './import-account-modal';
 import ImportContractModal from './import-contract-modal';
 import NewAccountModal from './new-account-modal';
 import NewNodeModal from './new-node-modal';
+import RemoveAccountModal from './remove-account-modal';
 import RemoveNodeModal from './remove-node-modal';
 
 export {
@@ -11,5 +12,6 @@ export {
   ImportContractModal,
   NewAccountModal,
   NewNodeModal,
-  RemoveNodeModal
+  RemoveAccountModal,
+  RemoveNodeModal,
 };

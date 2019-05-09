@@ -14,7 +14,6 @@ export default class ExportAccountModal extends React.Component {
   static get propTypes() {
     return {
       accountStore: PropTypes.any,
-      trigger: PropTypes.element
     };
   }
 
@@ -31,7 +30,7 @@ export default class ExportAccountModal extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={this.props.trigger}>
+      <Popup modal trigger={<Button name='Export' />}>
         {close =>
           <atom-panel class='modal'>
             <div>

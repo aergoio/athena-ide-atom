@@ -14,7 +14,6 @@ export default class RemoveNodeModal extends React.Component {
   static get propTypes() {
     return {
       nodeStore: PropTypes.any,
-      trigger: PropTypes.element
     };
   }
 
@@ -30,8 +29,9 @@ export default class RemoveNodeModal extends React.Component {
   }
 
   render() {
+    const disabled = "" === this.props.nodeStore.currentNode;
     return (
-      <Popup modal trigger={this.props.trigger}>
+      <Popup modal trigger={<Button name='Remove' disabled={disabled} />}>
         {close =>
           <atom-panel class='modal'>
             <div>

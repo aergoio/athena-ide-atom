@@ -73,10 +73,6 @@ export default class AccountStore {
 
   @action updateAccountState() {
     logger.debug("Update account state of", this.currentAddress);
-    if (typeof this.currentAddress === "undefined" || "" === this.currentAddress) {
-      return;
-    }
-
     serviceProvider.accountService.getAccountState(this.currentAddress).then(state => {
       this.currentBalance = "unknown" === state.balance ? state.balance : formatInteger(state.balance);
       this.currentBalanceWithUnit = "unknown" === state.balance ? state.balance : formatAergoBalance(state.balance);
@@ -108,8 +104,7 @@ export default class AccountStore {
       return;
     }
 
-    this.address2Identity.remove(address);
-    this.changeNode("");
+    this.address2Identity.delete(address);
     this.changeAccount("");
   }
 
