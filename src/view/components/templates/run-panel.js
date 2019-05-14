@@ -93,12 +93,11 @@ export default class RunPanel extends React.Component {
       logger.debug("Deploy contract");
       logger.debug("Input ref", argInputRef);
       let constructorArgs = [];
+      let amount = "";
       if (argInputRef.current) {
         constructorArgs = argInputRef.current.values;
+        amount = argInputRef.current.amount;
       }
-      // TODO
-      // const amount = argInputRef.current.amount;
-      const amount = "";
       this.props.contractStore.deployContract(constructorArgs, amount);
     }, this._onError);
   }
@@ -174,6 +173,7 @@ export default class RunPanel extends React.Component {
     const onChangeTarget = this._onFileChange;
     const onDeploy = this._onDeployButtonClicked;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
+    const payable = this.props.deployTargetStore.isPayable;
 
     // contract
     const contractAddress2Abi = this.props.contractStore.contractAddress2Abi;
@@ -213,6 +213,7 @@ export default class RunPanel extends React.Component {
           targets={targets}
           onChangeTarget={onChangeTarget}
           constructorArgs={constructorArgs}
+          payable={payable}
           onDeploy={onDeploy}
         />
         <Contract

@@ -182,12 +182,10 @@ export default class ContractService {
 
   async _signTx(identity, rawTransaction) {
     const signedTransaction = _.cloneDeep(rawTransaction)
-
-    const sign = await signTransaction(rawTransaction, identity.keyPair);
-    signedTransaction.sign = sign;
-    const hash = await hashTransaction(signedTransaction, "base58");
-    signedTransaction.hash = hash;
-
+    signedTransaction.sign = await signTransaction(signedTransaction, identity.keyPair);
+    signedTransaction.hash = await hashTransaction(signedTransaction, "base58");
+    // TODO : acktsap's hack. should i do this?
+    signedTransaction.amount = rawTransaction.amount;
     return signedTransaction;
   }
 

@@ -39,6 +39,19 @@ export default class DeployTargetStore {
       .map(a => a.name);
   }
 
+  @computed get isPayable() {
+    const compileResult = this.target2CompileResult.get(this.currentTarget);
+    if (typeof compileResult === "undefined") {
+      return false;
+    }
+
+    const abi = JSON.parse(compileResult.abi);
+    const abiFunctions = abi.functions;
+    return abiFunctions.filter(f => "constructor" === f.name)
+      .filter(f => typeof f.payable !== "undefined")
+      .length === 1;
+  }
+
   @computed get targets() {
     return Array.from(this.target2BaseDir.keys());
   }
