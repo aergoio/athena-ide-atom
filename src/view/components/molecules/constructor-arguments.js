@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { CardRow, Description } from '../atoms';
 import Arguments from './arguments';
 
-const ContractConstructor = (props) => {
+const ConstructorArguments = (props) => {
   const args = props.args;
   const payable = props.payable;
   const argsRef = props.argsRef;
@@ -17,10 +17,10 @@ const ContractConstructor = (props) => {
   );
 }
 
-ContractConstructor.propTypes = {
+ConstructorArguments.propTypes = {
   args: PropTypes.array,
   payable: PropTypes.bool,
   argsRef: PropTypes.any
 }
 
-export default ContractConstructor;
+export default ConstructorArguments;

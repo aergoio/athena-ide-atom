@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 
 import { CardRow, Button } from '../atoms';
-import { CardTitle, FoldableCard, ContractConstructor, TargetSelect } from '../molecules';
+import { CardTitle, FoldableCard, ConstructorArguments, TargetSelect } from '../molecules';
 
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
@@ -15,13 +15,11 @@ export const Deployment = (props) => {
 
   const onDeploy = props.onDeploy;
 
-  let ConstructorOrNot;
+  let constructorOrNot;
   if (constructorArgs.length > 0) {
-    ConstructorOrNot = () => (
-      <ContractConstructor args={constructorArgs} payable={payable} argsRef={argsRef} />
-    );
+    constructorOrNot = <ConstructorArguments args={constructorArgs} payable={payable} argsRef={argsRef} />;
   } else {
-    ConstructorOrNot = () => <div></div>;
+    constructorOrNot = <div></div>;
   }
 
   return (
@@ -31,7 +29,7 @@ export const Deployment = (props) => {
         targets={targets}
         onChange={onChangeTarget}
       />
-      <ConstructorOrNot />
+      {constructorOrNot}
       <CardRow class='card-row-button'>
         <Button
           name='Deploy'

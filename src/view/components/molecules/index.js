@@ -3,7 +3,7 @@ import ArgumentsAndRunner from './arguments-and-runner';
 import Arguments from './arguments';
 import Balance from './balance';
 import CardTitle from './card-title';
-import ContractConstructor from './contract-constructor';
+import ConstructorArguments from './constructor-arguments';
 import FoldableCard from './foldable-card';
 import Height from './height';
 import NodeSelect from './node-select';
@@ -18,7 +18,7 @@ export {
   Arguments,
   Balance,
   CardTitle,
-  ContractConstructor,
+  ConstructorArguments,
   FoldableCard,
   Height,
   NodeSelect,

@@ -16,5 +16,6 @@ function get(key)
   return system.getItem(key)
 end
 
-abi.register(libraryFunc, set, setItemWithTable)
+abi.register(libraryFunc, setItemWithTable)
+abi.payable(set)
 abi.register_view(get)

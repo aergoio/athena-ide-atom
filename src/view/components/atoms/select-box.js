@@ -11,6 +11,7 @@ export default class SelectBox extends React.Component {
 
   static get propTypes() {
     return {
+      class: PropTypes.class,
       value: PropTypes.string,
       options: PropTypes.array,
       onChange: PropTypes.func,
@@ -35,7 +36,7 @@ export default class SelectBox extends React.Component {
     const options = this.props.options.map(o => this._generateOption(o));
     return (
       <SelectBoxComponent
-        className={join('inline-block', 'native-key-bindings', selectBoxClass)}
+        className={join('inline-block', 'native-key-bindings', selectBoxClass, this.props.class)}
         classNamePrefix={selectBoxClass}
         value={option}
         options={options}

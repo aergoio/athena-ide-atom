@@ -1,7 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
-import { ArgumentRow, Foldable, ArgumentName, InputBox, TextBox } from '../atoms';
+import { Amount } from '@herajs/client';
+
+import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
+
+const units = [ "aer", "gaer", "aergo" ];
 
 export default class Arguments extends React.Component {
 
@@ -16,11 +20,13 @@ export default class Arguments extends React.Component {
     super(props);
     this.state = {
       args: new Array(props.args.length).fill(""),
-      amount: ""
+      amount: "",
+      unit: "aer"
     };
 
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
+    this._onUnitChange = this._onUnitChange.bind(this);
   }
 
   get values() {
@@ -28,7 +34,7 @@ export default class Arguments extends React.Component {
   }
 
   get amount() {
-    return this.state.amount;
+    return new Amount(this.state.amount, this.state.unit).toUnit("aer").toString();
   }
 
   _onArgumentValueChange(e, index) {
@@ -45,6 +51,11 @@ export default class Arguments extends React.Component {
     this.setState({ amount: newValue.toString() });
   }
 
+  _onUnitChange(target) {
+    const newValue = target.value;
+    this.setState({ unit: newValue });
+  }
+
   _generateArgsDisplay() {
     let argumentDisplay = "No arguments provided";
 
@@ -55,7 +66,7 @@ export default class Arguments extends React.Component {
     }
 
     if ("" !== this.state.amount) {
-      argumentDisplay += (" (amount: " + this.state.amount + ")");
+      argumentDisplay += (" (amount: " + this.state.amount + " " + this.state.unit + ")");
     }
 
     return argumentDisplay;
@@ -81,8 +92,15 @@ export default class Arguments extends React.Component {
         <ArgumentRow>
           <ArgumentName name="Amount" />
           <InputBox
+            type="number"
             onChange={this._onAmountChange}
             defaultValue=""
+          />
+          <SelectBox
+            class='component-selectbox-unit'
+            value={this.state.unit}
+            options={units}
+            onChange={this._onUnitChange}
           />
         </ArgumentRow>
       ));
