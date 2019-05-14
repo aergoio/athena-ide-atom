@@ -37,15 +37,15 @@ export default class ContractStore {
     });
   }
 
-  @action deployContract(constructorArgs) {
+  @action deployContract(constructorArgs, amount) {
     logger.debug("deploy contract with", constructorArgs);
     const identity = this.rootStore.accountStore.currentIdentity;
     const price = this.rootStore.feeStore.price;
     const limit = this.rootStore.feeStore.limit;
     const payload = this.rootStore.deployTargetStore.compileResult.payload;
-    logger.debug("Deploy contract with", price, limit, payload, constructorArgs);
+    logger.debug("Deploy contract with", payload, constructorArgs, amount, price, limit);
 
-    serviceProvider.contractService.deploy(identity, price, limit, payload, constructorArgs).then(deployResult => {
+    serviceProvider.contractService.deploy(identity, price, limit, payload, constructorArgs, amount).then(deployResult => {
       logger.debug("Deploy result:", deployResult);
       const contractAddress = deployResult.contractAddress;
       const abi = deployResult.abi;
@@ -62,14 +62,14 @@ export default class ContractStore {
     });
   }
 
-  @action executeContract(contractAddress, abi, functionName, args) {
+  @action executeContract(contractAddress, abi, functionName, args, amount) {
     const identity = this.rootStore.accountStore.currentIdentity;
     const price = this.rootStore.feeStore.price;
     const limit = this.rootStore.feeStore.limit;
-    logger.debug("Execute contract with", functionName, args, contractAddress, abi, price, limit);
+    logger.debug("Execute contract with", functionName, args, contractAddress, abi, amount, price, limit);
 
     serviceProvider.contractService.execute(identity, functionName, args,
-          contractAddress, abi, price, limit).then(execResult => {
+          contractAddress, abi, amount, price, limit).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
       this.rootStore.consoleStore.log("Execute ret: " + execResult, "info");
     }).catch(err => {

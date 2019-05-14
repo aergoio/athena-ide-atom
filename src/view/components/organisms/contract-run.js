@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Button, InputBox, CopyIcon, TrashIcon } from '../atoms';
-import { CardTitle, FoldableCard } from '../molecules';
+import { CopyIcon, TrashIcon } from '../atoms';
+import { CardTitle, ArgumentsAndRunner, FoldableCard } from '../molecules';
 
 export default class ContractRun extends React.Component {
 
@@ -18,17 +18,6 @@ export default class ContractRun extends React.Component {
 
   constructor(props) {
     super(props);
-
-    // FIXME : acktsap's hack to refresh input value
-    this.argsRefs = [];
-  }
-
-  cleanArgsValue() {
-    this.argsRefs.forEach(r => {
-      if (r.current) {
-        r.current.cleanValue()
-      }
-    });
   }
 
   render() {
@@ -44,35 +33,28 @@ export default class ContractRun extends React.Component {
       return <div></div>;
     }
 
-    this.argsRefs = [];
-
     const abiCalls = abiFunctions.filter(f => "constructor" !== f.name)
       .map((abiFunction, index) => {
-        const argsRef = React.createRef();
-        this.argsRefs.push(argsRef);
+        const args = abiFunction.arguments.map(a => a.name);
+        const payable = abiFunction.payable;
 
-        const args = abiFunction.arguments;
-        const inputPlaceHolder = args.length === 0 ? "No argument" : args.map(a => a.name).join(", ");
-
-        let buttonStyle = 'component-btn-transaction';
-        let callback = onAbiExec;
+        const runnerName = abiFunction.name;
+        let runnerStyle = 'component-btn-transaction';
+        let runner = onAbiExec;
         if (abiFunction.view) {
-          buttonStyle = '';
-          callback = onAbiQuery;
+          runnerStyle = '';
+          runner = onAbiQuery;
         }
+
         return (
-          <CardRow key={index} >
-            <InputBox type='text'
-              ref={argsRef}
-              defaultValue=""
-              placeHolder={inputPlaceHolder}
-            />
-            <Button
-              name={abiFunction.name}
-              class={buttonStyle}
-              onClick={() => callback(contractAddress, abi, abiFunction.name, argsRef)}
-            />
-          </CardRow>
+          <ArgumentsAndRunner
+            key={index}
+            args={args}
+            payable={payable}
+            runnerName={runnerName}
+            runnerStyle={runnerStyle}
+            runner={argsRef => runner(contractAddress, abi, runnerName, argsRef)}
+          />
         );
       });
 

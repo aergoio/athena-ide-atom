@@ -41,7 +41,7 @@ export default class NewNodeModal extends React.Component {
                 <InputBox ref={this.contractInputRef} type='text'
                     placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
               </CardRow>
-              <CardRow class='card-row-button'>
+              <CardRow class='card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
                 <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>

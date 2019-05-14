@@ -80,27 +80,53 @@
     display: flex;
   }
 
-  .Collapsible .Collapsible__contentOuter {
-    overflow: unset !important;
+  .foldable {
+    width: 100%;
+    margin-right: 10px;
   }
 
-  .foldable .Collapsible__contentOuter {
+  .foldable:last-child {
+    margin-right: 0px;
+  }
+
+  .foldable-closed > .foldable__contentOuter {
     overflow: hidden !important;
   }
 
-  .Collapsible__trigger:after {
-    font-family: monospace;
-    font-size: 1.7em;
-    content: '+';
+  .foldable-opened > .foldable__contentOuter {
+    overflow: unset !important;
+  }
+
+  .foldable__trigger {
+    display: block;
+    position: relative;
+  }
+
+  .foldable__trigger:after {
+    font-family: 'Octicons Regular';
+    font-size: 1.2em;
+    display: inline-block;
     position: absolute;
     right: 10px;
-    top: 0px;
+    top: 3px;
     display: block;
     transition: transform 300ms;
   }
 
-  .Collapsible__trigger.is-open:after {
-    content: '-';
+  .foldable-trigger-closed:after {
+    content: '\f05d';
+  }
+
+  .foldable-trigger-opened:after {
+    content: '\f0ca';
+  }
+
+  .smile-foldable-trigger-closed:after {
+    content: '\f0a3';
+  }
+
+  .smile-foldable-trigger-opened:after {
+    content: '\f0a2';
   }
 
   .card {
@@ -129,8 +155,16 @@
     display: flex;
   }
 
-  .card-row-sync, .card-row-button {
+  .card-row-argument {
+    border: 0.1em solid;
+  }
+
+  .card-row-sync, .card-row-button, .card-row-argument {
     justify-content: flex-end;
+  }
+
+  .card-row-button-modal {
+    justify-content: center;
   }
 
   .component-title {
@@ -152,6 +186,22 @@
   }
 
   .component-description {
+    width: 7em;
+    padding: 0.3em 0em;
+    height: 100%;
+    color: rgba(157, 165, 179, 0.65);
+  }
+
+  .argument-row {
+    padding: 3px 5px;
+    display: flex;
+  }
+
+  .argument-row:first-child {
+    padding-top: 6px;
+  }
+
+  .component-argument-name {
     width: 7em;
     padding: 0.3em 0em;
     height: 100%;
@@ -219,7 +269,7 @@
     padding: 0.3em;
   }
 
-  .component-textbox-compile-result {
+  .component-textbox-arguments {
     text-align: left;
   }
 
@@ -308,7 +358,7 @@
     width: 100%;
     overflow: auto;
   }
-  
+
   .panel-body {
     height: 100%;
     background-color: @inset-panel-background-color;

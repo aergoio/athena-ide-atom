@@ -5,18 +5,18 @@ import clipboardy from 'clipboardy';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Deployment, Contract } from '../organisms';
+import { Summary, Sync, Account, Node, Deployment, Contract } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
+import { runWithCallback } from '../../../utils';
 
-import Environment from './environment';
-import { parseArgs, runWithCallback } from '../../../utils';
-
-@inject('notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
+@inject('nodeStore', 'accountStore', 'notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class RunPanel extends React.Component {
 
   static get propTypes() {
     return {
+      nodeStore: PropTypes.any,
+      accountStore: PropTypes.any,
       notificationStore: PropTypes.any,
       compileStore: PropTypes.any,
       contractStore: PropTypes.any,
@@ -27,24 +27,23 @@ export default class RunPanel extends React.Component {
   constructor(props) {
     super(props);
 
+    this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
+    this._onSync = this._onSync.bind(this);
+
+    this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
+
+    this._onAddressChange = this._onAddressChange.bind(this);
+
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
-    this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
+
     this._onAbiExec = this._onAbiExec.bind(this);
     this._onAbiQuery = this._onAbiQuery.bind(this);
+
     this._onCopyContract = this._onCopyContract.bind(this);
     this._onRemoveContract = this._onRemoveContract.bind(this);
+
     this._onError = this._onError.bind(this);
-
-    // FIXME : acktsap's hack to refresh input value
-    this.abiCallsRef = React.createRef();
-  }
-
-  _onFileChange(selectedOption) {
-    runWithCallback.call(this, () => {
-      logger.debug("Compiled file change", selectedOption);
-      this.props.deployTargetStore.changeTarget(selectedOption.value);
-    }, this._onError);
   }
 
   _onCompileButtonClicked() {
@@ -58,6 +57,31 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
+  _onSync() {
+    logger.info("Sync status");
+    this.props.nodeStore.updateNodeState();
+    this.props.accountStore.updateAccountState();
+  }
+
+  _onNodeUrlChange(selectedNode) {
+    logger.info("Node change", selectedNode.value);
+    this.props.nodeStore.changeNode(selectedNode.value);
+    this._onSync();
+  }
+
+  _onAddressChange(selectedAddress) {
+    logger.info("Account address change to", selectedAddress.value);
+    this.props.accountStore.changeAccount(selectedAddress.value);
+    this._onSync();
+  }
+
+  _onFileChange(selectedOption) {
+    runWithCallback.call(this, () => {
+      logger.debug("Compiled file change", selectedOption);
+      this.props.deployTargetStore.changeTarget(selectedOption.value);
+    }, this._onError);
+  }
+
   _compile() {
     runWithCallback.call(this, () => {
       this.props.compileStore.compileCurrentTarget();
@@ -67,28 +91,34 @@ export default class RunPanel extends React.Component {
   _onDeployButtonClicked(argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Deploy contract");
-      logger.debug("Input ref:", argInputRef);
+      logger.debug("Input ref", argInputRef);
       let constructorArgs = [];
       if (argInputRef.current) {
-        constructorArgs = parseArgs(argInputRef.current.value);
+        constructorArgs = argInputRef.current.values;
       }
-      this.props.contractStore.deployContract(constructorArgs);
+      // TODO
+      // const amount = argInputRef.current.amount;
+      const amount = "";
+      this.props.contractStore.deployContract(constructorArgs, amount);
     }, this._onError);
   }
 
   _onAbiExec(contractAddress, abi, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
-      logger.debug("Input ref:", argInputRef);
-      const targetArgs = parseArgs(argInputRef.current.value);
+      logger.debug("Execute contract");
+      logger.debug("Input ref", argInputRef);
+      const targetArgs = argInputRef.current.values;
+      const amount = argInputRef.current.amount;
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(contractAddress, abi, targetFunction, targetArgs);
+      this.props.contractStore.executeContract(contractAddress, abi, targetFunction, targetArgs, amount);
     }, this._onError);
   }
 
   _onAbiQuery(contractAddress, abi, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
-      logger.debug("Input ref:", argInputRef);
-      const targetArgs = parseArgs(argInputRef.current.value);
+      logger.debug("Query contract");
+      logger.debug("Input ref", argInputRef);
+      const targetArgs = argInputRef.current.values;
       logger.info("Query contract", targetFunction, "with args", targetArgs);
       this.props.contractStore.queryContract(contractAddress, abi, targetFunction, targetArgs);
     }, this._onError);
@@ -114,11 +144,34 @@ export default class RunPanel extends React.Component {
   }
 
   render() {
+    // summary
+    const node = this.props.nodeStore.currentNode;
+    const address = this.props.accountStore.currentAddress;
+    const height = this.props.nodeStore.currentHeight;
+    const balanceWithUnit = this.props.accountStore.currentBalanceWithUnit;
+    const nonce = this.props.accountStore.currentNonce;
+
+    // sync
+    const onCompile = this._onCompileButtonClicked;
+    const onSync= this._onSync
+
+    // node
+    // const node = this.props.nodeStore.currentNode;
+    const nodes = this.props.nodeStore.nodes;
+    // const height = this.props.nodeStore.currentHeight;
+    const onNodeChange = this._onNodeUrlChange;
+
+    // address
+    // const accountAddress = this.props.accountStore.currentAddress;
+    const addresses = this.props.accountStore.addresses;
+    const onAddressChange = this._onAddressChange;
+    const balance = this.props.accountStore.currentBalance;
+    // const nonce = this.props.accountStore.currentNonce;
+
     // deployment target
     const currentTarget = this.props.deployTargetStore.currentTarget;
     const targets = this.props.deployTargetStore.targets;
     const onChangeTarget = this._onFileChange;
-    const onCompile = this._onCompileButtonClicked;
     const onDeploy = this._onDeployButtonClicked;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
 
@@ -131,14 +184,36 @@ export default class RunPanel extends React.Component {
 
     return (
       <Panel>
-        <Environment />
+        <Summary
+          node={node}
+          address={address}
+          height={height}
+          balanceWithUnit={balanceWithUnit}
+          nonce={nonce}
+        />
+        <Sync
+          onCompile={onCompile}
+          onSync={onSync}
+        />
+        <Node
+          node={node}
+          nodes={nodes}
+          height={height}
+          onNodeChange={onNodeChange}
+        />
+        <Account
+          address={address}
+          addresses={addresses}
+          onAddressChange={onAddressChange}
+          balance={balance}
+          nonce={nonce}
+        />
         <Deployment
           currentTarget={currentTarget}
           targets={targets}
           onChangeTarget={onChangeTarget}
-          onCompile={onCompile}
-          onDeploy={onDeploy}
           constructorArgs={constructorArgs}
+          onDeploy={onDeploy}
         />
         <Contract
           contractAddress2Abi={contractAddress2Abi}

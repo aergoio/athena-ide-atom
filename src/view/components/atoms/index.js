@@ -1,4 +1,6 @@
 import AddIcon from './add-icon';
+import ArgumentName from './argument-name';
+import ArgumentRow from './argument-row';
 import Button from './button';
 import CardRow from './card-row';
 import Card from './card';
@@ -21,6 +23,8 @@ import Void from './void';
 
 export {
   AddIcon,
+  ArgumentName,
+  ArgumentRow,
   Button,
   CardRow,
   Card,

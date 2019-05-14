@@ -22,7 +22,7 @@ export default class ContractService {
     return await this.client.getABI(decoded);
   }
 
-  async deploy(identity, price, limit, contractPayload, args) {
+  async deploy(identity, price, limit, contractPayload, args, amount) {
     if (isEmpty(identity)) {
       throw "Selected account is empty";
     }
@@ -46,7 +46,7 @@ export default class ContractService {
 
     const chainIdHash = await this.client.getChainIdHash();
     const trier = (nonce) => {
-      const rawTx = this._buildDeployTx(chainIdHash, accountAddress, "", nonce, payload);
+      const rawTx = this._buildDeployTx(chainIdHash, accountAddress, "", amount, nonce, payload);
       return this._signTx(identity, rawTx).then(signedTx => {
         logger.debug("Signed tx", signedTx);
         return this.client.sendSignedTransaction(signedTx);
@@ -62,7 +62,7 @@ export default class ContractService {
     return { contractAddress: contractAddress.toString(), abi: abi }
   }
 
-  async execute(identity, targetFunction, targetArgs, contractAddress, abi, price, limit) {
+  async execute(identity, targetFunction, targetArgs, contractAddress, abi, amount, price, limit) {
     if (isEmpty(identity)) {
       throw "Selected account is empty";
     }
@@ -94,7 +94,7 @@ export default class ContractService {
     const functionCallTx = functionCall.asTransaction({
       chainIdHash: chainIdHash,
       from: accountAddress,
-      amount: "0"
+      amount: amount
     });
     logger.debug("Tx form:", functionCallTx);
 
@@ -169,12 +169,12 @@ export default class ContractService {
     });
   }
 
-  _buildDeployTx(chainIdHash, from, to, nonce, payload) {
+  _buildDeployTx(chainIdHash, from, to, amount, nonce, payload) {
     return {
       chainIdHash: chainIdHash,
       from: from,
       to: to,
-      amount: "0",
+      amount: amount,
       nonce: nonce,
       payload: payload,
     };

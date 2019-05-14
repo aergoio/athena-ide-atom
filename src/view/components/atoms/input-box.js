@@ -9,6 +9,7 @@ export default class InputBox extends React.Component {
 
   static get propTypes() {
     return {
+      onChange: PropTypes.func,
       class: PropTypes.class,
       placeHolder: PropTypes.string,
       type: PropTypes.string
@@ -24,14 +25,12 @@ export default class InputBox extends React.Component {
     return this.inputRef.current.value;
   }
 
-  cleanValue() {
-    this.inputRef.current.value = "";
-  }
-
   render() {
     return (
       <input
         className={join('inline-block', 'input-text', 'native-key-bindings', inputBoxClass, this.props.class)}
+        tabIndex={-1}
+        onChange={this.props.onChange}
         placeHolder={this.props.placeHolder}
         type={this.props.type}
         ref={this.inputRef}

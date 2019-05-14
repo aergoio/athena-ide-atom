@@ -1,26 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Description, InputBox } from '../atoms';
+import { CardRow, Description } from '../atoms';
+import Arguments from './arguments';
 
 const ContractConstructor = (props) => {
   const args = props.args;
+  const payable = props.payable;
   const argsRef = props.argsRef;
-  const inputPlaceHolder = args.length === 0 ? "No argument" : args.join(", ");
   return (
     <CardRow>
       <Description
         description="Args"
       />
-      <InputBox type='text'
-        ref={argsRef}
-        placeHolder={inputPlaceHolder}
-      />
+      <Arguments args={args} payable={payable} ref={argsRef} />
     </CardRow>
   );
 }
 
 ContractConstructor.propTypes = {
   args: PropTypes.array,
+  payable: PropTypes.bool,
   argsRef: PropTypes.any
 }
 

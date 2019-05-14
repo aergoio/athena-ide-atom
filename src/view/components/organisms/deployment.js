@@ -7,16 +7,18 @@ import { CardTitle, FoldableCard, ContractConstructor, TargetSelect } from '../m
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
   const targets = props.targets;
-  const onCompile = props.onCompile;
-  const onDeploy = props.onDeploy;
   const onChangeTarget = props.onChangeTarget;
+
   const constructorArgs = props.constructorArgs;
+  const payable = props.payable;
   const argsRef = React.createRef();
+
+  const onDeploy = props.onDeploy;
 
   let ConstructorOrNot;
   if (constructorArgs.length > 0) {
     ConstructorOrNot = () => (
-      <ContractConstructor args={constructorArgs} argsRef={argsRef} />
+      <ContractConstructor args={constructorArgs} payable={payable} argsRef={argsRef} />
     );
   } else {
     ConstructorOrNot = () => <div></div>;
@@ -36,11 +38,6 @@ export const Deployment = (props) => {
           class='component-btn-transaction'
           onClick={() => onDeploy(argsRef)}
         />
-        <Button
-          name='Compile'
-          class='component-btn-rightmost'
-          onClick={onCompile}
-        />
       </CardRow>
     </FoldableCard>
   );
@@ -50,9 +47,9 @@ Deployment.propTypes = {
   currentTarget: PropTypes.string,
   targets: PropTypes.array,
   onChangeTarget: PropTypes.func,
-  onCompile: PropTypes.func,
+  constructorArgs: PropTypes.array,
+  payable: PropTypes.bool,
   onDeploy: PropTypes.func,
-  constructorArgs: PropTypes.array
 }
 
 export default Deployment;
