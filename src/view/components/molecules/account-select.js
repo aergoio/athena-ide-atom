@@ -1,16 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Description, SelectBox } from '../atoms';
+import { CardRow, Description, SelectBox, CopyIcon } from '../atoms';
 
 export const AddressSelect = (props) => {
+  const accountAddress = props.address;
+  const accountAddresses = props.addresses;
+  const onAddressChange = props.onAddressChange;
+  const onAddressCopy = props.onAddressCopy;
   return (
     <CardRow>
       <Description description='Address' />
       <SelectBox
-        value={props.address}
-        options={props.addresses}
-        onChange={props.onChange}
+        value={accountAddress}
+        options={accountAddresses}
+        onChange={onAddressChange}
       />
+      <CopyIcon onClick={(e) => { e.stopPropagation(); onAddressCopy(accountAddress)} } />
     </CardRow>
   );
 };
@@ -18,7 +23,8 @@ export const AddressSelect = (props) => {
 AddressSelect.propTypes = {
   address : PropTypes.string,
   addresses : PropTypes.array,
-  onChange: PropTypes.func
+  onAddressChange: PropTypes.func,
+  onAddressCopy: PropTypes.func
 }
 
 export default AddressSelect;

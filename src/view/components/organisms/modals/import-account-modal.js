@@ -32,7 +32,7 @@ export default class ImportAccountModal extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={<Button name='Import' />}>
+      <Popup modal trigger={<Button class='component-btn-ocean' name='Import' />}>
         {close =>
           <atom-panel class='modal'>
             <div>

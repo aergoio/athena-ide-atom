@@ -57,7 +57,7 @@ export default class Arguments extends React.Component {
   }
 
   _generateArgsDisplay() {
-    let argumentDisplay = "No arguments provided";
+    let argumentDisplay = "No arguments";
 
     if (this.state.args.map(a => a.trim())
           .filter(a => "" !== a)
@@ -66,7 +66,7 @@ export default class Arguments extends React.Component {
     }
 
     if ("" !== this.state.amount) {
-      argumentDisplay += (" (amount: " + this.state.amount + " " + this.state.unit + ")");
+      argumentDisplay += ("    " + this.state.amount + " " + this.state.unit);
     }
 
     return argumentDisplay;
@@ -80,6 +80,7 @@ export default class Arguments extends React.Component {
         <ArgumentRow key={index}>
           <ArgumentName name={arg} />
           <InputBox
+            class='component-inputbox-argument'
             onChange={e => this._onArgumentValueChange(e, index)}
             defaultValue=""
           />
@@ -93,6 +94,7 @@ export default class Arguments extends React.Component {
           <ArgumentName name="Amount" />
           <InputBox
             type="number"
+            class='component-inputbox-argument'
             onChange={this._onAmountChange}
             defaultValue=""
           />
@@ -109,7 +111,6 @@ export default class Arguments extends React.Component {
     return (
       <Foldable
         isOpen={false}
-        triggerBaseClass='smile-foldable'
         transitionTime={1}
         trigger={<TextBox class='component-textbox-arguments' text={argumentDisplay} />}
       >

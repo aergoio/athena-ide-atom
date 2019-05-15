@@ -1,13 +1,14 @@
 import React from 'react'
+import { Flex } from 'reflexbox';
 import PropTypes from 'prop-types';
 
-import { CardRow, Button } from '../atoms';
+import { Description, CardRow, Button } from '../atoms';
 import { CardTitle, FoldableCard, ConstructorArguments, TargetSelect } from '../molecules';
 
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
   const targets = props.targets;
-  const onChangeTarget = props.onChangeTarget;
+  const onTargetChange = props.onTargetChange;
 
   const constructorArgs = props.constructorArgs;
   const payable = props.payable;
@@ -27,15 +28,18 @@ export const Deployment = (props) => {
       <TargetSelect
         target={currentTarget}
         targets={targets}
-        onChange={onChangeTarget}
+        onChange={onTargetChange}
       />
       {constructorOrNot}
-      <CardRow class='card-row-button'>
-        <Button
-          name='Deploy'
-          class='component-btn-transaction'
-          onClick={() => onDeploy(argsRef)}
-        />
+      <CardRow>
+        <Description description='' />
+        <Flex justify='flex-end' w={1}>
+          <Button
+            name='Deploy'
+            class='component-btn-transaction'
+            onClick={() => onDeploy(argsRef)}
+          />
+        </Flex>
       </CardRow>
     </FoldableCard>
   );
@@ -44,7 +48,7 @@ export const Deployment = (props) => {
 Deployment.propTypes = {
   currentTarget: PropTypes.string,
   targets: PropTypes.array,
-  onChangeTarget: PropTypes.func,
+  onTargetChange: PropTypes.func,
   constructorArgs: PropTypes.array,
   payable: PropTypes.bool,
   onDeploy: PropTypes.func,

@@ -30,7 +30,7 @@ export default class ExportAccountModal extends React.Component {
 
   render() {
     return (
-      <Popup modal trigger={<Button name='Export' />}>
+      <Popup modal trigger={<Button class='component-btn-ocean' name='Export' />}>
         {close =>
           <atom-panel class='modal'>
             <div>

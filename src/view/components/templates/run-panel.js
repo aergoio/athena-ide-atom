@@ -5,7 +5,7 @@ import clipboardy from 'clipboardy';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Summary, Sync, Account, Node, Deployment, Contract } from '../organisms';
+import { Summary, TopBar, Account, Node, Deployment, Contract } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
 import { runWithCallback } from '../../../utils';
 
@@ -32,15 +32,17 @@ export default class RunPanel extends React.Component {
     this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
 
     this._onAddressChange = this._onAddressChange.bind(this);
+    this._onAddressCopy = this._onAddressCopy.bind(this);
 
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
 
+    this._onContractImport = this._onContractImport.bind(this);
+    this._onContractCopy = this._onContractCopy.bind(this);
+    this._onContractRemove = this._onContractRemove.bind(this);
+
     this._onAbiExec = this._onAbiExec.bind(this);
     this._onAbiQuery = this._onAbiQuery.bind(this);
-
-    this._onCopyContract = this._onCopyContract.bind(this);
-    this._onRemoveContract = this._onRemoveContract.bind(this);
 
     this._onError = this._onError.bind(this);
   }
@@ -74,6 +76,13 @@ export default class RunPanel extends React.Component {
     this._onSync();
   }
 
+  _onAddressCopy(accountAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Copy address", accountAddress);
+      clipboardy.writeSync(accountAddress);
+    }, this._onError);
+  }
+
   _onFileChange(selectedOption) {
     runWithCallback.call(this, () => {
       logger.debug("Compiled file change", selectedOption);
@@ -102,6 +111,25 @@ export default class RunPanel extends React.Component {
       this.props.contractStore.deployContract(constructorArgs, amount);
     }, this._onError);
   }
+  _onContractImport(contractInputRef) {
+    logger.debug("Import contract button clicked");
+    const contract = contractInputRef.current.value;
+    this.props.contractStore.addContract(contract);
+  }
+
+  _onContractCopy(contractAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Copy contract", contractAddress);
+      clipboardy.writeSync(contractAddress);
+    }, this._onError);
+  }
+
+  _onContractRemove(contractAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Remove contract", contractAddress);
+      this.props.contractStore.removeContract(contractAddress);
+    }, this._onError);
+  }
 
   _onAbiExec(contractAddress, abi, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
@@ -121,20 +149,6 @@ export default class RunPanel extends React.Component {
       const targetArgs = argInputRef.current.values;
       logger.info("Query contract", targetFunction, "with args", targetArgs);
       this.props.contractStore.queryContract(contractAddress, abi, targetFunction, targetArgs);
-    }, this._onError);
-  }
-
-  _onCopyContract(contractAddress) {
-    runWithCallback.call(this, () => {
-      logger.debug("Copy contract", contractAddress);
-      clipboardy.writeSync(contractAddress);
-    }, this._onError);
-  }
-
-  _onRemoveContract(contractAddress) {
-    runWithCallback.call(this, () => {
-      logger.debug("Remove contract", contractAddress);
-      this.props.contractStore.removeContract(contractAddress);
     }, this._onError);
   }
 
@@ -165,23 +179,25 @@ export default class RunPanel extends React.Component {
     // const accountAddress = this.props.accountStore.currentAddress;
     const addresses = this.props.accountStore.addresses;
     const onAddressChange = this._onAddressChange;
+    const onAddressCopy = this._onAddressCopy;
     const balance = this.props.accountStore.currentBalance;
     // const nonce = this.props.accountStore.currentNonce;
 
     // deployment target
     const currentTarget = this.props.deployTargetStore.currentTarget;
     const targets = this.props.deployTargetStore.targets;
-    const onChangeTarget = this._onFileChange;
+    const onTargetChange = this._onFileChange;
     const onDeploy = this._onDeployButtonClicked;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
     const payable = this.props.deployTargetStore.isPayable;
 
     // contract
+    const onContractImport = this._onContractImport
+    const onContractCopy = this._onContractCopy
+    const onContractRemove = this._onContractRemove
     const contractAddress2Abi = this.props.contractStore.contractAddress2Abi;
     const onAbiExec = this._onAbiExec;
     const onAbiQuery = this._onAbiQuery;
-    const onCopyContract = this._onCopyContract
-    const onRemoveContract = this._onRemoveContract
 
     return (
       <Panel>
@@ -192,7 +208,7 @@ export default class RunPanel extends React.Component {
           balanceWithUnit={balanceWithUnit}
           nonce={nonce}
         />
-        <Sync
+        <TopBar
           onCompile={onCompile}
           onSync={onSync}
         />
@@ -206,23 +222,25 @@ export default class RunPanel extends React.Component {
           address={address}
           addresses={addresses}
           onAddressChange={onAddressChange}
+          onAddressCopy={onAddressCopy}
           balance={balance}
           nonce={nonce}
         />
         <Deployment
           currentTarget={currentTarget}
           targets={targets}
-          onChangeTarget={onChangeTarget}
+          onTargetChange={onTargetChange}
           constructorArgs={constructorArgs}
           payable={payable}
           onDeploy={onDeploy}
         />
         <Contract
+          onContractImport={onContractImport}
+          onContractCopy={onContractCopy}
+          onContractRemove={onContractRemove}
           contractAddress2Abi={contractAddress2Abi}
           onAbiExec={onAbiExec}
           onAbiQuery={onAbiQuery}
-          onCopyContract={onCopyContract}
-          onRemoveContract={onRemoveContract}
         />
      </Panel>
     );

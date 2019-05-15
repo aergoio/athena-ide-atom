@@ -27,10 +27,11 @@ export default class InputBox extends React.Component {
   }
 
   render() {
-    const choosedInputBoxClass = this.props.type === "number" ? inputBoxNumberClass : inputBoxClass;
+    const numberTypeClass = this.props.type === "number" ? inputBoxNumberClass : "";
     return (
       <input
-        className={join('inline-block', 'input-text', 'native-key-bindings', choosedInputBoxClass, this.props.class)}
+        className={join('inline-block', 'input-text', 'native-key-bindings',
+          inputBoxClass, numberTypeClass, this.props.class)}
         tabIndex={-1}
         onChange={this.props.onChange}
         placeHolder={this.props.placeHolder}

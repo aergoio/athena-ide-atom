@@ -66,10 +66,14 @@
 
   .star-title {
     float: left;
-    width: 6em;
+    font-weight: 500;
+    padding-right: 3em;
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .star-content {
+    font-size: 9px;
+    color: white;
     width: 100%;
     text-align: right;
     overflow: hidden;
@@ -102,31 +106,37 @@
     position: relative;
   }
 
+  .foldable__trigger:before {
+    font-family: 'Octicons Regular';
+    font-size: 15px;
+    float: left;
+    margin-top: 0.1em;
+    transition: transform 300ms;
+  }
+
   .foldable__trigger:after {
     font-family: 'Octicons Regular';
-    font-size: 1.2em;
     display: inline-block;
     position: absolute;
     right: 10px;
-    top: 3px;
-    display: block;
+    top: 5px;
     transition: transform 300ms;
   }
 
   .foldable-trigger-closed:after {
-    content: '\f05d';
+    content: '\f05b';
   }
 
   .foldable-trigger-opened:after {
-    content: '\f0ca';
+    content: '\f0aa';
   }
 
-  .smile-foldable-trigger-closed:after {
+  .before-foldable-trigger-closed:before {
+    content: '\f078';
+  }
+
+  .before-foldable-trigger-opened:before {
     content: '\f0a3';
-  }
-
-  .smile-foldable-trigger-opened:after {
-    content: '\f0a2';
   }
 
   .card {
@@ -134,8 +144,7 @@
     height: 100%;
   }
 
-  .inner-card {
-    border: 0.1em solid;
+  .contract-run-card {
   }
 
   .inner-card:last-child {
@@ -147,7 +156,6 @@
   }
 
   .card-title {
-    margin-right: 1.5em;
   }
 
   .card-row {
@@ -155,11 +163,15 @@
     display: flex;
   }
 
-  .card-row-argument {
-    border: 0.1em solid;
+  .card-row-border {
+    border-bottom: 0.15em solid #4b515c;
+    margin: 0px 7px;
   }
 
-  .card-row-sync, .card-row-button, .card-row-argument {
+  .card-row-argument {
+  }
+
+  .card-row-top-bar, .card-row-argument {
     justify-content: flex-end;
   }
 
@@ -172,9 +184,9 @@
     font-weight: bold;
   }
 
-  .component-inner-title {
+  .component-contract-run-title {
     justify-content: center;
-    color: rgba(157, 165, 179, 0.65);
+    border-bottom: 0.15em solid #1b1d24;
     max-width: 40em;
     text-overflow: ellipsis;
     overflow: auto;
@@ -183,10 +195,17 @@
 
   .component-icon {
     cursor: pointer;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .icon-trashcan {
+    margin-left: 0.5em;
+    color: #ed612a;
   }
 
   .component-description {
-    width: 7em;
+    min-width: 6em;
     padding: 0.3em 0em;
     height: 100%;
     color: rgba(157, 165, 179, 0.65);
@@ -221,6 +240,8 @@
 
         .component-selectbox__single-value {
           color: @text-color;
+          margin-left: 0.4em;
+          margin-right: 0.4em;
         }
 
         .css-1g6gooi {
@@ -252,8 +273,12 @@
   .component-inputbox {
   }
 
+  .component-inputbox-argument {
+    text-align: right;
+  }
+
   .component-inputbox-number {
-    text-align: left;
+    text-align: right;
   }
 
   .component-inputbox-number::-webkit-outer-spin-button,
@@ -270,11 +295,13 @@
     text-align: right;
     color: rgba(157, 165, 179, 0.65);
     background-color: @input-background-color;
-    padding: 0.3em;
+    padding: 0.3em 0.5em;
   }
 
   .component-textbox-arguments {
     text-align: left;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.65);
   }
 
   .component-btn {
@@ -300,6 +327,33 @@
 
   .component-btn-disabled:hover {
     background-color: #3a3f4b;
+  }
+
+  .component-btn-top-bar {
+    background-color: transparent;
+    opacity: 0.65;
+    border-radius: 3px;
+    border: solid 1px #ffffff;
+  }
+
+  .component-btn-top-bar:hover {
+    // TODO
+  }
+
+  .component-btn-top-bar:active {
+    // TODO
+  }
+
+  .component-btn-ocean {
+    background-color: #4b4de1;
+  }
+
+  .component-btn-ocean:hover {
+    // TODO
+  }
+
+  .component-btn-ocean:active {
+    // TODO
   }
 
   .component-btn-rightmost {

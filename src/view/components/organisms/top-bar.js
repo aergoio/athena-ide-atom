@@ -1,28 +1,32 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import { Card, CardRow, Button, SyncIcon } from '../atoms';
+import { Card, CardRow, Button } from '../atoms';
 
-export const Sync = (props) => {
+export const TopBar = (props) => {
   const onCompile = props.onCompile;
   const onSync = props.onSync;
   return (
     <Card class='transparent-background'>
-      <CardRow class='card-row-sync'>
+      <CardRow class='card-row-top-bar'>
         <Button
           name='Compile'
-          class='component-btn-rightmost'
+          class='component-btn-top-bar'
           onClick={onCompile}
         />
-        <SyncIcon onClick={onSync} />
+        <Button
+          name='Sync'
+          class='component-btn-top-bar'
+          onClick={onSync}
+        />
       </CardRow>
     </Card>
   );
 }
 
-Sync.propTypes = {
+TopBar.propTypes = {
   onCompile: PropTypes.func,
   onSync: PropTypes.func,
 }
 
-export default Sync;
+export default TopBar;

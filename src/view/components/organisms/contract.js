@@ -1,17 +1,25 @@
 import React from 'react'
+import { Flex } from 'reflexbox';
 import PropTypes from 'prop-types';
 
-import { Card, AddIcon } from '../atoms';
+import { Card, CardRow, Description, InputBox, Button } from '../atoms';
 import { CardTitle } from '../molecules';
-import { ImportContractModal } from './modals';
 import ContractRun from './contract-run';
 
 export const Contract = (props) => {
+  const onContractImport = props.onContractImport;
+  const onContractCopy = props.onContractCopy;
+  const onContractRemove = props.onContractRemove;
   const contractAddress2Abi = props.contractAddress2Abi;
   const onAbiExec = props.onAbiExec;
   const onAbiQuery = props.onAbiQuery;
-  const onCopyContract = props.onCopyContract;
-  const onRemoveContract = props.onRemoveContract;
+
+  let border;
+  if (contractAddress2Abi.size !== 0) {
+    border = <CardRow class='card-row-border' />
+  } else {
+    border = <div></div>;
+  }
 
   let contractRuns = Array.from(contractAddress2Abi.keys()).map(contractAddress => {
     const abi = contractAddress2Abi.get(contractAddress);
@@ -22,28 +30,39 @@ export const Contract = (props) => {
         abi={abi}
         onAbiExec={onAbiExec}
         onAbiQuery={onAbiQuery}
-        onCopyContract={onCopyContract}
-        onRemoveContract={onRemoveContract}
+        onContractCopy={onContractCopy}
+        onContractRemove={onContractRemove}
       />
     );
   });
 
+  const contractInputRef = React.createRef();
   return (
     <Card>
-      <CardTitle title='Contract'>
-        <ImportContractModal trigger={<AddIcon />} />
-      </CardTitle>
+      <CardTitle title='Contract' />
+      <CardRow>
+        <Description description='Contract' />
+        <InputBox ref={contractInputRef} type='text'
+            placeHolder='eg. Amg6TQrTd6f7dE67PBzv6vbVDnxpEnzKpRfRbV46NNNDhjqmdk77'/>
+      </CardRow>
+      <CardRow>
+        <Flex justify='flex-end' w={1}>
+          <Button name='Import' class='component-btn-ocean' onClick={() => onContractImport(contractInputRef) } />
+        </Flex>
+      </CardRow>
+      {border}
       {contractRuns}
     </Card>
   );
 }
 
 Contract.propTypes = {
+  onContractImport: PropTypes.func,
+  onContractCopy: PropTypes.func,
+  onContractRemove: PropTypes.func,
   contractAddress2Abi: PropTypes.object,
   onAbiExec: PropTypes.func,
   onAbiQuery: PropTypes.func,
-  onCopyContract: PropTypes.func,
-  onRemoveContract: PropTypes.func,
 }
 
 export default Contract;
