@@ -9,7 +9,7 @@ import { Summary, Sync, Account, Node, Deployment, Contract } from '../organisms
 import { editor, SaveConfirmView } from '../..';
 import { runWithCallback } from '../../../utils';
 
-@inject('nodeStore', 'accountStore', 'notificationStore', 'compileStore', 'contractStore', 'deployTargetStore')
+@inject('nodeStore', 'accountStore', 'notificationStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class RunPanel extends React.Component {
 
@@ -18,7 +18,6 @@ export default class RunPanel extends React.Component {
       nodeStore: PropTypes.any,
       accountStore: PropTypes.any,
       notificationStore: PropTypes.any,
-      compileStore: PropTypes.any,
       contractStore: PropTypes.any,
       deployTargetStore: PropTypes.any
     };
@@ -84,7 +83,9 @@ export default class RunPanel extends React.Component {
 
   _compile() {
     runWithCallback.call(this, () => {
-      this.props.compileStore.compileCurrentTarget();
+      const baseDir = editor.getProjectRootDir();
+      const target = editor.getCurrentByRelative();
+      this.props.deployTargetStore.addTarget(baseDir, target);
     }, this._onError);
   }
 

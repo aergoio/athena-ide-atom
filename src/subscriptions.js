@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { CompositeDisposable, TextEditor } from 'atom';
+import { CompositeDisposable } from 'atom';
 import { SaveConfirmView, editor } from './view';
 
 export default class Subscriptions {
@@ -30,35 +30,6 @@ export default class Subscriptions {
           this._show();
         }
       }),
-      atom.workspace.observeTextEditors(activeEditor => {
-        const targetAbsolute = activeEditor.getBuffer().getPath();
-        if (this._isContractTarget(targetAbsolute)) {
-          const baseDirAndRelative = editor.getBaseDirAndRelativePath(targetAbsolute);
-          this.rootStore.deployTargetStore.addTarget(baseDirAndRelative[1], baseDirAndRelative[0]);
-          this.rootStore.deployTargetStore.changeTarget(baseDirAndRelative[1]);
-        }
-      }),
-      atom.workspace.onDidChangeActiveTextEditor(activeEditor => {
-        if (typeof activeEditor === "undefined") {
-          this.rootStore.deployTargetStore.changeTarget("");
-          return;
-        }
-
-        const targetAbsolute = activeEditor.getBuffer().getPath();
-        if (this._isContractTarget(targetAbsolute)) {
-          const baseDirAndRelative = editor.getBaseDirAndRelativePath(targetAbsolute);
-          this.rootStore.deployTargetStore.addTarget(baseDirAndRelative[1], baseDirAndRelative[0]);
-          this.rootStore.deployTargetStore.changeTarget(baseDirAndRelative[1]);
-        }
-      }),
-      atom.workspace.onDidDestroyPaneItem(event => {
-        const item = event.item;
-        if (item instanceof TextEditor) {
-          const targetAbsolute = item.getBuffer().getPath();
-          const targetRelative = editor.getRelative(targetAbsolute);
-          this.rootStore.deployTargetStore.removeTarget(targetRelative);
-        }
-      })
     );
 
     return subscriptions;
@@ -72,8 +43,7 @@ export default class Subscriptions {
   _compile() {
     const baseDir = editor.getProjectRootDir();
     const target = editor.getCurrentByRelative();
-    this.rootStore.deployTargetStore.addTarget(target, baseDir);
-    this.rootStore.compileStore.compileCurrentTarget();
+    this.rootStore.deployTargetStore.addTarget(baseDir, target);
   }
 
   _isContractTarget(path) {

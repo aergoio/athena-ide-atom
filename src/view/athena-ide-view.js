@@ -13,7 +13,6 @@ export default class AtheneIdeView {
     this.element.appendChild(this._buildRoot());
     this.stores = {
       accountStore: rootStore.accountStore,
-      compileStore: rootStore.compileStore,
       consoleStore: rootStore.consoleStore,
       contractStore: rootStore.contractStore,
       deployTargetStore: rootStore.deployTargetStore,

@@ -1,18 +1,16 @@
-import {observable, action, computed} from 'mobx';
+import path from 'path';
+import { observable, action, computed } from 'mobx';
 import logger from 'loglevel';
+
+import serviceProvider from '../service';
 
 export default class DeployTargetStore {
 
   @observable currentTarget = "";
-  @observable target2BaseDir = new Map();
   @observable target2CompileResult = new Map();
 
   constructor(rootStore) {
     this.rootStore = rootStore;
-  }
-
-  @computed get currentBaseDir() {
-    return this.target2BaseDir.get(this.currentTarget);
   }
 
   @computed get compileResult() {
@@ -53,7 +51,7 @@ export default class DeployTargetStore {
   }
 
   @computed get targets() {
-    return Array.from(this.target2BaseDir.keys());
+    return Array.from(this.target2CompileResult.keys());
   }
 
   serialize() {
@@ -64,14 +62,24 @@ export default class DeployTargetStore {
     logger.debug("Deserialize", data);
   }
 
-  @action addTarget(target, baseDir) {
-    logger.debug("Add compile target", target, baseDir);
-    this.target2BaseDir.set(target, baseDir);
-  }
+  @action addTarget(baseDir, target) {
+    logger.debug("Compile with", baseDir, target);
+    Promise.resolve(path.resolve(baseDir, target)).then(absolutePath => {
+      return serviceProvider.compileService.compile(absolutePath);
+    }).then(compileResult => {
+      this.target2CompileResult.set(target, compileResult);
+      this.changeTarget(target);
 
-  @action addTargetResult(target, compileResult) {
-    logger.debug("Add compile target result", target, compileResult);
-    this.target2CompileResult.set(target, compileResult);
+      this.rootStore.consoleStore.log("Compile success", "info");
+      this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
+      this.rootStore.consoleStore.log("abi: \n" + compileResult.abi, "info");
+      this.rootStore.notificationStore.notify("Compiled successfully", "success");
+    }).catch(err => {
+      logger.error(err);
+      const message = err.toString();
+      this.rootStore.consoleStore.log(message, "error");
+      this.rootStore.notificationStore.notify("Compile failed", "error");
+    });
   }
 
   @action changeTarget(target) {
@@ -80,12 +88,8 @@ export default class DeployTargetStore {
   }
 
   @action removeTarget(target) {
-    logger.debug("Remove possibly candidate", target);
-    // can't remove already compiled item
-    if (this.target2CompileResult.has(target)) {
-      return;
-    }
-    this.target2BaseDir.delete(target);
+    logger.debug("Remove deploy target", target);
+    this.target2CompileResult.delete(target);
   }
 
 }

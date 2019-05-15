@@ -1,7 +1,6 @@
 import logger from 'loglevel';
 
 import AccountStore from './account-store';
-import CompileStore from './compile-store';
 import ConsoleStore from './console-store';
 import ContractStore from './contract-store';
 import DeployTargetStore from './deploy-target-store';
@@ -14,7 +13,6 @@ export default class RootStore {
   constructor() {
     this.stores = {
       accountStore: new AccountStore(this),
-      compileStore: new CompileStore(this),
       consoleStore: new ConsoleStore(this),
       contractStore: new ContractStore(this),
       deployTargetStore: new DeployTargetStore(this),
@@ -38,10 +36,6 @@ export default class RootStore {
 
   get accountStore() {
     return this.stores.accountStore;
-  }
-
-  get compileStore() {
-    return this.stores.compileStore;
   }
 
   get consoleStore() {
