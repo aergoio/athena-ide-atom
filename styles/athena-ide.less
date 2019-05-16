@@ -163,6 +163,10 @@
     display: flex;
   }
 
+  .card-row:last-child {
+    padding-bottom: 10px;
+  }
+
   .card-row-border {
     border-bottom: 0.15em solid #4b515c;
     margin: 0px 7px;
@@ -298,7 +302,22 @@
     padding: 0.3em 0.5em;
   }
 
+  .component-textbox-no-arguments {
+    width: auto;
+    text-align: left;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.30);
+  }
+
   .component-textbox-arguments {
+    width: auto;
+    text-align: left;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .component-textbox-amount {
+    width: auto;
     text-align: left;
     background-color: transparent;
     color: rgba(255, 255, 255, 0.65);
@@ -337,11 +356,11 @@
   }
 
   .component-btn-top-bar:hover {
-    // TODO
+    background-color: #494f5d;
   }
 
   .component-btn-top-bar:active {
-    // TODO
+    background-color: #1a1d22;
   }
 
   .component-btn-ocean {
@@ -349,11 +368,11 @@
   }
 
   .component-btn-ocean:hover {
-    // TODO
+    background-color: #6c6ee4;
   }
 
   .component-btn-ocean:active {
-    // TODO
+    background-color: #363772;
   }
 
   .component-btn-rightmost {

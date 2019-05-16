@@ -5,6 +5,7 @@ import { Amount } from '@herajs/client';
 
 import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
 
+const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
 
 export default class Arguments extends React.Component {
@@ -57,7 +58,7 @@ export default class Arguments extends React.Component {
   }
 
   _generateArgsDisplay() {
-    let argumentDisplay = "No arguments";
+    let argumentDisplay = noArgumentsDisplay;
 
     if (this.state.args.map(a => a.trim())
           .filter(a => "" !== a)
@@ -65,15 +66,16 @@ export default class Arguments extends React.Component {
       argumentDisplay = "[" + this.state.args.join(", ") + "]";
     }
 
-    if ("" !== this.state.amount) {
-      argumentDisplay += ("    " + this.state.amount + " " + this.state.unit);
-    }
-
     return argumentDisplay;
+  }
+
+  _generateAmountDisplay() {
+    return "" !== this.state.amount ? (this.state.amount + " " + this.state.unit) : "";
   }
 
   render() {
     const argumentDisplay = this._generateArgsDisplay();
+    const amountDisplay = this._generateAmountDisplay();
 
     const argumentComponents = this.props.args.map((arg, index) => {
       return (
@@ -108,11 +110,20 @@ export default class Arguments extends React.Component {
       ));
     }
 
+    const argumentsTextBoxClass = argumentDisplay === noArgumentsDisplay ?
+      'component-textbox-no-arguments' : 'component-textbox-arguments';
+    const trigger = (
+      <div>
+        <TextBox class={argumentsTextBoxClass} text={argumentDisplay} />
+        <TextBox class='component-textbox-amount' text={amountDisplay} />
+      </div>
+    );
+
     return (
       <Foldable
         isOpen={false}
         transitionTime={1}
-        trigger={<TextBox class='component-textbox-arguments' text={argumentDisplay} />}
+        trigger={trigger}
       >
         {argumentComponents}
       </Foldable>

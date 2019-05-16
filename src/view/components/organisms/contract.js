@@ -17,8 +17,6 @@ export const Contract = (props) => {
   let border;
   if (contractAddress2Abi.size !== 0) {
     border = <CardRow class='card-row-border' />
-  } else {
-    border = <div></div>;
   }
 
   let contractRuns = Array.from(contractAddress2Abi.keys()).map(contractAddress => {

@@ -13,15 +13,9 @@ export const Deployment = (props) => {
   const constructorArgs = props.constructorArgs;
   const payable = props.payable;
   const argsRef = React.createRef();
-
   const onDeploy = props.onDeploy;
 
-  let constructorOrNot;
-  if (constructorArgs.length > 0) {
-    constructorOrNot = <ConstructorArguments args={constructorArgs} payable={payable} argsRef={argsRef} />;
-  } else {
-    constructorOrNot = <div></div>;
-  }
+  let constructorOrNot = <ConstructorArguments args={constructorArgs} payable={payable} argsRef={argsRef} />;
 
   return (
     <FoldableCard trigger={<CardTitle title='Deploy' />}>
