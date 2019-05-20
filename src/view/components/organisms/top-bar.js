@@ -5,7 +5,7 @@ import { Card, CardRow, Button } from '../atoms';
 
 export const TopBar = (props) => {
   const onCompile = props.onCompile;
-  const onSync = props.onSync;
+  const onRefresh = props.onRefresh;
   return (
     <Card class='transparent-background'>
       <CardRow class='card-row-top-bar'>
@@ -15,9 +15,9 @@ export const TopBar = (props) => {
           onClick={onCompile}
         />
         <Button
-          name='Sync'
+          name='Refresh'
           class='component-btn-top-bar'
-          onClick={onSync}
+          onClick={onRefresh}
         />
       </CardRow>
     </Card>
@@ -26,7 +26,7 @@ export const TopBar = (props) => {
 
 TopBar.propTypes = {
   onCompile: PropTypes.func,
-  onSync: PropTypes.func,
+  onRefresh: PropTypes.func,
 }
 
 export default TopBar;

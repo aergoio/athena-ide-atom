@@ -27,7 +27,7 @@ export default class RunPanel extends React.Component {
     super(props);
 
     this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
-    this._onSync = this._onSync.bind(this);
+    this._onRefresh = this._onRefresh.bind(this);
 
     this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
 
@@ -58,7 +58,7 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onSync() {
+  _onRefresh() {
     logger.info("Sync status");
     this.props.nodeStore.updateNodeState();
     this.props.accountStore.updateAccountState();
@@ -67,13 +67,13 @@ export default class RunPanel extends React.Component {
   _onNodeUrlChange(selectedNode) {
     logger.info("Node change", selectedNode.value);
     this.props.nodeStore.changeNode(selectedNode.value);
-    this._onSync();
+    this._onRefresh();
   }
 
   _onAddressChange(selectedAddress) {
     logger.info("Account address change to", selectedAddress.value);
     this.props.accountStore.changeAccount(selectedAddress.value);
-    this._onSync();
+    this._onRefresh();
   }
 
   _onAddressCopy(accountAddress) {
@@ -168,7 +168,7 @@ export default class RunPanel extends React.Component {
 
     // sync
     const onCompile = this._onCompileButtonClicked;
-    const onSync= this._onSync
+    const onRefresh= this._onRefresh
 
     // node
     // const node = this.props.nodeStore.currentNode;
@@ -211,7 +211,7 @@ export default class RunPanel extends React.Component {
         />
         <TopBar
           onCompile={onCompile}
-          onSync={onSync}
+          onRefresh={onRefresh}
         />
         <Node
           node={node}
