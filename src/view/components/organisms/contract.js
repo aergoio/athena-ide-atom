@@ -19,7 +19,8 @@ export const Contract = (props) => {
     border = <CardRow class='card-row-border' />
   }
 
-  let contractRuns = Array.from(contractAddress2Abi.keys()).map(contractAddress => {
+  // reverse to display recent elememt first
+  let contractRuns = Array.from(contractAddress2Abi.keys()).reverse().map(contractAddress => {
     const abi = contractAddress2Abi.get(contractAddress);
     return (
       <ContractRun
