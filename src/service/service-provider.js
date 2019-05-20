@@ -1,41 +1,52 @@
-import { AergoClient, GrpcProvider } from '@herajs/client';
-import logger from 'loglevel';
-
 import AccountService from './account-service';
 import CompileService from './compile-service';
 import ContractService from './contract-service';
 import NodeService from './node-service';
 
+import { isUndefined } from '../utils';
+
 export class ServiceProvider {
 
-  constructor() {
-    this.client = new AergoClient();
-    this._accountService = new AccountService(this.client);
-    this._compileService = new CompileService();
-    this._contractService = new ContractService(this.client);
-    this._nodeService = new NodeService(this.client);
+  get client() {
+    if (isUndefined(this._client)) {
+      let { AthenaClient } = require('@aergo/athena-client');
+      this._client = new AthenaClient();
+    }
+    return this._client;
   }
 
   get accountService() {
+    if (isUndefined(this._accountService)) {
+      this._accountService = new AccountService(this.client);
+    }
     return this._accountService;
   }
 
   get compileService() {
+    if (isUndefined(this._compileService)) {
+      this._compileService = new CompileService();
+    }
     return this._compileService;
   }
 
   get contractService() {
+    if (isUndefined(this._contractService)) {
+      this._contractService = new ContractService(this.client);
+    }
     return this._contractService;
   }
 
   get nodeService() {
+    if (isUndefined(this._nodeService)) {
+      this._nodeService = new NodeService(this.client);
+    }
     return this._nodeService;
   }
 
   setEndpoint(endpoint) {
-    logger.debug("Set endpoint as", endpoint);
-    this.client.setProvider(new GrpcProvider({url: endpoint}));
-    this.client.chainIdHash = undefined;
+    if ("" !== endpoint) {
+      this.client.use(endpoint);
+    }
   }
 
 }

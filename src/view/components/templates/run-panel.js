@@ -111,6 +111,7 @@ export default class RunPanel extends React.Component {
       this.props.contractStore.deployContract(constructorArgs, amount);
     }, this._onError);
   }
+
   _onContractImport(contractInputRef) {
     logger.debug("Import contract button clicked");
     const contract = contractInputRef.current.value;

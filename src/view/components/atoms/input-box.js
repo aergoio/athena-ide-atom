@@ -10,6 +10,7 @@ export default class InputBox extends React.Component {
 
   static get propTypes() {
     return {
+      defaultValue: PropTypes.any,
       onChange: PropTypes.func,
       class: PropTypes.class,
       placeHolder: PropTypes.string,
@@ -26,6 +27,10 @@ export default class InputBox extends React.Component {
     return this.inputRef.current.value;
   }
 
+  cleanValue() {
+    this.inputRef.current.value = "";
+  }
+
   render() {
     const numberTypeClass = this.props.type === "number" ? inputBoxNumberClass : "";
     return (
@@ -37,6 +42,7 @@ export default class InputBox extends React.Component {
         placeHolder={this.props.placeHolder}
         type={this.props.type}
         ref={this.inputRef}
+        defaultValue={this.props.defaultValue}
       />
     );
   }

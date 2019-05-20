@@ -11,12 +11,8 @@ export default class CompileService {
 
   async compile(absolutePath) {
     logger.debug("Compile with", absolutePath);
-    const source = this._readFile(absolutePath);
+    const source = fs.readFileSync(absolutePath, "utf8");
     return await this.compiler.compile(source, absolutePath);
-  }
-
-  _readFile(filePath) {
-    return fs.readFileSync(filePath, "utf8");
   }
 
 }

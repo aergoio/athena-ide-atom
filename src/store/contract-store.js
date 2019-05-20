@@ -38,20 +38,26 @@ export default class ContractStore {
   }
 
   @action deployContract(constructorArgs, amount) {
-    logger.debug("deploy contract with", constructorArgs);
-    const identity = this.rootStore.accountStore.currentIdentity;
-    const price = this.rootStore.feeStore.price;
-    const limit = this.rootStore.feeStore.limit;
-    const payload = this.rootStore.deployTargetStore.compileResult.payload;
-    logger.debug("Deploy contract with", payload, constructorArgs, amount, price, limit);
+    logger.debug("Deploy contract with", constructorArgs, amount);
 
-    serviceProvider.contractService.deploy(identity, price, limit, payload, constructorArgs, amount).then(deployResult => {
-      logger.debug("Deploy result:", deployResult);
+    const account = this.rootStore.accountStore.currentAccount;
+    const deployInfo = {
+      payload: this.rootStore.deployTargetStore.compileResult.payload.trim(),
+      args: constructorArgs
+    }
+    const fee = {
+      price: this.rootStore.feeStore.price,
+      limit: this.rootStore.feeStore.limit
+    }
+
+    serviceProvider.contractService.deploy(account, deployInfo, fee, amount).then(deployResult => {
+      this.rootStore.accountStore.updateAccountState();
+
       const contractAddress = deployResult.contractAddress;
       const abi = deployResult.abi;
+      const txHash = deployResult.txHash;
       this.observableContractAddress2Abi.set(contractAddress, abi);
-
-      this.rootStore.accountStore.updateAccountState();
+      this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
       this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
       this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
     }).catch(err => {
@@ -63,15 +69,28 @@ export default class ContractStore {
   }
 
   @action executeContract(contractAddress, abi, functionName, args, amount) {
-    const identity = this.rootStore.accountStore.currentIdentity;
-    const price = this.rootStore.feeStore.price;
-    const limit = this.rootStore.feeStore.limit;
-    logger.debug("Execute contract with", functionName, args, contractAddress, abi, amount, price, limit);
+    logger.debug("Execute contract with", contractAddress, abi, functionName, args, amount);
 
-    serviceProvider.contractService.execute(identity, functionName, args,
-          contractAddress, abi, amount, price, limit).then(execResult => {
+    const account = this.rootStore.accountStore.currentAccount;
+    const invocationInfo = {
+      contractAddress: contractAddress,
+      abi: abi,
+      targetFunction: functionName,
+      args: args
+    };
+    const fee = {
+      price: this.rootStore.feeStore.price,
+      limit: this.rootStore.feeStore.limit
+    }
+
+    serviceProvider.contractService.execute(account, invocationInfo, fee, amount).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
-      this.rootStore.consoleStore.log("Execute ret: " + execResult, "info");
+
+      const txHash = execResult.txHash;
+      const result = execResult.result;
+      const status = execResult.status;
+      this.rootStore.consoleStore.log("Execute txHash: " + txHash, "info");
+      this.rootStore.consoleStore.log("Execute result: " + result + ", status: " + status, "info");
     }).catch(err => {
       logger.error(err);
       this.rootStore.accountStore.updateAccountState();
@@ -83,7 +102,14 @@ export default class ContractStore {
   @action queryContract(contractAddress, abi, functionName, args) {
     logger.debug("Query contract with", contractAddress, abi, functionName, args);
 
-    serviceProvider.contractService.query(contractAddress, abi, functionName, args).then(queryResult => {
+    const invocationInfo = {
+      contractAddress: contractAddress,
+      abi: abi,
+      targetFunction: functionName,
+      args: args
+    };
+
+    serviceProvider.contractService.query(invocationInfo).then(queryResult => {
       this.rootStore.consoleStore.log("Query result: " + queryResult, "info");
     }).catch(err => {
       logger.error(err);

@@ -68,9 +68,8 @@
   },
   "dependencies": {
     "@aergo/athena-analysis": "0.1.0",
+    "@aergo/athena-client": "0.1.0-rc1",
     "@aergo/athena-compiler": "0.1.0",
-    "@herajs/client": "^0.8.6",
-    "@herajs/crypto": "^0.4.2",
     "atom-package-deps": "^5.0.0",
     "atom-space-pen-views": "^2.2.0",
     "clipboardy": "^2.0.0",

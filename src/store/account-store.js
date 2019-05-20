@@ -1,8 +1,16 @@
-import {observable, action, computed} from 'mobx';
+import { observable, action, computed } from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
 import { formatInteger, formatAergoBalance } from '../utils';
+
+let Account = undefined;
+const loadAccount = () => {
+  if (typeof Account === "undefined") {
+    Account = require("@aergo/athena-client").Account;
+  }
+  return Account;
+}
 
 export default class AccountStore {
 
@@ -10,18 +18,18 @@ export default class AccountStore {
   @observable currentBalance = "";
   @observable currentBalanceWithUnit = "";
   @observable currentNonce = "";
-  @observable address2Identity = new Map();
+  @observable address2Account = new Map();
 
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
 
-  @computed get currentIdentity() {
-    return this.address2Identity.get(this.currentAddress);
+  @computed get currentAccount() {
+    return this.address2Account.get(this.currentAddress);
   }
 
   @computed get addresses() {
-    return Array.from(this.address2Identity.keys());
+    return Array.from(this.address2Account.keys());
   }
 
   serialize() {
@@ -34,12 +42,14 @@ export default class AccountStore {
 
   @action newAccount() {
     logger.debug("New account");
-    serviceProvider.accountService.newAccount().then(identity => {
-      this.address2Identity.set(identity.address, identity);
-      const message = "Created account " + identity.address + " successfully";
+
+    loadAccount().new().then(account => {
+      this.address2Account.set(account.address, account);
+      this.changeAccount(account.address);
+
+      const message = "Created account " + account.address + " successfully";
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
-      this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
       this.rootStore.consoleStore.log(err, "error");
@@ -50,12 +60,13 @@ export default class AccountStore {
 
   @action addAccount(encryptedPrivateKey, password) {
     logger.debug("Add account with", encryptedPrivateKey);
-    serviceProvider.accountService.decryptIdentity(encryptedPrivateKey, password).then(identity => {
-      this.address2Identity.set(identity.address, identity);
-      const message = "Successfully imported account " + identity.address;
+    loadAccount().from(encryptedPrivateKey, password).then(account => {
+      this.address2Account.set(account.address, account);
+      this.changeAccount(account.address);
+
+      const message = "Successfully imported account " + account.address;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
-      this.changeAccount(identity.address);
     }).catch(err => {
       logger.error(err);
       this.rootStore.consoleStore.log(err, "error");
@@ -64,15 +75,13 @@ export default class AccountStore {
   }
 
   @action changeAccount(address) {
-    const message = "Change account to " + address;
-    logger.debug(message);
-    this.rootStore.consoleStore.log(message, "info");
+    this.rootStore.consoleStore.log("Change account to " + address, "info");
     this.currentAddress = address;
     this.updateAccountState();
   }
 
   @action updateAccountState() {
-    logger.debug("Update account state of", this.currentAddress);
+  logger.debug("Update account state of", this.currentAddress);
     serviceProvider.accountService.getAccountState(this.currentAddress).then(state => {
       this.currentBalance = "unknown" === state.balance ? state.balance : formatInteger(state.balance);
       this.currentBalanceWithUnit = "unknown" === state.balance ? state.balance : formatAergoBalance(state.balance);
@@ -86,8 +95,8 @@ export default class AccountStore {
       return;
     }
 
-    const identity = this.address2Identity.get(this.currentAddress);
-    serviceProvider.accountService.encryptIdentity(identity, password).then(encrypted => {
+    const account = this.address2Account.get(this.currentAddress);
+    account.encrypt(password).then(encrypted => {
       const message = "exported: " + encrypted;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
@@ -100,11 +109,11 @@ export default class AccountStore {
 
   @action removeAccount(address) {
     logger.debug("Remove account", address);
-    if (!this.address2Identity.has(address)) {
+    if (!this.address2Account.has(address)) {
       return;
     }
 
-    this.address2Identity.delete(address);
+    this.address2Account.delete(address);
     this.changeAccount("");
   }
 

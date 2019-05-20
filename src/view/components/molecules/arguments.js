@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
-import { Amount } from '@herajs/client';
 
 import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
+import { convertToAerAmountWithUnit } from '../../../utils';
 
 const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
@@ -12,8 +12,9 @@ export default class Arguments extends React.Component {
 
   static get propTypes() {
     return {
-      payable: PropTypes.bool,
+      resetState: PropTypes.bool,
       args: PropTypes.array.isRequired,
+      payable: PropTypes.bool,
     };
   }
 
@@ -22,7 +23,8 @@ export default class Arguments extends React.Component {
     this.state = {
       args: new Array(props.args.length).fill(""),
       amount: "",
-      unit: "aer"
+      unit: "aer",
+      inputRefs: []
     };
 
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
@@ -30,12 +32,23 @@ export default class Arguments extends React.Component {
     this._onUnitChange = this._onUnitChange.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.args.length !== nextProps.args.length) {
+      this.state.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
+      this.setState({
+        args: new Array(nextProps.args.length).fill(""),
+        amount: "",
+        unit: "aer"
+      });
+    }
+  }
+
   get values() {
     return this.state.args;
   }
 
   get amount() {
-    return new Amount(this.state.amount, this.state.unit).toUnit("aer").toString();
+    return convertToAerAmountWithUnit(this.state.amount, this.state.unit);
   }
 
   _onArgumentValueChange(e, index) {
@@ -74,10 +87,13 @@ export default class Arguments extends React.Component {
   }
 
   render() {
-    const argumentDisplay = this._generateArgsDisplay();
-    const amountDisplay = this._generateAmountDisplay();
+    this.state.inputRefs = [];
 
     const argumentComponents = this.props.args.map((arg, index) => {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.state.inputRefs.push(inputRef);
+
       return (
         <ArgumentRow key={index}>
           <ArgumentName name={arg} />
@@ -85,12 +101,17 @@ export default class Arguments extends React.Component {
             class='component-inputbox-argument'
             onChange={e => this._onArgumentValueChange(e, index)}
             defaultValue=""
+            ref={inputRef}
           />
         </ArgumentRow>
       );
     });
 
     if (this.props.payable) {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.state.inputRefs.push(inputRef);
+
       argumentComponents.push((
         <ArgumentRow>
           <ArgumentName name="Amount" />
@@ -99,6 +120,7 @@ export default class Arguments extends React.Component {
             class='component-inputbox-argument'
             onChange={this._onAmountChange}
             defaultValue=""
+            ref={inputRef}
           />
           <SelectBox
             class='component-selectbox-unit'
@@ -109,6 +131,9 @@ export default class Arguments extends React.Component {
         </ArgumentRow>
       ));
     }
+
+    const argumentDisplay = this._generateArgsDisplay();
+    const amountDisplay = this._generateAmountDisplay();
 
     const argumentsTextBoxClass = argumentDisplay === noArgumentsDisplay ?
       'component-textbox-no-arguments' : 'component-textbox-arguments';

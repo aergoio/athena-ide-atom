@@ -1,5 +1,3 @@
-import { Amount } from '@herajs/client';
-
 export function join() {
   return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
 }
@@ -21,16 +19,9 @@ export const isEmpty = o => {
   return false;
 }
 
-export function parseArgs(rawArgs) {
-  const trimmed = rawArgs.trim();
-  try {
-    if ("[" === trimmed[0]) {
-      return JSON.parse(trimmed);
-    } else {
-      return JSON.parse("[" + trimmed + "]");
-    }
-  } catch (err) {
-    throw "Parsing error in arguments";
+export const assertNotEmpty = (o, message) => {
+  if (isEmpty(o)) {
+    throw new Error(typeof message === "undefined" ? o + " should not empty" : message);
   }
 }
 
@@ -42,13 +33,28 @@ export function runWithCallback(invoke, onError) {
   }
 }
 
-const units = [
-  new Amount("1", "aergo"),
-  new Amount("1", "gaer"),
-  new Amount("1", "aer"),
-];
+
+let Amount = undefined;
+const loadAmount = () => {
+  if (typeof Amount === "undefined") {
+    Amount = require('@aergo/athena-client').Amount;
+  }
+  return Amount;
+}
+
+let units = undefined;
 
 export function formatAergoBalance(balance) {
+  let Amount = loadAmount();
+
+  if (isUndefined(units)) {
+    units = [
+      new Amount("1", "aergo"),
+      new Amount("1", "gaer"),
+      new Amount("1", "aer"),
+    ];
+  }
+
   const amount = new Amount(balance, "aer");
   let unit = "aergo";
   for (let i = 0; i < units.length; ++i) {
@@ -57,5 +63,15 @@ export function formatAergoBalance(balance) {
       break;
     }
   }
+
   return amount.toUnit(unit).toString();
+}
+
+export function convertToAerAmountWithUnit(amount, unit) {
+  let Amount = loadAmount();
+  return new Amount(amount, unit).toUnit("aer").formatNumber();
+}
+
+export function isUndefined(o) {
+  return null == o || typeof o === "undefined";
 }
