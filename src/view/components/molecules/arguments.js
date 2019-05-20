@@ -24,8 +24,10 @@ export default class Arguments extends React.Component {
       args: new Array(props.args.length).fill(""),
       amount: "",
       unit: "aer",
-      inputRefs: []
     };
+
+    // hack to clean value when reset
+    this.inputRefs = []
 
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
@@ -34,7 +36,7 @@ export default class Arguments extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.args.length !== nextProps.args.length) {
-      this.state.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
+      this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
       this.setState({
         args: new Array(nextProps.args.length).fill(""),
         amount: "",
@@ -87,12 +89,12 @@ export default class Arguments extends React.Component {
   }
 
   render() {
-    this.state.inputRefs = [];
+    this.inputRefs = [];
 
     const argumentComponents = this.props.args.map((arg, index) => {
       // hack to clean value when reset
       const inputRef = React.createRef();
-      this.state.inputRefs.push(inputRef);
+      this.inputRefs.push(inputRef);
 
       return (
         <ArgumentRow key={index}>
@@ -110,7 +112,7 @@ export default class Arguments extends React.Component {
     if (this.props.payable) {
       // hack to clean value when reset
       const inputRef = React.createRef();
-      this.state.inputRefs.push(inputRef);
+      this.inputRefs.push(inputRef);
 
       argumentComponents.push((
         <ArgumentRow>
