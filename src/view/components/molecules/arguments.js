@@ -50,7 +50,8 @@ export default class Arguments extends React.Component {
   }
 
   get amount() {
-    return convertToAerAmountWithUnit(this.state.amount, this.state.unit);
+    const amount = "" === this.state.amount ? "0" : this.state.amount;
+    return convertToAerAmountWithUnit(amount, this.state.unit);
   }
 
   _onArgumentValueChange(e, index) {

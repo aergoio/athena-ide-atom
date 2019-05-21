@@ -103,7 +103,7 @@ export default class RunPanel extends React.Component {
       logger.debug("Deploy contract");
       logger.debug("Input ref", argInputRef);
       let constructorArgs = [];
-      let amount = "";
+      let amount = "0";
       if (argInputRef.current) {
         constructorArgs = argInputRef.current.values;
         amount = argInputRef.current.amount;

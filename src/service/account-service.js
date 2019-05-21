@@ -14,7 +14,7 @@ export default class AccountService {
 
     return await this.client.getState(accountAddress).then(queriedState => {
       logger.debug("Quried account state:", queriedState);
-      return { balance: queriedState.balance, nonce: queriedState.nonce };
+      return { balance: queriedState.balance.toUnit("aer").formatNumber(), nonce: queriedState.nonce };
     }).catch(err => {
       logger.debug(err);
       return { balance: "unknown", nonce: "unknown" };
