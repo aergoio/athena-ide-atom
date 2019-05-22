@@ -45,9 +45,7 @@ export default class NodeStore {
   }
 
   @action changeNode(node) {
-    const message = "Change node to " + node;
-    logger.debug(message);
-    this.rootStore.consoleStore.log(message, "info");
+    this.rootStore.consoleStore.log("Change node to " + node, "info");
     this.currentNode = node;
     serviceProvider.setEndpoint(node);
     this.updateNodeState();
@@ -55,6 +53,7 @@ export default class NodeStore {
 
   @action updateNodeState() {
     logger.debug("Update node state of", this.currentNode);
+    serviceProvider.setEndpoint(this.currentNode);
     serviceProvider.nodeService.blockchainStatus().then(status => {
       this.currentHeight = "unknown" === status.height ? status.height : formatInteger(status.height);
       this.bestHash = status.hash;

@@ -16,6 +16,7 @@ export default class ContractService {
   async deploy(account, deployInfo, fee, amount) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(deployInfo, "Deploy info is empty");
+    assertNotEmpty(deployInfo.payload, "Deploy target is empty");
     assertNotEmpty(fee, "Contract deploy fee is empty");
     assertNotEmpty(amount, "Contract deploy amount is empty");
 

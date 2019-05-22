@@ -7,6 +7,10 @@ import { isUndefined } from '../utils';
 
 export class ServiceProvider {
 
+  constructor() {
+    this.endpoint = "";
+  }
+
   get client() {
     if (isUndefined(this._client)) {
       let { AthenaClient } = require('@aergo/athena-client');
@@ -44,8 +48,13 @@ export class ServiceProvider {
   }
 
   setEndpoint(endpoint) {
-    if ("" !== endpoint) {
-      this.client.use(endpoint);
+    if (this.endpoint !== endpoint) {
+      this.endpoint = endpoint;
+      if ("" === endpoint) {
+        this.client.use("unknown");
+      } else {
+        this.client.use(endpoint);
+      }
     }
   }
 
