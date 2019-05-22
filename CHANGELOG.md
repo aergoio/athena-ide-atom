@@ -1,7 +1,10 @@
-## 0.3.6 - Apply UI Design
+## 0.4.0 - Renew UI/UX
 
-* Parse lua table arguments (in json)
 * Apply new design
+* Merge two panel view into one
+* Parse lua table arguments (in json)
+* Add deploying contract with aergo
+* Add executing contract with aergo
 
 ## 0.3.4 - Aergo Mainnet
 
