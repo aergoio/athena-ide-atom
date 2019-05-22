@@ -9,8 +9,10 @@ import AthenaIdeViewRoot from './components';
 export default class AtheneIdeView {
 
   constructor(rootStore) {
-    this.element = document.createElement('atom-panel');
-    this.element.appendChild(this._buildRoot());
+    this.element = this._buildContainer();
+    this.rootView = this._buildRootView();
+    this.element.appendChild(this.rootView);
+
     this.stores = {
       accountStore: rootStore.accountStore,
       consoleStore: rootStore.consoleStore,
@@ -22,13 +24,16 @@ export default class AtheneIdeView {
     }
   }
 
-  _buildRoot() {
-    let rootNode = document.createElement('div');
-    let attribute = document.createAttribute('id');
-    attribute.value = 'athena-ide-panel-root';
-    rootNode.setAttributeNode(attribute);
-    rootNode.setAttribute('tabindex', '-1');
-    return rootNode;
+  _buildContainer() {
+    const athenaIdeViewContainer = document.createElement('div');
+    athenaIdeViewContainer.classList.add('athena-ide-view-container');
+    return athenaIdeViewContainer;
+  }
+
+  _buildRootView() {
+    const athenaIdeView = document.createElement('div');
+    athenaIdeView.classList.add('athena-ide-view');
+    return athenaIdeView;
   }
 
   getElement() {
@@ -64,7 +69,7 @@ export default class AtheneIdeView {
         <Provider {...this.stores} >
           <AthenaIdeViewRoot />
         </Provider>),
-        document.getElementById('athena-ide-panel-root')
+        this.rootView
       );
     }
   }
