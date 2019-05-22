@@ -4,6 +4,25 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+html {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  cursor: default;
+}
+
+input, textarea, select, button, img {
+  -webkit-user-drag: none;
+}
+
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.selectable {
+  -webkit-user-select: auto;
+  cursor: auto;
+}
+
 .athena-ide-view-container {
   overflow: auto;
 }
