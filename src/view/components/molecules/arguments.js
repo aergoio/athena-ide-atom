@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
-import { convertToAerAmountWithUnit } from '../../../utils';
+import { convertToAerAmountWithUnit, join } from '../../../utils';
 
 const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
@@ -139,22 +139,25 @@ export default class Arguments extends React.Component {
     const amountDisplay = this._generateAmountDisplay();
 
     const argumentsTextBoxClass = argumentDisplay === noArgumentsDisplay ?
-      'component-textbox-no-arguments' : 'component-textbox-arguments';
+      join('component-textbox-no-arguments', 'component-textbox-arguments')
+      : 'component-textbox-arguments';
     const trigger = (
-      <div>
+      <div className='component-arguments-and-amount'>
         <TextBox class={argumentsTextBoxClass} text={argumentDisplay} />
         <TextBox class='component-textbox-amount' text={amountDisplay} />
       </div>
     );
 
     return (
-      <Foldable
-        isOpen={false}
-        transitionTime={1}
-        trigger={trigger}
-      >
-        {argumentComponents}
-      </Foldable>
+      <div className='overflow-hidden'>
+        <Foldable
+          isOpen={false}
+          transitionTime={1}
+          trigger={trigger}
+        >
+          {argumentComponents}
+        </Foldable>
+      </div>
     );
   }
 

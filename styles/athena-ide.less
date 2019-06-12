@@ -88,6 +88,11 @@
     display: flex;
   }
 
+  .overflow-hidden {
+    width: 100%;
+    overflow: hidden;
+  }
+
   .foldable {
     width: 100%;
     margin-right: 10px;
@@ -306,11 +311,11 @@
     padding: 0.3em 0.5em;
   }
 
-  .component-textbox-no-arguments {
-    width: auto;
-    text-align: left;
-    background-color: transparent;
-    color: rgba(255, 255, 255, 0.30);
+  .component-arguments-and-amount {
+    margin-right: 1.8em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
   }
 
   .component-textbox-arguments {
@@ -318,11 +323,19 @@
     text-align: left;
     background-color: transparent;
     color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .component-textbox-no-arguments {
+    color: rgba(255, 255, 255, 0.30);
   }
 
   .component-textbox-amount {
-    width: auto;
+    width: max-content;
+    white-space: nowrap;
     text-align: left;
+    overflow: unset;
     background-color: transparent;
     color: rgba(255, 255, 255, 0.65);
   }
