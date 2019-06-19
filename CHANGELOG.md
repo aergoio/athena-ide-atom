@@ -1,3 +1,9 @@
+## 0.4.1 - Bug fix & Improvement
+
+* Fix overflowing arguments summary when it's too long
+* Add tabindex to arguments. Can use tab to navigate argument input box
+
+
 ## 0.4.0 - Renew UI/UX
 
 * Apply new design
