@@ -10,11 +10,14 @@ export default class InputBox extends React.Component {
 
   static get propTypes() {
     return {
+      class: PropTypes.class,
+      tabIndex: PropTypes.number,
+      type: PropTypes.string,
+      placeHolder: PropTypes.string,
       defaultValue: PropTypes.any,
       onChange: PropTypes.func,
-      class: PropTypes.class,
-      placeHolder: PropTypes.string,
-      type: PropTypes.string
+      onFocus: PropTypes.func,
+      onBlur: PropTypes.func,
     };
   }
 
@@ -32,17 +35,29 @@ export default class InputBox extends React.Component {
   }
 
   render() {
+    const injectedClass = this.props.class;
+    const tabIndex = typeof this.props.tabIndex === "undefined" ? -1 : this.props.tabIndex;
+    const type = this.props.type;
+    const placeHolder = this.props.placeHolder;
+    const defaultValue = typeof this.props.defaultValue === "undefined" ? "" : this.props.defaultValue;
+    const onChange = this.props.onChange;
+    const onFocus = this.props.onFocus;
+    const onBlur = this.props.onBlur;
+
     const numberTypeClass = this.props.type === "number" ? inputBoxNumberClass : "";
+    const inputRef = this.inputRef;
     return (
       <input
-        className={join('inline-block', 'input-text', 'native-key-bindings',
-          inputBoxClass, numberTypeClass, this.props.class)}
-        tabIndex={-1}
-        onChange={this.props.onChange}
-        placeHolder={this.props.placeHolder}
-        type={this.props.type}
-        ref={this.inputRef}
-        defaultValue={this.props.defaultValue}
+        className={join('inline-block', 'native-key-bindings',
+            inputBoxClass, numberTypeClass, injectedClass)}
+        tabIndex={tabIndex}
+        type={type}
+        placeHolder={placeHolder}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        ref={inputRef}
       />
     );
   }

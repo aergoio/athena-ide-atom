@@ -21,6 +21,7 @@ export default class Arguments extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isFocused: false,
       args: new Array(props.args.length).fill(""),
       amount: "",
       unit: "aer",
@@ -29,6 +30,8 @@ export default class Arguments extends React.Component {
     // hack to clean value when reset
     this.inputRefs = []
 
+    this._onFocusOnAnyInput = this._onFocusOnAnyInput.bind(this);
+    this._onBrurOnAnyInput = this._onBrurOnAnyInput.bind(this);
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
     this._onUnitChange = this._onUnitChange.bind(this);
@@ -88,9 +91,22 @@ export default class Arguments extends React.Component {
     return "" !== this.state.amount ? (this.state.amount + " " + this.state.unit) : "";
   }
 
-  render() {
-    this.inputRefs = [];
+  _onFocusOnAnyInput() {
+    if (!this.state.isFocused) {
+      this.setState({ isFocused: true });
+    }
+  }
 
+  _onBrurOnAnyInput() {
+    this.setState({ isFocused: false });
+  }
+
+  render() {
+    // reactive tabindex
+    let tabIndex = 1;
+    const tabIndexProvider = () => this.state.isFocused ? tabIndex++ : -1;
+
+    this.inputRefs = [];
     const argumentComponents = this.props.args.map((arg, index) => {
       // hack to clean value when reset
       const inputRef = React.createRef();
@@ -100,9 +116,11 @@ export default class Arguments extends React.Component {
         <ArgumentRow key={index}>
           <ArgumentName name={arg} />
           <InputBox
+            tabIndex={tabIndexProvider()}
+            onFocus={this._onFocusOnAnyInput}
+            onBlur={this._onBrurOnAnyInput}
             class='component-inputbox-argument'
             onChange={e => this._onArgumentValueChange(e, index)}
-            defaultValue=""
             ref={inputRef}
           />
         </ArgumentRow>
@@ -118,10 +136,12 @@ export default class Arguments extends React.Component {
         <ArgumentRow>
           <ArgumentName name="Amount" />
           <InputBox
+            tabIndex={tabIndexProvider()}
             type="number"
             class='component-inputbox-argument'
             onChange={this._onAmountChange}
-            defaultValue=""
+            onFocus={this._onFocusOnAnyInput}
+            onBlur={this._onBrurOnAnyInput}
             ref={inputRef}
           />
           <SelectBox
