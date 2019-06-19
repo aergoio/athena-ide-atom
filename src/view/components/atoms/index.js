@@ -2,6 +2,7 @@ import AddIcon from './add-icon';
 import ArgumentName from './argument-name';
 import ArgumentRow from './argument-row';
 import Button from './button';
+import CardItem from './card-item';
 import CardRow from './card-row';
 import Card from './card';
 import CopyIcon from './copy-icon';
@@ -26,6 +27,7 @@ export {
   ArgumentName,
   ArgumentRow,
   Button,
+  CardItem,
   CardRow,
   Card,
   CopyIcon,

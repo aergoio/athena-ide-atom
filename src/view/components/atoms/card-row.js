@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { join } from '../../../utils';
 
-const rowClass = 'card-row';
+const cardRowClass = 'component-card-row';
 
 export const CardRow = (props) => {
   return (
-    <div className={join(rowClass, props.class)}>
+    <div className={join(cardRowClass, props.class)}>
       {props.children}
     </div>
   );

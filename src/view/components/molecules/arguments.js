@@ -68,9 +68,8 @@ export default class Arguments extends React.Component {
     this.setState({ amount: newValue.toString() });
   }
 
-  _onUnitChange(target) {
-    const newValue = target.value;
-    this.setState({ unit: newValue });
+  _onUnitChange(newUnit) {
+    this.setState({ unit: newUnit });
   }
 
   _generateArgsDisplay() {
@@ -149,15 +148,13 @@ export default class Arguments extends React.Component {
     );
 
     return (
-      <div className='overflow-hidden'>
-        <Foldable
-          isOpen={false}
-          transitionTime={1}
-          trigger={trigger}
-        >
-          {argumentComponents}
-        </Foldable>
-      </div>
+      <Foldable
+        isOpen={false}
+        transitionTime={1}
+        trigger={trigger}
+      >
+        {argumentComponents}
+      </Foldable>
     );
   }
 

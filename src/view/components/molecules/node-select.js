@@ -1,16 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Description, SelectBox } from '../atoms';
+import { CardRow, CardItem, Description, SelectBox } from '../atoms';
 
 export const NodeSelect = (props) => {
   return (
     <CardRow>
-      <Description description='Node' />
-      <SelectBox
-        value={props.node}
-        options={props.nodes}
-        onChange={props.onChange}
-      />
+      <CardItem ratio={0}>
+        <Description description='Node' />
+      </CardItem>
+      <CardItem ratio={1} hideOverflow>
+        <SelectBox
+          value={props.node}
+          options={props.nodes}
+          onChange={props.onChange}
+        />
+      </CardItem>
     </CardRow>
   );
 }

@@ -80,7 +80,7 @@
     "react": "^16.8.2",
     "react-collapsible": "^2.6.0",
     "react-dom": "^16.8.2",
-    "react-select": "^2.4.1",
+    "react-dropdown": "^1.6.4",
     "reactjs-popup": "^1.3.2",
     "reflexbox": "^3.0.1",
     "universal-analytics": "^0.4.20",

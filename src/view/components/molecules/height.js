@@ -1,12 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Description, TextBox } from '../atoms';
+import { CardRow, CardItem, Description, TextBox } from '../atoms';
 
 export const Height = (props) => {
   return (
     <CardRow>
-      <Description description='Height' />
-      <TextBox text={props.height} />
+      <CardItem ratio={0}>
+        <Description description='Height' />
+      </CardItem>
+      <CardItem ratio={1}>
+        <TextBox text={props.height} />
+      </CardItem>
     </CardRow>
   );
 }

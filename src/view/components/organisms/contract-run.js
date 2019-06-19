@@ -65,7 +65,7 @@ export default class ContractRun extends React.Component {
       </CardTitle>
     );
     return (
-      <FoldableCard class='contract-run-card' foldableClass='before-foldable' trigger={trigger} transitionTime={1} >
+      <FoldableCard foldableClass='before-component-foldable' trigger={trigger} transitionTime={1} >
         {abiCalls}
       </FoldableCard>
     )

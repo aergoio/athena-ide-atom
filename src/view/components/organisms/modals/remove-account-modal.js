@@ -36,7 +36,7 @@ export default class RemoveAccountModal extends React.Component {
           <atom-panel class='modal'>
             <div>
               <CardTitle title='Do you want to remove current account?' />
-              <CardRow class='card-row-button-modal'>
+              <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
                 <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>

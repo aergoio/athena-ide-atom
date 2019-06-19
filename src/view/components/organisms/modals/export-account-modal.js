@@ -40,7 +40,7 @@ export default class ExportAccountModal extends React.Component {
                 <InputBox ref={this.passwordInputRef} type='text'
                     placeHolder='password to encrypt private key'/>
               </CardRow>
-              <CardRow class='card-row-button-modal'>
+              <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
                 <Button class='component-btn-rightmost' name='Ok' onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>

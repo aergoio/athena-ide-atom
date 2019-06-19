@@ -8,7 +8,7 @@ export const TopBar = (props) => {
   const onRefresh = props.onRefresh;
   return (
     <Card class='transparent-background'>
-      <CardRow class='card-row-top-bar'>
+      <CardRow class='component-card-row-top-bar'>
         <Button
           name='Compile'
           class='component-btn-top-bar'

@@ -40,7 +40,7 @@ export default class NewNodeModal extends React.Component {
               <InputBox ref={this.nodetInputRef} type='text'
                     placeHolder='eg. 192.168.1.168:7845'/>
               </CardRow>
-              <CardRow class='card-row-button-modal'>
+              <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
                 <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>

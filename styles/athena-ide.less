@@ -1,8 +1,13 @@
+// Naming rule
+//  - TODO
+
 // The ui-variables file is provided by base themes provided by Atom.
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
 @import "ui-variables";
+
+@card-row-padding: 0.3em 0.5em;
 
 .athena-ide-view-container {
   overflow: auto;
@@ -12,29 +17,6 @@
   height: 100%;
   min-width: 45vh;
   overflow: scroll;
-
-  .react-tabs {
-    .react-tabs__tab-list {
-      display: flex;
-      list-style: none;
-      margin: 0em;
-      padding: 0em;
-    }
-
-    .react-tabs__tab {
-      width: 100%;
-      color: #9da5b3;
-      padding: 0.5em 0em;
-      text-align: center;
-      background-color: #292c35;
-    }
-
-    .react-tabs__tab--selected {
-      color: white;
-      background-color: #131621;
-      box-shadow: inset 0 -2px 0 0 #7b87f0;
-    }
-  }
 
   .void {
     background-color: #131621;
@@ -86,11 +68,6 @@
 
   .star {
     display: flex;
-  }
-
-  .overflow-hidden {
-    width: 100%;
-    overflow: hidden;
   }
 
   .foldable {
@@ -153,9 +130,6 @@
     height: 100%;
   }
 
-  .contract-run-card {
-  }
-
   .inner-card:last-child {
     margin-bottom: 5px;
   }
@@ -164,37 +138,35 @@
     background-color: transparent;
   }
 
-  .card-title {
-  }
-
-  .card-row {
+  .component-card-row {
     padding: 5px 10px;
     display: flex;
   }
 
-  .card-row:last-child {
+  .component-card-row:last-child {
     padding-bottom: 10px;
   }
 
-  .card-row-border {
+  .component-card-row-border {
     border-bottom: 0.15em solid #4b515c;
     margin: 0px 7px;
   }
 
-  .card-row-argument {
-  }
-
-  .card-row-top-bar, .card-row-argument {
+  .component-card-row-top-bar {
     justify-content: flex-end;
   }
 
-  .card-row-button-modal {
+  .component-card-row-button-modal {
     justify-content: center;
+  }
+
+  .component-card-item {
+
   }
 
   .component-title {
     justify-content: center;
-    font-weight: bold;
+    font-weight: bold
   }
 
   .component-contract-run-title {
@@ -242,45 +214,89 @@
 
   .component-selectbox {
     width: 100%;
+    background-color: @input-background-color;
+    position: relative;
 
+    // selected & closed view
     .component-selectbox__control {
-      background-color: @input-background-color;
-      min-height: 0em;
-      height: 100%;
+      display: flex;
+      position: relative;
+      border: 1px solid #ccc;
+      border-radius: 2.5px;
+      box-sizing: border-box;
+      padding: @card-row-padding;
+      transition: all 200ms ease;
 
-      .component-selectbox__value-container {
-        padding: 0em;
-
-        .component-selectbox__single-value {
-          color: @text-color;
-          margin-left: 0.4em;
-          margin-right: 0.4em;
-        }
-
-        .css-1g6gooi {
-          width: 100%;
-
-          .component-selectbox__input {
-            color: @text-color;
-            width: 100%;
-
-            input {
-              width: 100% !important;
-            }
-          }
-        }
+      .component-selectbox__placeholder {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
-      .component-selectbox__indicators {
-        .component-selectbox__dropdown-indicator {
-          padding: 0em;
-        }
+      .Dropdown-arrow-wrapper {
+        width: 1em;
+      }
+
+      .component-selectbox__arrow {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        border: solid #999;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 3.5px;
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+    }
+
+    // items view
+    .component-selectbox__menu {
+      background-color: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+      box-sizing: border-box;
+      overflow-x: scroll;
+      position: absolute;
+      width: 100%;
+      z-index: 1000;
+
+      .Dropdown-noresults, .Dropdown-option {
+        box-sizing: border-box;
+        color: rgba(51, 51, 51, 0.8);
+        cursor: pointer;
+        display: block;
+        padding: @card-row-padding;
+      }
+
+      .Dropdown-option:last-child {
+        border-bottom-right-radius: 2px;
+        border-bottom-left-radius: 2px;
+      }
+
+      .Dropdown-option:hover {
+        background-color: #f2f9fc;
+        color: #333;
+      }
+
+      .Dropdown-option .is-selected {
+        background-color: #f2f9fc;
+        color: #333;
       }
     }
   }
 
+  // placed here because of 'is-open' class
+  // arrow when open
+  .is-open .component-selectbox__arrow {
+    top: 10px;
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+
   .component-selectbox-unit {
-    max-width: 5.5em;
+    width: 7.5em;
   }
 
   .component-inputbox {
@@ -301,6 +317,7 @@
 
   .component-textbox {
     width: 100%;
+    height: 100%;
     white-space: pre-wrap;
     overflow: auto;
     word-wrap: break-word;
@@ -308,7 +325,7 @@
     text-align: right;
     color: rgba(157, 165, 179, 0.65);
     background-color: @input-background-color;
-    padding: 0.3em 0.5em;
+    padding: @card-row-padding;
   }
 
   .component-arguments-and-amount {
@@ -324,6 +341,7 @@
     background-color: transparent;
     color: rgba(255, 255, 255, 0.65);
     white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
   }
 

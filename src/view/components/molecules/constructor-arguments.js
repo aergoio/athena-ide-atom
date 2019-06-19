@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Description } from '../atoms';
+import { CardRow, CardItem, Description } from '../atoms';
 import Arguments from './arguments';
 
 const ConstructorArguments = (props) => {
@@ -9,10 +9,12 @@ const ConstructorArguments = (props) => {
   const argsRef = props.argsRef;
   return (
     <CardRow>
-      <Description
-        description="Args"
-      />
-      <Arguments args={args} payable={payable} ref={argsRef} />
+      <CardItem ratio={0}>
+        <Description description="Args" />
+      </CardItem>
+      <CardItem ratio={1} hideOverflow>
+        <Arguments args={args} payable={payable} ref={argsRef} />
+      </CardItem>
     </CardRow>
   );
 }

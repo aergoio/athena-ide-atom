@@ -65,14 +65,14 @@ export default class RunPanel extends React.Component {
   }
 
   _onNodeUrlChange(selectedNode) {
-    logger.info("Node change", selectedNode.value);
-    this.props.nodeStore.changeNode(selectedNode.value);
+    logger.info("Node change", selectedNode);
+    this.props.nodeStore.changeNode(selectedNode);
     this._onRefresh();
   }
 
   _onAddressChange(selectedAddress) {
-    logger.info("Account address change to", selectedAddress.value);
-    this.props.accountStore.changeAccount(selectedAddress.value);
+    logger.info("Account address change to", selectedAddress);
+    this.props.accountStore.changeAccount(selectedAddress);
     this._onRefresh();
   }
 
@@ -83,10 +83,10 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onFileChange(selectedOption) {
+  _onFileChange(selectedFile) {
     runWithCallback.call(this, () => {
-      logger.debug("Compiled file change", selectedOption);
-      this.props.deployTargetStore.changeTarget(selectedOption.value);
+      logger.debug("Compiled file change", selectedFile);
+      this.props.deployTargetStore.changeTarget(selectedFile);
     }, this._onError);
   }
 

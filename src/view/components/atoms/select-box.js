@@ -1,48 +1,39 @@
 import React from 'react';
-import Select from 'react-select';
-import CreatableSelect from 'react-select/lib/Creatable';
+import Dropdown from 'react-dropdown';
 import PropTypes from 'prop-types';
 
 import {join} from '../../../utils';
 
 const selectBoxClass = 'component-selectbox';
 
-export default class SelectBox extends React.Component {
+export const SelectBox = (props) => {
+  const injectedClass = props.class;
+  const value = props.value;
+  const options = props.options;
+  const placeholder = typeof props.placeholder === "undefined" ? "select an item" : props.placeholder;
+  const onChange = props.onChange;
+  const arrowClassName = selectBoxClass + '__arrow';
+  return (
+    <Dropdown // main dropdown component
+      className={join('inline-block', selectBoxClass, injectedClass)}
+      controlClassName={selectBoxClass + '__control'}
+      placeholderClassName={selectBoxClass + '__placeholder'}
+      menuClassName={selectBoxClass + '__menu'}
+      arrowClassName={arrowClassName}
+      value={value}
+      options={options}
+      placeholder={placeholder}
+      onChange={o => onChange(o.value)}
+    />
+  );
+};
 
-  static get propTypes() {
-    return {
-      class: PropTypes.class,
-      value: PropTypes.string,
-      options: PropTypes.array,
-      onChange: PropTypes.func,
-      isCreatable: PropTypes.bool
-    };
-  }
+SelectBox.propTypes = {
+  class: PropTypes.class,
+  value: PropTypes.string,
+  options: PropTypes.array,
+  placeholder: PropTypes.string,
+  onChange: PropTypes.func,
+};
 
-  constructor(props) {
-    super(props);
-  }
-
-  _generateOption(option) {
-    return {
-      value: option,
-      label: option
-    }
-  }
-
-  render() {
-    const SelectBoxComponent = this.props.isCreatable ? CreatableSelect : Select;
-    const option = this._generateOption(this.props.value);
-    const options = this.props.options.map(o => this._generateOption(o));
-    return (
-      <SelectBoxComponent
-        className={join('inline-block', 'native-key-bindings', selectBoxClass, this.props.class)}
-        classNamePrefix={selectBoxClass}
-        value={option}
-        options={options}
-        onChange={this.props.onChange}
-      />
-    );
-  }
-
-}
+export default SelectBox;

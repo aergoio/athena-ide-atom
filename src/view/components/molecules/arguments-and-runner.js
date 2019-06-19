@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CardRow, Button } from '../atoms';
+import { CardRow, CardItem, Button } from '../atoms';
 import Arguments from './arguments';
 
 const ArgumentsAndRunner = (props) => {
@@ -12,13 +12,17 @@ const ArgumentsAndRunner = (props) => {
 
   const argsRef = React.createRef();
   return (
-    <CardRow class='card-row-argument'>
-      <Arguments args={args} payable={payable} ref={argsRef} />
-      <Button
-        name={runnerName}
-        class={runnerStyle}
-        onClick={() => runner(argsRef)}
-      />
+    <CardRow class='component-card-row-argument'>
+      <CardItem ratio={1} hideOverflow>
+        <Arguments args={args} payable={payable} ref={argsRef} />
+      </CardItem>
+      <CardItem ratio={0}>
+        <Button
+          name={runnerName}
+          class={runnerStyle}
+          onClick={() => runner(argsRef)}
+        />
+      </CardItem>
     </CardRow>
   );
 }

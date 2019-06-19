@@ -16,7 +16,7 @@ export const Contract = (props) => {
 
   let border;
   if (contractAddress2Abi.size !== 0) {
-    border = <CardRow class='card-row-border' />
+    border = <CardRow class='component-card-row-border' />
   }
 
   // reverse to display recent elememt first
