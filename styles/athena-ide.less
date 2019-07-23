@@ -471,48 +471,59 @@
   }
 }
 
-#athena-ide-console {
-  .view-scroller {
-    height: 100%;
-    width: 100%;
-    overflow: auto;
+.console-view-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .top-bar {
+    padding: 0em 0.1em;
+    flex: 0 0 2em;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: 0.15em solid #4b515c;
   }
 
-  .panel-body {
-    height: 100%;
-    background-color: @inset-panel-background-color;
-    cursor: text;
-    -webkit-user-select: text;
+  .top-bar-item {
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
 
-    &.closed {
-      height: 0px !important;
+  .bottom-bar {
+    width: 100%;
+    overflow: scroll;
+  }
+
+  .log {
+    display: flex;
+    padding: 0.1em;
+  }
+
+  .time {
+    flex: 0 0 5em;
+    padding-left: 0.3em;
+  }
+
+  .message {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-wrap;
+
+    &.level-debug {
+      color: @text-color-subtle;
     }
 
-    pre {
-      &:empty {
-        padding: 0;
-      }
-      overflow: visible;
+    &.level-info {
+      color: @text-color;
     }
 
-    div {
-      margin: 0;
+    &.level-warn {
+      color: @text-color-warning;
+    }
 
-      &.level-debug {
-        color: @text-color-subtle;
-      }
-
-      &.level-info {
-        color: @text-color;
-      }
-
-      &.level-warn {
-        color: @text-color-warning;
-      }
-
-      &.level-error {
-        color: @text-color-error;
-      }
+    &.level-error {
+      color: @text-color-error;
     }
   }
 }

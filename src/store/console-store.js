@@ -1,9 +1,9 @@
-import {observable, action} from 'mobx';
+import { observable, action } from 'mobx';
 import logger from 'loglevel';
 
 export default class ConsoleStore {
 
-  @observable recent = { message: "", level: "info" };
+  @observable logs = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -18,7 +18,23 @@ export default class ConsoleStore {
   }
 
   @action log(message, level) {
-    this.recent = { message: message, level: level };
+    const stringMessage = typeof message === "string" ? message : message.toString();
+    const time = this._getTime();
+    const logElement = {time: time, message: stringMessage, level: level};
+    this.logs.push(logElement);
+  }
+
+  _getTime() {
+    const date = new Date();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    const second = date.getSeconds();
+    const timeInfo = [ hour, minute, second ].map((m) => m < 10 ? "0" + m : m).join(":");
+    return timeInfo;
+  }
+
+  @action clear() {
+    this.logs.clear();
   }
 
 }

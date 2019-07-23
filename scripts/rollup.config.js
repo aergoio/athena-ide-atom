@@ -1,4 +1,5 @@
 import babel from 'rollup-plugin-babel';
+import replace from 'rollup-plugin-replace';
 import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
 import builtins from 'rollup-plugin-node-builtins';
@@ -21,6 +22,9 @@ const nodeExternals = [
 const externals = Object.keys(pkg.dependencies).concat(...nodeExternals);
 
 const plugIns = [
+  replace({
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) // process.env.NODE_ENV works config file only
+  }),
   commonjs({ // so Rollup can convert `ms` to an ES module
     include: [ 'node_modules/**' ]
   }),

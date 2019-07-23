@@ -58,7 +58,7 @@ export default class AtheneIdeView {
 
   show() {
     atom.workspace.getRightDock().show();
-    atom.workspace.open(this, {activatePane: false}).then(() => {
+    return atom.workspace.open(this, {activatePane: false}).then(() => {
       this._draw();
     });
   }

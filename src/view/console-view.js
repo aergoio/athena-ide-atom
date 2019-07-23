@@ -1,26 +1,18 @@
 /* eslint-disable */
 
-import {$$, View} from 'atom-space-pen-views';
-import {autorun} from 'mobx';
-import logger from 'loglevel';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'mobx-react';
 
-export default class ConsoleView extends View {
+import ConsoleViewRoot from './components/console-view-root';
 
-  static content() {
-    this.div({id: 'athena-ide-console'}, () => {
-      this.div({class: 'panel-body view-scroller', outlet: 'body'}, () => {
-        this.pre({class: 'native-key-bindings', outlet: 'output', tabindex: -1});
-      });
-    });
-  }
+export default class ConsoleView {
 
   constructor(rootStore) {
-    super();
-    autorun(() => {
-      if (null != rootStore.consoleStore.recent && "" !== rootStore.consoleStore.recent.message) {
-        this.log(rootStore.consoleStore.recent);
-      }
-    })
+    this.element = document.createElement('atom-panel');
+    this.element.classList.add('native-key-bindings');
+    this.element.setAttribute('tabindex', -1);
+    this.consoleStore = rootStore.consoleStore;
   }
 
   getTitle() {
@@ -39,39 +31,30 @@ export default class ConsoleView extends View {
     return 'bottom';
   }
 
+  getElement() {
+    return this.element;
+  }
+
   show() {
     atom.workspace.getBottomDock().show();
-    return atom.workspace.open(this, {activatePane: false});
+    return atom.workspace.open(this, {activatePane: false}).then(() => {
+      this._draw();
+    });
+  }
+
+  _draw() {
+    if (!this.rootReactNode) {
+      this.rootReactNode = ReactDOM.render((
+        <Provider consoleStore={this.consoleStore} >
+          <ConsoleViewRoot />
+        </Provider>),
+        this.element
+      );
+    }
   }
 
   distroy() {
     // TODO remove element form dock
-    this.clear();
-  }
-
-  log(messageAndLevel) {
-    this.show().then(() => {
-      const message = messageAndLevel.message.toString();
-      const level = messageAndLevel.level;
-      const messageWithTime = this._wrapTime(message);
-      this.output.append($$(function() {
-        this.div({class: `level-${level}`}, messageWithTime);
-      }));
-      this.body.scrollToBottom();
-    });
-  }
-
-  _wrapTime(message) {
-    const date = new Date();
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    const second = date.getSeconds();
-    const timeInfo = [ hour, minute, second ].map((m) => m < 10 ? "0" + m : m).join(":");
-    return timeInfo + " " + message.toString();
-  }
-
-  clear() {
-    this.output.empty();
   }
 
 }

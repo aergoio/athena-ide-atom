@@ -71,8 +71,8 @@ export default class DeployTargetStore {
       this.changeTarget(target);
 
       this.rootStore.consoleStore.log("Compile success", "info");
-      this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
-      this.rootStore.consoleStore.log("abi: \n" + compileResult.abi, "info");
+      this.rootStore.consoleStore.log("Payload:\n" + compileResult.payload, "info");
+      this.rootStore.consoleStore.log("Abi:\n" + compileResult.abi, "info");
       this.rootStore.notificationStore.notify("Compiled successfully", "success");
     }).catch(err => {
       logger.error(err);
