@@ -49,7 +49,21 @@ export default class Arguments extends React.Component {
   }
 
   get values() {
-    return this.state.args;
+    const jsonProcessed = this.state.args.map(rawArg => {
+      try {
+        // empty -> null
+        if ("" === rawArg) {
+          return null;
+        }
+        // process boolean, number, object, array
+        const parsed = JSON.parse(rawArg);
+        return parsed;
+      } catch (error) {
+        // otherwise, it is string
+        return rawArg;
+      }
+    });
+    return jsonProcessed;
   }
 
   get amount() {
