@@ -17,7 +17,6 @@ var Collapsible = _interopDefault(require('react-collapsible'));
 var Dropdown = _interopDefault(require('react-dropdown'));
 var reflexbox = require('reflexbox');
 var Popup = _interopDefault(require('reactjs-popup'));
-var atomSpacePenViews = require('atom-space-pen-views');
 var atom$1 = require('atom');
 var os = _interopDefault(require('os'));
 var crypto = _interopDefault(require('crypto'));
@@ -215,44 +214,34 @@ class ContractService {
     this.client = client;
   }
 
-  async getABI(contractAddress) {
+  async getContractInterface(contractAddress) {
     assertNotEmpty(contractAddress, "Contract address is empty");
-    return await this.client.getABI(contractAddress);
+    return await this.client.getContractInterface(contractAddress);
   }
 
-  async deploy(account, deployInfo, fee, amount) {
+  async deploy(account, deployment, fee) {
     assertNotEmpty(account, "Selected account is empty");
-    assertNotEmpty(deployInfo, "Deploy info is empty");
-    assertNotEmpty(deployInfo.payload, "Deploy target is empty");
+    assertNotEmpty(deployment, "Deployment is empty");
+    assertNotEmpty(deployment.payload, "Deploy target is empty");
     assertNotEmpty(fee, "Contract deploy fee is empty");
-    assertNotEmpty(amount, "Contract deploy amount is empty");
-    logger.debug("Deploy with", account.address, deployInfo, fee, amount);
-    const deployResult = await this.client.deploy(account, deployInfo, fee, amount);
-    return {
-      contractAddress: deployResult.contractAddress,
-      abi: deployResult.abi,
-      txHash: deployResult.txHash
-    };
+    logger.debug("Deploy with", account.address, deployment, fee);
+    const deployResult = await this.client.deploy(account, deployment, fee);
+    return deployResult;
   }
 
-  async execute(account, invocationInfo, fee, amount) {
+  async execute(account, invocation, fee) {
     assertNotEmpty(account, "Selected account is empty");
-    assertNotEmpty(invocationInfo, "Invocation info is empty");
+    assertNotEmpty(invocation, "Invocation is empty");
     assertNotEmpty(fee, "Contract deploy fee is empty");
-    assertNotEmpty(amount, "Contract deploy amount is empty");
-    logger.debug("Execution with", account.address, invocationInfo, fee, amount);
-    const executeResult = await this.client.execute(account, invocationInfo, fee, amount);
-    return {
-      txHash: executeResult.txHash,
-      result: executeResult.result,
-      status: executeResult.status
-    };
+    logger.debug("Execution with", account.address, invocation, fee);
+    const executeResult = await this.client.execute(account, invocation, fee);
+    return executeResult;
   }
 
-  async query(invocationInfo) {
-    assertNotEmpty(invocationInfo, "Invocation info is empty");
-    logger.debug("Query with", invocationInfo);
-    const result = await this.client.query(invocationInfo);
+  async query(query) {
+    assertNotEmpty(query, "Invocation info is empty");
+    logger.debug("Query with", query);
+    const result = await this.client.query(query);
     return JSON.stringify(result);
   }
 
@@ -440,7 +429,7 @@ let AccountStore = (_class = (_temp = class AccountStore {
     }
 
     const account = this.address2Account.get(this.currentAddress);
-    account.encrypt(password).then(encrypted => {
+    account["export"](password).then(encrypted => {
       const message = "exported: " + encrypted;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
@@ -502,7 +491,7 @@ let AccountStore = (_class = (_temp = class AccountStore {
 var _class$1, _descriptor$1, _temp$1;
 let ConsoleStore = (_class$1 = (_temp$1 = class ConsoleStore {
   constructor(rootStore) {
-    _initializerDefineProperty(this, "recent", _descriptor$1, this);
+    _initializerDefineProperty(this, "logs", _descriptor$1, this);
 
     this.rootStore = rootStore;
   }
@@ -516,28 +505,44 @@ let ConsoleStore = (_class$1 = (_temp$1 = class ConsoleStore {
   }
 
   log(message, level) {
-    this.recent = {
-      message: message,
+    const stringMessage = typeof message === "string" ? message : message.toString();
+
+    const time = this._getTime();
+
+    const logElement = {
+      time: time,
+      message: stringMessage,
       level: level
     };
+    this.logs.push(logElement);
   }
 
-}, _temp$1), (_descriptor$1 = _applyDecoratedDescriptor(_class$1.prototype, "recent", [mobx.observable], {
+  _getTime() {
+    const date = new Date();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    const second = date.getSeconds();
+    const timeInfo = [hour, minute, second].map(m => m < 10 ? "0" + m : m).join(":");
+    return timeInfo;
+  }
+
+  clear() {
+    this.logs.clear();
+  }
+
+}, _temp$1), (_descriptor$1 = _applyDecoratedDescriptor(_class$1.prototype, "logs", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
-    return {
-      message: "",
-      level: "info"
-    };
+    return [];
   }
-}), _applyDecoratedDescriptor(_class$1.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "deserialize"), _class$1.prototype), _applyDecoratedDescriptor(_class$1.prototype, "log", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "log"), _class$1.prototype)), _class$1);
+}), _applyDecoratedDescriptor(_class$1.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "deserialize"), _class$1.prototype), _applyDecoratedDescriptor(_class$1.prototype, "log", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "log"), _class$1.prototype), _applyDecoratedDescriptor(_class$1.prototype, "clear", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "clear"), _class$1.prototype)), _class$1);
 
 var _class$2, _descriptor$2, _temp$2;
 let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   constructor(rootStore) {
-    _initializerDefineProperty(this, "observableContractAddress2Abi", _descriptor$2, this);
+    _initializerDefineProperty(this, "address2Interface", _descriptor$2, this);
 
     this.rootStore = rootStore;
   }
@@ -547,18 +552,20 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   }
 
   get contractAddress2Abi() {
-    return this.observableContractAddress2Abi.toJS();
+    const address2AbiInArray = Array.from(this.address2Interface.toJS()).map(([address, i]) => [address, i.abi]);
+    const address2Abi = new Map(address2AbiInArray);
+    return address2Abi;
   }
 
   deserialize(data) {
     logger.debug("Deserialize", data);
   }
 
-  addContract(contract) {
-    logger.debug("Add contract", contract);
-    serviceProvider.contractService.getABI(contract).then(abi => {
-      this.observableContractAddress2Abi.set(contract, abi);
-      const message = "Successfully imported contract " + contract;
+  addContract(contractAddress) {
+    logger.debug("Add contract", contractAddress);
+    serviceProvider.contractService.getContractInterface(contractAddress).then(contractInterface => {
+      this.address2Interface.set(contractAddress, contractInterface);
+      const message = "Successfully imported contract " + contractAddress;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
     })["catch"](err => {
@@ -571,20 +578,18 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   deployContract(constructorArgs, amount) {
     logger.debug("Deploy contract with", constructorArgs, amount);
     const account = this.rootStore.accountStore.currentAccount;
-    const deployInfo = {
+    const deployment = {
       payload: this.rootStore.deployTargetStore.compileResult.payload.trim(),
-      args: constructorArgs
+      args: constructorArgs,
+      amount: amount
     };
-    const fee = {
-      price: this.rootStore.feeStore.price,
-      limit: this.rootStore.feeStore.limit
-    };
-    serviceProvider.contractService.deploy(account, deployInfo, fee, amount).then(deployResult => {
+    const feeLimit = this.rootStore.feeStore.limit;
+    serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
       this.rootStore.accountStore.updateAccountState();
       const contractAddress = deployResult.contractAddress;
-      const abi = deployResult.abi;
+      const contractInterface = deployResult.contractInterface;
       const txHash = deployResult.txHash;
-      this.observableContractAddress2Abi.set(contractAddress, abi);
+      this.address2Interface.set(contractAddress, contractInterface);
       this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
       this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
       this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
@@ -596,20 +601,14 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
     });
   }
 
-  executeContract(contractAddress, abi, functionName, args, amount) {
-    logger.debug("Execute contract with", contractAddress, abi, functionName, args, amount);
+  executeContract(contractAddress, functionName, args, amount) {
+    logger.debug("Execute contract with", contractAddress, functionName, args, amount);
+    const contractInterface = this.address2Interface.get(contractAddress);
     const account = this.rootStore.accountStore.currentAccount;
-    const invocationInfo = {
-      contractAddress: contractAddress,
-      abi: abi,
-      targetFunction: functionName,
-      args: args
-    };
-    const fee = {
-      price: this.rootStore.feeStore.price,
-      limit: this.rootStore.feeStore.limit
-    };
-    serviceProvider.contractService.execute(account, invocationInfo, fee, amount).then(execResult => {
+    const execution = contractInterface.getInvocation(functionName, ...args);
+    execution.amount = amount;
+    const feeLimit = this.rootStore.feeStore.limit;
+    serviceProvider.contractService.execute(account, execution, feeLimit).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
       const txHash = execResult.txHash;
       const result = execResult.result;
@@ -624,15 +623,11 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
     });
   }
 
-  queryContract(contractAddress, abi, functionName, args) {
-    logger.debug("Query contract with", contractAddress, abi, functionName, args);
-    const invocationInfo = {
-      contractAddress: contractAddress,
-      abi: abi,
-      targetFunction: functionName,
-      args: args
-    };
-    serviceProvider.contractService.query(invocationInfo).then(queryResult => {
+  queryContract(contractAddress, functionName, args) {
+    logger.debug("Query contract with", contractAddress, functionName, args);
+    const contractInterface = this.address2Interface.get(contractAddress);
+    const query = contractInterface.getInvocation(functionName, ...args);
+    serviceProvider.contractService.query(query).then(queryResult => {
       this.rootStore.consoleStore.log("Query result: " + queryResult, "info");
     })["catch"](err => {
       logger.error(err);
@@ -644,14 +639,14 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   removeContract(contractAddress) {
     logger.debug("Remove contract", contractAddress);
 
-    if (!this.observableContractAddress2Abi.has(contractAddress)) {
+    if (!this.address2Interface.has(contractAddress)) {
       return;
     }
 
-    this.observableContractAddress2Abi["delete"](contractAddress);
+    this.address2Interface["delete"](contractAddress);
   }
 
-}, _temp$2), (_descriptor$2 = _applyDecoratedDescriptor(_class$2.prototype, "observableContractAddress2Abi", [mobx.observable], {
+}, _temp$2), (_descriptor$2 = _applyDecoratedDescriptor(_class$2.prototype, "address2Interface", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -728,8 +723,8 @@ let DeployTargetStore = (_class$3 = (_temp$3 = class DeployTargetStore {
       this.target2CompileResult.set(target, compileResult);
       this.changeTarget(target);
       this.rootStore.consoleStore.log("Compile success", "info");
-      this.rootStore.consoleStore.log("payload: " + compileResult.payload, "info");
-      this.rootStore.consoleStore.log("abi: \n" + compileResult.abi, "info");
+      this.rootStore.consoleStore.log("Payload:\n" + compileResult.payload, "info");
+      this.rootStore.consoleStore.log("Abi:\n" + compileResult.abi, "info");
       this.rootStore.notificationStore.notify("Compiled successfully", "success");
     })["catch"](err => {
       logger.error(err);
@@ -765,12 +760,10 @@ let DeployTargetStore = (_class$3 = (_temp$3 = class DeployTargetStore {
   }
 }), _applyDecoratedDescriptor(_class$3.prototype, "compileResult", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "compileResult"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "constructorArgs", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "constructorArgs"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "isPayable", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "isPayable"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "targets", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "targets"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "deserialize"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "addTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "addTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "changeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "changeTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "removeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "removeTarget"), _class$3.prototype)), _class$3);
 
-var _class$4, _descriptor$4, _descriptor2$2, _temp$4;
+var _class$4, _descriptor$4, _temp$4;
 let FeeStore = (_class$4 = (_temp$4 = class FeeStore {
   constructor(rootStore) {
-    _initializerDefineProperty(this, "price", _descriptor$4, this);
-
-    _initializerDefineProperty(this, "limit", _descriptor2$2, this);
+    _initializerDefineProperty(this, "limit", _descriptor$4, this);
 
     this.rootStore = rootStore;
   }
@@ -783,36 +776,25 @@ let FeeStore = (_class$4 = (_temp$4 = class FeeStore {
     logger.debug("Deserialize", data);
   }
 
-  setPrice(price) {
-    this.price = price;
-  }
-
   setLimit(limit) {
     this.limit = limit;
   }
 
-}, _temp$4), (_descriptor$4 = _applyDecoratedDescriptor(_class$4.prototype, "price", [mobx.observable], {
+}, _temp$4), (_descriptor$4 = _applyDecoratedDescriptor(_class$4.prototype, "limit", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
-    return "0";
+    return 0;
   }
-}), _descriptor2$2 = _applyDecoratedDescriptor(_class$4.prototype, "limit", [mobx.observable], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return "0";
-  }
-}), _applyDecoratedDescriptor(_class$4.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "deserialize"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "setPrice", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "setPrice"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "setLimit", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "setLimit"), _class$4.prototype)), _class$4);
+}), _applyDecoratedDescriptor(_class$4.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "deserialize"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "setLimit", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "setLimit"), _class$4.prototype)), _class$4);
 
-var _class$5, _descriptor$5, _descriptor2$3, _descriptor3$1, _descriptor4$1, _temp$5;
+var _class$5, _descriptor$5, _descriptor2$2, _descriptor3$1, _descriptor4$1, _temp$5;
 let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
   constructor(rootStore) {
     _initializerDefineProperty(this, "currentNode", _descriptor$5, this);
 
-    _initializerDefineProperty(this, "currentHeight", _descriptor2$3, this);
+    _initializerDefineProperty(this, "currentHeight", _descriptor2$2, this);
 
     _initializerDefineProperty(this, "bestHash", _descriptor3$1, this);
 
@@ -887,7 +869,7 @@ let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
   initializer: function () {
     return "localhost:7845";
   }
-}), _descriptor2$3 = _applyDecoratedDescriptor(_class$5.prototype, "currentHeight", [mobx.observable], {
+}), _descriptor2$2 = _applyDecoratedDescriptor(_class$5.prototype, "currentHeight", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -1001,23 +983,6 @@ class RootStore {
   }
 
 }
-
-var global$1 = (typeof global !== "undefined" ? global :
-            typeof self !== "undefined" ? self :
-            typeof window !== "undefined" ? window : {});
-
-if (typeof global$1.setTimeout === 'function') ;
-if (typeof global$1.clearTimeout === 'function') ;
-
-// from https://github.com/kumavis/browser-process-hrtime/blob/master/index.js
-var performance = global$1.performance || {};
-var performanceNow =
-  performance.now        ||
-  performance.mozNow     ||
-  performance.msNow      ||
-  performance.oNow       ||
-  performance.webkitNow  ||
-  function(){ return (new Date()).getTime() };
 
 function unwrapExports (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -1688,7 +1653,7 @@ var factoryWithTypeCheckers = function(isValidElement, throwOnDirectAccess) {
           );
           err.name = 'Invariant Violation';
           throw err;
-        } else if (typeof console !== 'undefined') {
+        } else if ( typeof console !== 'undefined') {
           // Old behavior for people using React.PropTypes
           var cacheKey = componentName + ':' + propName;
           if (
@@ -1865,7 +1830,7 @@ var factoryWithTypeCheckers = function(isValidElement, throwOnDirectAccess) {
 
   function createUnionTypeChecker(arrayOfTypeCheckers) {
     if (!Array.isArray(arrayOfTypeCheckers)) {
-      printWarning$1('Invalid argument supplied to oneOfType, expected an instance of array.');
+       printWarning$1('Invalid argument supplied to oneOfType, expected an instance of array.') ;
       return emptyFunctionThatReturnsNull;
     }
 
@@ -2541,7 +2506,22 @@ class Arguments extends React.Component {
   }
 
   get values() {
-    return this.state.args;
+    const jsonProcessed = this.state.args.map(rawArg => {
+      try {
+        // empty -> null
+        if ("" === rawArg) {
+          return null;
+        } // process boolean, number, object, array
+
+
+        const parsed = JSON.parse(rawArg);
+        return parsed;
+      } catch (error) {
+        // otherwise, it is string
+        return rawArg;
+      }
+    });
+    return jsonProcessed;
   }
 
   get amount() {
@@ -3269,7 +3249,7 @@ class ContractRun extends React.Component {
         payable: payable,
         runnerName: runnerName,
         runnerStyle: runnerStyle,
-        runner: argsRef => runner(contractAddress, abi, runnerName, argsRef)
+        runner: argsRef => runner(contractAddress, runnerName, argsRef)
       });
     });
     const trigger = React.createElement(CardTitle, {
@@ -3601,24 +3581,24 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }, this._onError);
   }
 
-  _onAbiExec(contractAddress, abi, targetFunction, argInputRef) {
+  _onAbiExec(contractAddress, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Execute contract");
       logger.debug("Input ref", argInputRef);
       const targetArgs = argInputRef.current.values;
       const amount = argInputRef.current.amount;
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(contractAddress, abi, targetFunction, targetArgs, amount);
+      this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, amount);
     }, this._onError);
   }
 
-  _onAbiQuery(contractAddress, abi, targetFunction, argInputRef) {
+  _onAbiQuery(contractAddress, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Query contract");
       logger.debug("Input ref", argInputRef);
       const targetArgs = argInputRef.current.values;
       logger.info("Query contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.queryContract(contractAddress, abi, targetFunction, targetArgs);
+      this.props.contractStore.queryContract(contractAddress, targetFunction, targetArgs);
     }, this._onError);
   }
 
@@ -3768,7 +3748,7 @@ class AtheneIdeView {
 
   show() {
     atom.workspace.getRightDock().show();
-    atom.workspace.open(this, {
+    return atom.workspace.open(this, {
       activatePane: false
     }).then(() => {
       this._draw();
@@ -3786,32 +3766,156 @@ class AtheneIdeView {
 
 }
 
-/* eslint-disable */
-class ConsoleView extends atomSpacePenViews.View {
-  static content() {
-    this.div({
-      id: 'athena-ide-console'
-    }, () => {
-      this.div({
-        "class": 'panel-body view-scroller',
-        outlet: 'body'
-      }, () => {
-        this.pre({
-          "class": 'native-key-bindings',
-          outlet: 'output',
-          tabindex: -1
-        });
-      });
-    });
+var _dec$7, _class$e;
+let ConsoleViewRoot = (_dec$7 = mobxReact.inject('consoleStore'), _dec$7(_class$e = mobxReact.observer(_class$e = class ConsoleViewRoot extends React.Component {
+  static get propTypes() {
+    return {
+      consoleStore: propTypes.any
+    };
   }
 
-  constructor(rootStore) {
-    super();
-    mobx.autorun(() => {
-      if (null != rootStore.consoleStore.recent && "" !== rootStore.consoleStore.recent.message) {
-        this.log(rootStore.consoleStore.recent);
+  constructor(props) {
+    super(props);
+    this._onClearClick = this._onClearClick.bind(this);
+  }
+
+  _onClearClick() {
+    this.props.consoleStore.clear();
+  }
+
+  render() {
+    const onClearClick = this._onClearClick; // require toJS in handling mobx proxy array
+
+    const logs = mobx.toJS(this.props.consoleStore.logs);
+    return React.createElement("div", {
+      "class": "console-view-root"
+    }, React.createElement(TopBar$1, null, React.createElement(TopBarItem, {
+      className: "icon-x",
+      onClick: onClearClick
+    })), React.createElement(BottomBar, {
+      logs: logs
+    }));
+  }
+
+}) || _class$e) || _class$e);
+
+const TopBar$1 = props => {
+  return React.createElement("div", {
+    className: join('top-bar')
+  }, props.children);
+};
+
+const TopBarItem = props => {
+  return React.createElement("div", {
+    className: join('top-bar-item', props.className),
+    onClick: props.onClick
+  });
+};
+
+TopBarItem.propTypes = {
+  className: propTypes["class"],
+  onClick: propTypes.func.isRequired
+};
+
+class BottomBar extends React.Component {
+  static get propTypes() {
+    return {
+      logs: propTypes.array
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    this.lastLogRef = React.createRef();
+  }
+
+  componentDidUpdate() {
+    // move to last log element
+    const current = this.lastLogRef.current;
+
+    if (current) {
+      current.scrollIntoView(false);
+    }
+  }
+
+  render() {
+    const logs = this.props.logs;
+    const logsView = logs.map((log, index) => {
+      if (index === logs.length - 1) {
+        return React.createElement(Log, {
+          time: log.time,
+          message: log.message,
+          level: log.level,
+          innerRef: this.lastLogRef
+        });
+      } else {
+        return React.createElement(Log, {
+          time: log.time,
+          message: log.message,
+          level: log.level
+        });
       }
     });
+    return React.createElement("div", {
+      className: join('bottom-bar')
+    }, logsView);
+  }
+
+}
+
+const Log = props => {
+  const time = props.time;
+  const message = props.message;
+  const level = props.level;
+  const innerRef = props.innerRef;
+  return React.createElement("div", {
+    className: join('log'),
+    ref: innerRef
+  }, React.createElement(Time, {
+    time: time
+  }), React.createElement(Message, {
+    message: message,
+    level: level
+  }));
+};
+
+Log.propTypes = {
+  time: propTypes.string,
+  message: propTypes.string,
+  level: propTypes.string
+};
+
+const Time = props => {
+  const time = props.time;
+  return React.createElement("div", {
+    className: join('time')
+  }, time);
+};
+
+Time.propTypes = {
+  time: propTypes.string
+};
+
+const Message = props => {
+  const message = props.message;
+  const level = typeof props.level === "undefined" ? "info" : props.level;
+  return React.createElement("div", {
+    className: join('message', 'level-' + level)
+  }, message);
+};
+
+Message.propTypes = {
+  message: propTypes.string,
+  level: propTypes.string
+};
+
+/* eslint-disable */
+class ConsoleView {
+  constructor(rootStore) {
+    this.element = document.createElement('atom-panel');
+    this.element.classList.add('native-key-bindings');
+    this.element.setAttribute('tabindex', -1);
+    this.consoleStore = rootStore.consoleStore;
   }
 
   getTitle() {
@@ -3830,45 +3934,28 @@ class ConsoleView extends atomSpacePenViews.View {
     return 'bottom';
   }
 
+  getElement() {
+    return this.element;
+  }
+
   show() {
     atom.workspace.getBottomDock().show();
     return atom.workspace.open(this, {
       activatePane: false
+    }).then(() => {
+      this._draw();
     });
   }
 
-  distroy() {
-    // TODO remove element form dock
-    this.clear();
+  _draw() {
+    if (!this.rootReactNode) {
+      this.rootReactNode = ReactDOM.render(React.createElement(mobxReact.Provider, {
+        consoleStore: this.consoleStore
+      }, React.createElement(ConsoleViewRoot, null)), this.element);
+    }
   }
 
-  log(messageAndLevel) {
-    this.show().then(() => {
-      const message = messageAndLevel.message.toString();
-      const level = messageAndLevel.level;
-
-      const messageWithTime = this._wrapTime(message);
-
-      this.output.append(atomSpacePenViews.$$(function () {
-        this.div({
-          "class": `level-${level}`
-        }, messageWithTime);
-      }));
-      this.body.scrollToBottom();
-    });
-  }
-
-  _wrapTime(message) {
-    const date = new Date();
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    const second = date.getSeconds();
-    const timeInfo = [hour, minute, second].map(m => m < 10 ? "0" + m : m).join(":");
-    return timeInfo + " " + message.toString();
-  }
-
-  clear() {
-    this.output.empty();
+  distroy() {// TODO remove element form dock
   }
 
 }
@@ -4139,6 +4226,8 @@ class AutoCompleteProvider {
 
     if (prefixInfo.prefix === "-") {
       replacementPrefix = "-";
+    } else if (replacementPrefix === ".") {
+      replacementPrefix = "";
     }
 
     return this.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
@@ -4267,6 +4356,10 @@ class Subscriptions {
 
 }
 
+var global$1 = (typeof global !== "undefined" ? global :
+            typeof self !== "undefined" ? self :
+            typeof window !== "undefined" ? window : {});
+
 var lookup = [];
 var revLookup = [];
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
@@ -4376,11 +4469,6 @@ function fromByteArray (uint8) {
 
   return parts.join('')
 }
-
-var base64 = /*#__PURE__*/Object.freeze({
-  toByteArray: toByteArray,
-  fromByteArray: fromByteArray
-});
 
 function read (buffer, offset, isLE, mLen, nBytes) {
   var e, m;
@@ -5925,7 +6013,7 @@ function checkIEEE754 (buf, value, offset, ext, max, min) {
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
   if (!noAssert) {
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38);
+    checkIEEE754(buf, value, offset, 4);
   }
   write(buf, value, offset, littleEndian, 23, 4);
   return offset + 4
@@ -5941,7 +6029,7 @@ Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) 
 
 function writeDouble (buf, value, offset, littleEndian, noAssert) {
   if (!noAssert) {
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308);
+    checkIEEE754(buf, value, offset, 8);
   }
   write(buf, value, offset, littleEndian, 52, 8);
   return offset + 8

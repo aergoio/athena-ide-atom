@@ -1,3 +1,10 @@
+## 0.4.2 - Bug fix & Improvement
+
+* Fix bug in autocomplete replacment
+* Update athena client version
+* Parse table, boolean, number type arguments
+* Add clear button to console view
+
 ## 0.4.1 - Bug fix & Improvement
 
 * Fix overflowing arguments summary when it's too long
