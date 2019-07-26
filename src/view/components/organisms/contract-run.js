@@ -53,7 +53,7 @@ export default class ContractRun extends React.Component {
             payable={payable}
             runnerName={runnerName}
             runnerStyle={runnerStyle}
-            runner={argsRef => runner(contractAddress, abi, runnerName, argsRef)}
+            runner={argsRef => runner(contractAddress, runnerName, argsRef)}
           />
         );
       });

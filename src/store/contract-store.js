@@ -5,7 +5,7 @@ import serviceProvider from '../service';
 
 export default class ContractStore {
 
-  @observable observableContractAddress2Abi = new Map();
+  @observable address2Interface = new Map();
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -16,18 +16,21 @@ export default class ContractStore {
   }
 
   @computed get contractAddress2Abi() {
-    return this.observableContractAddress2Abi.toJS();
+    const address2AbiInArray = Array.from(this.address2Interface.toJS()).map(([address, i]) => [ address, i.abi ]);
+    const address2Abi = new Map(address2AbiInArray);
+    return address2Abi;
   }
 
   @action deserialize(data) {
     logger.debug("Deserialize", data);
   }
 
-  @action addContract(contract) {
-    logger.debug("Add contract", contract);
-    serviceProvider.contractService.getABI(contract).then(abi => {
-      this.observableContractAddress2Abi.set(contract, abi);
-      const message = "Successfully imported contract " + contract;
+  @action addContract(contractAddress) {
+    logger.debug("Add contract", contractAddress);
+    serviceProvider.contractService.getContractInterface(contractAddress).then(contractInterface => {
+      this.address2Interface.set(contractAddress, contractInterface);
+
+      const message = "Successfully imported contract " + contractAddress;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
     }).catch(err => {
@@ -41,22 +44,21 @@ export default class ContractStore {
     logger.debug("Deploy contract with", constructorArgs, amount);
 
     const account = this.rootStore.accountStore.currentAccount;
-    const deployInfo = {
+    const deployment = {
       payload: this.rootStore.deployTargetStore.compileResult.payload.trim(),
-      args: constructorArgs
+      args: constructorArgs,
+      amount: amount
     }
-    const fee = {
-      price: this.rootStore.feeStore.price,
-      limit: this.rootStore.feeStore.limit
-    }
+    const feeLimit = this.rootStore.feeStore.limit
 
-    serviceProvider.contractService.deploy(account, deployInfo, fee, amount).then(deployResult => {
+    serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
       this.rootStore.accountStore.updateAccountState();
 
       const contractAddress = deployResult.contractAddress;
-      const abi = deployResult.abi;
+      const contractInterface = deployResult.contractInterface;
       const txHash = deployResult.txHash;
-      this.observableContractAddress2Abi.set(contractAddress, abi);
+      this.address2Interface.set(contractAddress, contractInterface);
+
       this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
       this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
       this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
@@ -68,22 +70,17 @@ export default class ContractStore {
     });
   }
 
-  @action executeContract(contractAddress, abi, functionName, args, amount) {
-    logger.debug("Execute contract with", contractAddress, abi, functionName, args, amount);
+  @action executeContract(contractAddress, functionName, args, amount) {
+    logger.debug("Execute contract with", contractAddress, functionName, args, amount);
+
+    const contractInterface = this.address2Interface.get(contractAddress);
 
     const account = this.rootStore.accountStore.currentAccount;
-    const invocationInfo = {
-      contractAddress: contractAddress,
-      abi: abi,
-      targetFunction: functionName,
-      args: args
-    };
-    const fee = {
-      price: this.rootStore.feeStore.price,
-      limit: this.rootStore.feeStore.limit
-    }
+    const execution = contractInterface.getInvocation(functionName, ...args);
+    execution.amount = amount;
+    const feeLimit = this.rootStore.feeStore.limit;
 
-    serviceProvider.contractService.execute(account, invocationInfo, fee, amount).then(execResult => {
+    serviceProvider.contractService.execute(account, execution, feeLimit).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
 
       const txHash = execResult.txHash;
@@ -99,17 +96,13 @@ export default class ContractStore {
     });
   }
 
-  @action queryContract(contractAddress, abi, functionName, args) {
-    logger.debug("Query contract with", contractAddress, abi, functionName, args);
+  @action queryContract(contractAddress, functionName, args) {
+    logger.debug("Query contract with", contractAddress, functionName, args);
 
-    const invocationInfo = {
-      contractAddress: contractAddress,
-      abi: abi,
-      targetFunction: functionName,
-      args: args
-    };
+    const contractInterface = this.address2Interface.get(contractAddress);
+    const query = contractInterface.getInvocation(functionName, ...args);
 
-    serviceProvider.contractService.query(invocationInfo).then(queryResult => {
+    serviceProvider.contractService.query(query).then(queryResult => {
       this.rootStore.consoleStore.log("Query result: " + queryResult, "info");
     }).catch(err => {
       logger.error(err);
@@ -120,10 +113,10 @@ export default class ContractStore {
 
   @action removeContract(contractAddress) {
     logger.debug("Remove contract", contractAddress);
-    if (!this.observableContractAddress2Abi.has(contractAddress)) {
+    if (!this.address2Interface.has(contractAddress)) {
       return;
     }
-    this.observableContractAddress2Abi.delete(contractAddress);
+    this.address2Interface.delete(contractAddress);
   }
 
 }

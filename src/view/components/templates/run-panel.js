@@ -132,24 +132,24 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onAbiExec(contractAddress, abi, targetFunction, argInputRef) {
+  _onAbiExec(contractAddress, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Execute contract");
       logger.debug("Input ref", argInputRef);
       const targetArgs = argInputRef.current.values;
       const amount = argInputRef.current.amount;
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(contractAddress, abi, targetFunction, targetArgs, amount);
+      this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, amount);
     }, this._onError);
   }
 
-  _onAbiQuery(contractAddress, abi, targetFunction, argInputRef) {
+  _onAbiQuery(contractAddress, targetFunction, argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Query contract");
       logger.debug("Input ref", argInputRef);
       const targetArgs = argInputRef.current.values;
       logger.info("Query contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.queryContract(contractAddress, abi, targetFunction, targetArgs);
+      this.props.contractStore.queryContract(contractAddress, targetFunction, targetArgs);
     }, this._onError);
   }
 

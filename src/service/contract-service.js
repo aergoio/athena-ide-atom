@@ -8,41 +8,39 @@ export default class ContractService {
     this.client = client;
   }
 
-  async getABI(contractAddress) {
+  async getContractInterface(contractAddress) {
     assertNotEmpty(contractAddress, "Contract address is empty");
-    return await this.client.getABI(contractAddress);
+    return await this.client.getContractInterface(contractAddress);
   }
 
-  async deploy(account, deployInfo, fee, amount) {
+  async deploy(account, deployment, fee) {
     assertNotEmpty(account, "Selected account is empty");
-    assertNotEmpty(deployInfo, "Deploy info is empty");
-    assertNotEmpty(deployInfo.payload, "Deploy target is empty");
+    assertNotEmpty(deployment, "Deployment is empty");
+    assertNotEmpty(deployment.payload, "Deploy target is empty");
     assertNotEmpty(fee, "Contract deploy fee is empty");
-    assertNotEmpty(amount, "Contract deploy amount is empty");
 
-    logger.debug("Deploy with", account.address, deployInfo, fee, amount);
-    const deployResult = await this.client.deploy(account, deployInfo, fee, amount);
+    logger.debug("Deploy with", account.address, deployment, fee);
+    const deployResult = await this.client.deploy(account, deployment, fee);
 
-    return { contractAddress: deployResult.contractAddress, abi: deployResult.abi, txHash: deployResult.txHash };
+    return deployResult;
   }
 
-  async execute(account, invocationInfo, fee, amount) {
+  async execute(account, invocation, fee) {
     assertNotEmpty(account, "Selected account is empty");
-    assertNotEmpty(invocationInfo, "Invocation info is empty");
+    assertNotEmpty(invocation, "Invocation is empty");
     assertNotEmpty(fee, "Contract deploy fee is empty");
-    assertNotEmpty(amount, "Contract deploy amount is empty");
 
-    logger.debug("Execution with", account.address, invocationInfo, fee, amount);
-    const executeResult = await this.client.execute(account, invocationInfo, fee, amount);
+    logger.debug("Execution with", account.address, invocation, fee);
+    const executeResult = await this.client.execute(account, invocation, fee);
 
-    return { txHash: executeResult.txHash, result: executeResult.result, status: executeResult.status };
+    return executeResult;
   }
 
-  async query(invocationInfo) {
-    assertNotEmpty(invocationInfo, "Invocation info is empty");
+  async query(query) {
+    assertNotEmpty(query, "Invocation info is empty");
 
-    logger.debug("Query with", invocationInfo);
-    const result = await this.client.query(invocationInfo);
+    logger.debug("Query with", query);
+    const result = await this.client.query(query);
     return JSON.stringify(result);
   }
 

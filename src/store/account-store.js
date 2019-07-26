@@ -96,7 +96,7 @@ export default class AccountStore {
     }
 
     const account = this.address2Account.get(this.currentAddress);
-    account.encrypt(password).then(encrypted => {
+    account.export(password).then(encrypted => {
       const message = "exported: " + encrypted;
       this.rootStore.consoleStore.log(message, "info");
       this.rootStore.notificationStore.notify(message, "success");
