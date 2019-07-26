@@ -49,6 +49,8 @@ export default class AutoCompleteProvider {
     let replacementPrefix = originPrefix;
     if (prefixInfo.prefix === "-") {
       replacementPrefix = "-";
+    } else if (replacementPrefix === ".") {
+      replacementPrefix = "";
     }
 
     return this.autoCompleteService.suggest(source, filePath, prefixInfo.prefix, prefixStartIndex).then(rawSuggestions => {
