@@ -4,7 +4,7 @@
   "version": "0.4.2",
   "description": "A package for writing smart contract in aergo using atom ide",
   "scripts": {
-    "postinstall": "npm rebuild --runtime=electron --target=2.0.0",
+    "postinstall": "./scripts/postinstall.sh",
     "lint": "eslint --fix ./src",
     "test": "npm run lint && mocha --exit --require @babel/register --recursive",
     "dev": "npm run test && rollup -c ./scripts/rollup.config.js -w --environment NODE_ENV:development",
