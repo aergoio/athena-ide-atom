@@ -69,8 +69,8 @@
   },
   "dependencies": {
     "@aergo/athena-analysis": "0.1.1",
-    "@aergo/athena-client": "0.1.1",
-    "@aergo/athena-compiler": "0.1.3",
+    "@aergo/athena-client": "0.1.2",
+    "@aergo/athena-compiler": "0.1.4",
     "atom-package-deps": "^5.1.0",
     "clipboardy": "^2.1.0",
     "lodash": "^4.17.15",
