@@ -1,3 +1,8 @@
+## 0.4.3 - Bug fix & Improvement
+
+* Support recent atom version (v1.39 or higher)
+* Update compiler, client to aergo v1.3.0
+
 ## 0.4.2 - Bug fix & Improvement
 
 * Fix bug in autocomplete replacment

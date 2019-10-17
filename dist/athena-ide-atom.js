@@ -888,7 +888,7 @@ let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
   enumerable: true,
   writable: true,
   initializer: function () {
-    return new Set(["localhost:7845", "testnet.aergo.io:7845"]);
+    return new Set(["localhost:7845", "testnet-api.aergo.io:7845"]);
   }
 }), _applyDecoratedDescriptor(_class$5.prototype, "nodes", [mobx.computed], Object.getOwnPropertyDescriptor(_class$5.prototype, "nodes"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "deserialize"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "addNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "addNode"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "changeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "changeNode"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "updateNodeState", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "updateNodeState"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "removeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "removeNode"), _class$5.prototype)), _class$5);
 
