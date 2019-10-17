@@ -1,3 +1,7 @@
+## 0.4.4 - Fix install error
+
+* Fix install error
+
 ## 0.4.3 - Bug fix & Improvement
 
 * Support recent atom version (v1.39 or higher)
