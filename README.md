@@ -7,9 +7,10 @@
 
 A package for writing smart contract in aergo using atom
 
-## Compatible Aergo Version
+## Compatibility
 
-v1.0.x
+- Atom: v1.28 or higher
+- Aergo: v1.3.0 or higher
 
 ## Features
 
@@ -25,15 +26,60 @@ v1.0.x
 - [ ] Advanced linter (recommandation)
 - [ ] Simulation
 
+`./screenshots` holds all the supported features
 
-## How to use
+## Build
 
-### Installation
+Clone
+
+```sh
+> git clone https://github.com/aergoio/athena-ide-atom.git
+```
+
+Install dependency
+
+```sh
+> npm install
+```
+
+Run lint
+
+```sh
+> npm run lint
+```
+
+Run test (including lint)
+
+```sh
+> npm run test
+```
+
+Run dev
+
+```sh
+> npm run dev
+```
+
+Build
+
+```sh
+> npm run build
+```
+
+Link to local atom package
+
+```sh
+> apm link
+```
+
+## Product
+
+### Install
 
 With atom package manager
 
 ```sh
-$ apm install athena-ide-atom
+> apm install athena-ide-atom
 ```
 
 With atom ui
@@ -132,46 +178,3 @@ Query contract
 
 ![query_contract](./screenshots/21.query_contract.gif)
 
-## Build
-
-Clone
-
-```sh
-$ git clone https://github.com/aergoio/athena-ide-atom.git
-```
-
-Install dependency
-
-```sh
-$ npm install
-```
-
-Run lint
-
-```sh
-$ npm run lint
-```
-
-Run test (including lint)
-
-```sh
-$ npm run test
-```
-
-Run dev
-
-```sh
-$ npm run dev
-```
-
-Build
-
-```sh
-$ npm run build
-```
-
-Link to local atom package
-
-```sh
-$ apm link
-```
