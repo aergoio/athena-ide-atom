@@ -1,7 +1,7 @@
 # Athena-ide package
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Travis_ci](https://travis-ci.org/aergoio/athena-ide-atom.svg?branch=master)](https://travis-ci.org/aergoio/athena-ide-atom/)
+[![Travis_ci](https://travis-ci.org/aergoio/athena-ide-atom.svg?branch=develop)](https://travis-ci.org/aergoio/athena-ide-atom/)
 [![apm version](https://img.shields.io/apm/v/athena-ide-atom.svg)](https://atom.io/packages/athena-ide-atom)
 [![apm downloads](https://img.shields.io/apm/dm/athena-ide-atom.svg)](https://atom.io/packages/athena-ide-atom)
 
