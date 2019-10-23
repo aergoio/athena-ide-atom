@@ -1,4 +1,4 @@
-## 0.4.6 - Fix install error
+## 0.4.7 - Fix install error
 
 * Fix windows install error
 
