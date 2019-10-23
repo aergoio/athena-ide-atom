@@ -1,6 +1,6 @@
-## 0.4.5 - Fix install error
+## 0.4.6 - Fix install error
 
-* Fix install error
+* Fix windows install error
 
 ## 0.4.3 - Bug fix & Improvement
 
