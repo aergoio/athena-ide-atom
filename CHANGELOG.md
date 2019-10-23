@@ -1,4 +1,4 @@
-## 0.4.4 - Fix install error
+## 0.4.5 - Fix install error
 
 * Fix install error
 
