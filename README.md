@@ -12,6 +12,14 @@ A package for writing smart contract in aergo using atom
 - Atom: v1.28 or higher
 - Aergo: v1.3.0 or higher
 
+Need to rebuild for atom compatible electron version for grpc native modules in a herajs
+
+- atom 1.28.0: electron 2.0.0
+- atom 1.39.0: electron 3.1.1
+- atom 1.41.0: electron 4.2.0
+
+Check release notes of atom : https://github.com/atom/atom/releases
+
 ## Features
 
 - [X] Syntax highlighting
@@ -28,49 +36,15 @@ A package for writing smart contract in aergo using atom
 
 `./screenshots` holds all the supported features
 
-## Build
+## Build from source
 
-Clone
-
-```sh
-> git clone https://github.com/aergoio/athena-ide-atom.git
-```
-
-Install dependency
-
-```sh
-> npm install
-```
-
-Run lint
-
-```sh
-> npm run lint
-```
-
-Run test (including lint)
-
-```sh
-> npm run test
-```
-
-Run dev
-
-```sh
-> npm run dev
-```
-
-Build
-
-```sh
-> npm run build
-```
-
-Link to local atom package
-
-```sh
-> apm link
-```
+- Install dependency: `npm install`
+- Lint: `npm run lint`
+- Run test (including lint): `npm run test`
+- Link and run as dev mode (real time ui changes)
+  - Atom package link: `apm link`
+  - Run dev mode: `npm run dev`
+- Build dist: `npm run build`
 
 ## Product
 
@@ -178,3 +152,16 @@ Query contract
 
 ![query_contract](./screenshots/21.query_contract.gif)
 
+## Contribution
+
+Do not write custom scripts as external file like
+
+```json
+  "scripts": {
+    "some-script": "scripts/some-script.sh",
+  },
+```
+
+It would be broken in windows cmd.exe. Which causes package install failure in windows.
+
+Following single rule, feel free to make any pull requests.
