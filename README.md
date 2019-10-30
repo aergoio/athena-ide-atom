@@ -45,6 +45,7 @@ Check release notes of atom : https://github.com/atom/atom/releases
   - Atom package link: `apm link`
   - Run dev mode: `npm run dev`
 - Build dist: `npm run build`
+- Make installer: `npm run archive`
 
 ## Product
 
@@ -59,6 +60,14 @@ With atom package manager
 With atom ui
 
 ![install_with_atom_ui](./screenshots/1.install_with_atom_ui.gif)
+
+With installer (need unzip)
+
+[Release page](https://github.com/aergoio/athena-ide-atom/releases)
+
+```sh
+> ./athena-ide-atom-x.x.x-installer.bin
+```
 
 ### Open panel
 

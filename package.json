@@ -11,7 +11,8 @@
     "lint": "eslint --fix ./src",
     "test": "npm run lint && mocha --exit --require @babel/register --recursive",
     "dev": "npm run test && rollup -c ./scripts/rollup.config.js -w --environment NODE_ENV:development",
-    "build": "npm run test && rollup -c ./scripts/rollup.config.js --environment BUILD:production"
+    "build": "npm run test && rollup -c ./scripts/rollup.config.js --environment BUILD:production",
+    "archive": "./scripts/make-bin.sh"
   },
   "repository": "https://github.com/aergoio/athena-ide-atom",
   "keywords": [
