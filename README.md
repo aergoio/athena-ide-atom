@@ -18,7 +18,9 @@ Need to rebuild for atom compatible electron version for grpc native modules in 
 - atom 1.39.0: electron 3.1.1
 - atom 1.41.0: electron 4.2.0
 
-Check release notes of atom : https://github.com/atom/atom/releases
+And for all platform (win32, linux, darwin) for packaging
+
+Check [release notes of atom](https://github.com/atom/atom/releases)
 
 ## Features
 
@@ -49,6 +51,11 @@ Check release notes of atom : https://github.com/atom/atom/releases
 
 ## Product
 
+### Prerequisite
+
+- [Atom](https://atom.io/)
+- [Git bash (windows only)](https://git-scm.com/downloads)
+
 ### Install
 
 With atom package manager
@@ -61,7 +68,7 @@ With atom ui
 
 ![install_with_atom_ui](./screenshots/1.install_with_atom_ui.gif)
 
-With installer (need unzip)
+With installer (use gitbash in windows)
 
 [Release page](https://github.com/aergoio/athena-ide-atom/releases)
 
@@ -163,14 +170,17 @@ Query contract
 
 ## Contribution
 
-Do not write custom scripts as external file like
+1. Do not write custom scripts as external file like
 
-```json
-  "scripts": {
-    "some-script": "scripts/some-script.sh",
-  },
-```
+   ```json
+   "scripts": {
+     "some-script": "scripts/some-script.sh",
+   },
+   ```
 
-It would be broken in windows cmd.exe. Which causes package install failure in windows.
+   It would break windows build in cmd.exe. Which causes package install failure in windows.
 
-Following single rule, feel free to make any pull requests.
+2. Since atom is electron-based, make sure external library is build on electron target.\
+   Do not use `electron-rebuild` because of grpc [see also](https://www.npmjs.com/package/grpc#about-electron).
+
+Following these rules, feel free to make any pull requests.

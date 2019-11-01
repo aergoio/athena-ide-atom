@@ -34,7 +34,7 @@ function archive-bin() {
   echo "Archiving.."
 
   pushd $PROJECT_HOME/.. > /dev/null
-  zip -r ${TEMP_ZIP} ${PROJECT_NAME} -x \*.git\* -x \*.bin -x .DS_Store > /dev/null
+  zip -9 -r ${TEMP_ZIP} ${PROJECT_NAME} -x \*.git\* -x \*.bin -x \*.DS_Store > /dev/null
   cat << EOF | cat - ${PROJECT_HOME}/scripts/installer.sh ${TEMP_ZIP} > ${target}
 EOF
   chmod +x ${target}
