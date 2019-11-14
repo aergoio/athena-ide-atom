@@ -21,6 +21,10 @@ export default class ContractStore {
     return address2Abi;
   }
 
+  @computed get contractAddresses() {
+    return Array.from(this.address2Interface.toJS()).map(([address]) => address);
+  }
+
   @action deserialize(data) {
     logger.debug("Deserialize", data);
   }
@@ -44,10 +48,15 @@ export default class ContractStore {
     logger.debug("Deploy contract with", constructorArgs, amount);
 
     const account = this.rootStore.accountStore.currentAccount;
+    const redeployTarget = this.rootStore.deployTargetStore.currentContract;
     const deployment = {
       payload: this.rootStore.deployTargetStore.compileResult.payload.trim(),
       args: constructorArgs,
       amount: amount
+    }
+    if ("" !== redeployTarget) {
+      logger.debug("Redeploy to", redeployTarget);
+      // TODO: set redeploy
     }
     const feeLimit = this.rootStore.feeStore.limit
 
@@ -117,6 +126,7 @@ export default class ContractStore {
       return;
     }
     this.address2Interface.delete(contractAddress);
+    this.rootStore.deployTargetStore.removeContract();
   }
 
 }

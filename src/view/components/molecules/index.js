@@ -5,6 +5,7 @@ import Balance from './balance';
 import CardTitle from './card-title';
 import ConstructorArguments from './constructor-arguments';
 import GasPrice from './gas-price';
+import ContractSelect from './contract-select';
 import FoldableCard from './foldable-card';
 import GasLimit from './gas-limit';
 import Height from './height';
@@ -22,6 +23,7 @@ export {
   CardTitle,
   ConstructorArguments,
   GasPrice,
+  ContractSelect,
   FoldableCard,
   GasLimit,
   Height,

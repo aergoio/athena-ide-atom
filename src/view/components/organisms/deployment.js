@@ -3,7 +3,7 @@ import { Flex } from 'reflexbox';
 import PropTypes from 'prop-types';
 
 import { Description, CardRow, Button } from '../atoms';
-import { CardTitle, FoldableCard, ConstructorArguments, TargetSelect } from '../molecules';
+import { CardTitle, FoldableCard, ConstructorArguments, TargetSelect, ContractSelect } from '../molecules';
 
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
@@ -14,6 +14,10 @@ export const Deployment = (props) => {
   const payable = props.payable;
   const argsRef = React.createRef();
   const onDeploy = props.onDeploy;
+
+  const currentContract = props.currentContract;
+  const contracts = props.contracts;
+  const onContractChange = props.onContractChange;
 
   let constructorOrNot;
   if (constructorArgs.length > 0 || payable === true) {
@@ -30,6 +34,11 @@ export const Deployment = (props) => {
         onChange={onTargetChange}
       />
       {constructorOrNot}
+      <ContractSelect
+        contract={currentContract}
+        contracts={contracts}
+        onChange={onContractChange}
+      />
       <CardRow>
         <Description description='' />
         <Flex justify='flex-end' w={1}>
@@ -51,6 +60,9 @@ Deployment.propTypes = {
   constructorArgs: PropTypes.array,
   payable: PropTypes.bool,
   onDeploy: PropTypes.func,
+  currentContract: PropTypes.string,
+  contracts: PropTypes.array,
+  onContractChange: PropTypes.func,
 }
 
 export default Deployment;

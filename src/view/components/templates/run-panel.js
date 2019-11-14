@@ -38,6 +38,7 @@ export default class RunPanel extends React.Component {
 
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
+    this._onContractChange = this._onContractChange.bind(this);
 
     this._onContractImport = this._onContractImport.bind(this);
     this._onContractCopy = this._onContractCopy.bind(this);
@@ -118,6 +119,13 @@ export default class RunPanel extends React.Component {
         amount = argInputRef.current.amount;
       }
       this.props.contractStore.deployContract(constructorArgs, amount);
+    }, this._onError);
+  }
+
+  _onContractChange(selectedContract) {
+    runWithCallback.call(this, () => {
+      logger.debug("Change contract target", selectedContract);
+      this.props.deployTargetStore.changeContract(selectedContract);
     }, this._onError);
   }
 
@@ -202,6 +210,9 @@ export default class RunPanel extends React.Component {
     const onDeploy = this._onDeployButtonClicked;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
     const payable = this.props.deployTargetStore.isPayable;
+    const currentContract = this.props.deployTargetStore.currentContract;
+    const contracts = this.props.contractStore.contractAddresses;
+    const onContractChange = this._onContractChange;
 
     // contract
     const onContractImport = this._onContractImport
@@ -247,6 +258,9 @@ export default class RunPanel extends React.Component {
           constructorArgs={constructorArgs}
           payable={payable}
           onDeploy={onDeploy}
+          currentContract={currentContract}
+          contracts={contracts}
+          onContractChange={onContractChange}
         />
         <Contract
           onContractImport={onContractImport}

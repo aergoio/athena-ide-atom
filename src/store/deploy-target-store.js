@@ -8,6 +8,7 @@ export default class DeployTargetStore {
 
   @observable currentTarget = "";
   @observable target2CompileResult = new Map();
+  @observable currentContract = "";
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -90,6 +91,16 @@ export default class DeployTargetStore {
   @action removeTarget(target) {
     logger.debug("Remove deploy target", target);
     this.target2CompileResult.delete(target);
+  }
+
+  @action changeContract(contract) {
+    logger.debug("Change contract to", contract);
+    this.currentContract = contract;
+  }
+
+  @action removeContract() {
+    logger.debug("Remove deploy contract");
+    this.currentContract = "";
   }
 
 }
