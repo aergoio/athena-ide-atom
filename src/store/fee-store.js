@@ -17,7 +17,7 @@ export default class FeeStore {
     logger.debug("Deserialize", data);
   }
 
-  @action setLimit(limit) {
+  @action changeLimit(limit) {
     this.limit = limit;
   }
 

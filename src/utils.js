@@ -33,7 +33,7 @@ export function runWithCallback(invoke, onError) {
   }
 }
 
-
+// lazy loading (herajs which used by athena client is too heavy)
 let Amount = undefined;
 const loadAmount = () => {
   if (typeof Amount === "undefined") {
@@ -44,7 +44,11 @@ const loadAmount = () => {
 
 let units = undefined;
 
-export function formatAergoBalance(balance) {
+export function convertAerPretty(balance) {
+  if (isNaN(balance)) {
+    return balance;
+  }
+
   let Amount = loadAmount();
 
   if (isUndefined(units)) {
@@ -67,9 +71,13 @@ export function formatAergoBalance(balance) {
   return amount.toUnit(unit).toString();
 }
 
-export function convertToAerAmountWithUnit(amount, unit) {
+export function convertToUnit(amount, originUnit, newUnit) {
+  if (isNaN(amount)) {
+    return amount;
+  }
+
   let Amount = loadAmount();
-  return new Amount(amount, unit).toUnit("aer").formatNumber();
+  return new Amount(amount, originUnit).toUnit(newUnit).formatNumber();
 }
 
 export function isUndefined(o) {

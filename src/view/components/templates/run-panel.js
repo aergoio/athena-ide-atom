@@ -7,9 +7,9 @@ import logger from 'loglevel';
 import { Panel } from '../atoms';
 import { Summary, TopBar, Account, Node, Deployment, Contract } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
-import { runWithCallback } from '../../../utils';
+import { formatInteger, convertAerPretty, runWithCallback } from '../../../utils';
 
-@inject('nodeStore', 'accountStore', 'notificationStore', 'contractStore', 'deployTargetStore')
+@inject('nodeStore', 'accountStore', 'feeStore', 'notificationStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class RunPanel extends React.Component {
 
@@ -17,6 +17,7 @@ export default class RunPanel extends React.Component {
     return {
       nodeStore: PropTypes.any,
       accountStore: PropTypes.any,
+      feeStore: PropTypes.any,
       notificationStore: PropTypes.any,
       contractStore: PropTypes.any,
       deployTargetStore: PropTypes.any
@@ -33,6 +34,7 @@ export default class RunPanel extends React.Component {
 
     this._onAddressChange = this._onAddressChange.bind(this);
     this._onAddressCopy = this._onAddressCopy.bind(this);
+    this._onLimitChange = this._onLimitChange.bind(this);
 
     this._onFileChange = this._onFileChange.bind(this);
     this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
@@ -80,6 +82,13 @@ export default class RunPanel extends React.Component {
     runWithCallback.call(this, () => {
       logger.debug("Copy address", accountAddress);
       clipboardy.writeSync(accountAddress);
+    }, this._onError);
+  }
+
+  _onLimitChange(limit) {
+    runWithCallback.call(this, () => {
+      logger.debug("Change limit", limit);
+      this.props.feeStore.changeLimit(limit);
     }, this._onError);
   }
 
@@ -162,8 +171,8 @@ export default class RunPanel extends React.Component {
     // summary
     const node = this.props.nodeStore.currentNode;
     const address = this.props.accountStore.currentAddress;
-    const height = this.props.nodeStore.currentHeight;
-    const balanceWithUnit = this.props.accountStore.currentBalanceWithUnit;
+    const height = formatInteger(this.props.nodeStore.currentHeight);
+    const balanceWithUnit = convertAerPretty(this.props.accountStore.currentBalance);
     const nonce = this.props.accountStore.currentNonce;
 
     // sync
@@ -173,7 +182,7 @@ export default class RunPanel extends React.Component {
     // node
     // const node = this.props.nodeStore.currentNode;
     const nodes = this.props.nodeStore.nodes;
-    // const height = this.props.nodeStore.currentHeight;
+    // const height = formatInteger(this.props.nodeStore.currentHeight);
     const onNodeChange = this._onNodeUrlChange;
 
     // address
@@ -183,6 +192,8 @@ export default class RunPanel extends React.Component {
     const onAddressCopy = this._onAddressCopy;
     const balance = this.props.accountStore.currentBalance;
     // const nonce = this.props.accountStore.currentNonce;
+    const price = 100; // TODO: integrate price
+    const onLimitChange = this._onLimitChange;
 
     // deployment target
     const currentTarget = this.props.deployTargetStore.currentTarget;
@@ -226,6 +237,8 @@ export default class RunPanel extends React.Component {
           onAddressCopy={onAddressCopy}
           balance={balance}
           nonce={nonce}
+          price={price}
+          onLimitChange={onLimitChange}
         />
         <Deployment
           currentTarget={currentTarget}

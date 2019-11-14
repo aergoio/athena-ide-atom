@@ -2,7 +2,6 @@ import { observable, action, computed } from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
-import { formatInteger, formatAergoBalance } from '../utils';
 
 let Account = undefined;
 const loadAccount = () => {
@@ -15,9 +14,8 @@ const loadAccount = () => {
 export default class AccountStore {
 
   @observable currentAddress = "";
-  @observable currentBalance = "";
-  @observable currentBalanceWithUnit = "";
-  @observable currentNonce = "";
+  @observable currentBalance = "unknown";
+  @observable currentNonce = "unknown";
   @observable address2Account = new Map();
 
   constructor(rootStore) {
@@ -83,9 +81,8 @@ export default class AccountStore {
   @action updateAccountState() {
   logger.debug("Update account state of", this.currentAddress);
     serviceProvider.accountService.getAccountState(this.currentAddress).then(state => {
-      this.currentBalance = "unknown" === state.balance ? state.balance : formatInteger(state.balance);
-      this.currentBalanceWithUnit = "unknown" === state.balance ? state.balance : formatAergoBalance(state.balance);
-      this.currentNonce = state.nonce;
+      this.currentBalance = "unknown" !== state.balance ? state.balance : "unknown";
+      this.currentNonce = "unknown" !== state.nonce ? state.nonce : "unknown";
     });
   }
 

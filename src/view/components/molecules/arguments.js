@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
-import { convertToAerAmountWithUnit, join } from '../../../utils';
+import { convertToUnit, join } from '../../../utils';
 
 const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
@@ -68,7 +68,7 @@ export default class Arguments extends React.Component {
 
   get amount() {
     const amount = "" === this.state.amount ? "0" : this.state.amount;
-    return convertToAerAmountWithUnit(amount, this.state.unit);
+    return convertToUnit(amount, 'aer', this.state.unit);
   }
 
   _onArgumentValueChange(e, index) {

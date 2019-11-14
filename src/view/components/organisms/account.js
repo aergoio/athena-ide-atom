@@ -3,7 +3,7 @@ import { Flex, Box } from 'reflexbox';
 import PropTypes from 'prop-types';
 
 import { Description, CardRow } from '../atoms';
-import { FoldableCard, CardTitle, AccountSelect, Balance, Nonce } from '../molecules';
+import { FoldableCard, CardTitle, AccountSelect, Balance, Nonce, GasPrice, GasLimit } from '../molecules';
 import { ImportAccountModal, ExportAccountModal, RemoveAccountModal, NewAccountModal } from './modals';
 
 export const Account = (props) => {
@@ -13,12 +13,23 @@ export const Account = (props) => {
   const onAddressCopy = props.onAddressCopy;
   const balance = props.balance;
   const nonce = props.nonce;
+  const price = props.price;
+  const limitRef = React.createRef();
+  const onLimitChange = props.onLimitChange;
 
   return (
     <FoldableCard trigger={<CardTitle title='Account' />}>
       <AccountSelect address={address} addresses={addresses} onAddressChange={onAddressChange} onAddressCopy={onAddressCopy} />
-      <Balance balance={balance} />
-      <Nonce nonce={nonce} />
+      <Flex w={1}>
+        <Box w={2/3}>
+          <Balance balance={balance} />
+        </Box>
+        <Box w={1/3}>
+          <Nonce nonce={nonce} />
+        </Box>
+      </Flex>
+      <GasPrice price={price} />
+      <GasLimit limitRef={limitRef} onLimitChange={() => onLimitChange(limitRef.current.value)} />
       <CardRow>
         <Description description='' />
         <Flex justify='space-between' w={1}>
@@ -42,7 +53,9 @@ Account.propTypes = {
   onAddressChange: PropTypes.func,
   onAddressCopy: PropTypes.func,
   balance: PropTypes.number,
-  nonce: PropTypes.number
+  nonce: PropTypes.number,
+  price: PropTypes.number,
+  onLimitChange: PropTypes.func,
 }
 
 export default Account;

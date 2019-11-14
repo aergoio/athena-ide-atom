@@ -2,7 +2,6 @@ import {observable, action, computed} from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
-import { formatInteger } from '../utils';
 
 export default class NodeStore {
 
@@ -55,8 +54,8 @@ export default class NodeStore {
     logger.debug("Update node state of", this.currentNode);
     serviceProvider.setEndpoint(this.currentNode);
     serviceProvider.nodeService.blockchainStatus().then(status => {
-      this.currentHeight = "unknown" === status.height ? status.height : formatInteger(status.height);
-      this.bestHash = status.hash;
+      this.currentHeight = "unknown" !== status.height ? status.height : "unknown";
+      this.bestHash = "unknown" !== status.hash ? status.hash : "unknown";
     })
     this.rootStore.accountStore.updateAccountState();
   }
