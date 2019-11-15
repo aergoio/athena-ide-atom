@@ -1,7 +1,9 @@
 import "./library.lua"
 
 function constructor(key, arg1, arg2)
-  system.setItem(key, {intVal=arg1, stringVal=arg2})
+  if key ~= nil then
+    system.setItem(key, {intVal=arg1, stringVal=arg2})
+  end
 end
 
 function setItemWithTable(key, table)

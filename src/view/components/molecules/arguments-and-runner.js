@@ -17,7 +17,11 @@ const ArgumentsAndRunner = (props) => {
 
   let delegateFeeBoxOrNot;
   if (true === feeDelegation) {
-    delegateFeeBoxOrNot = <CheckBox text="Delegate fee" ref={delegateFeeRef} />;
+    delegateFeeBoxOrNot = (
+      <Box>
+        <CheckBox text="Delegate fee" ref={delegateFeeRef} />
+      </Box>
+    );
   } else {
     delegateFeeBoxOrNot = <div></div>;
   }
@@ -28,9 +32,7 @@ const ArgumentsAndRunner = (props) => {
       </Box>
       <Box style={{ paddingTop: '5px' }}>
         <Flex align='right' justify='space-between'>
-          <Box>
-            {delegateFeeBoxOrNot}
-          </Box>
+          {delegateFeeBoxOrNot}
           <Box>
             <Button
               name={runnerName}

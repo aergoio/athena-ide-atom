@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { CopyIcon, TrashIcon } from '../atoms';
 import { CardTitle, ArgumentsAndRunner, FoldableCard } from '../molecules';
 
+const blacklist = [ 'constructor', 'default', 'check_delegation' ];
+
 export default class ContractRun extends React.Component {
 
   static get propTypes() {
@@ -33,13 +35,11 @@ export default class ContractRun extends React.Component {
       return <div></div>;
     }
 
-    const abiCalls = abiFunctions.filter(f => "constructor" !== f.name)
+    const abiCalls = abiFunctions.filter(f => blacklist.indexOf(f.name) === -1)
       .map((abiFunction, index) => {
         const args = abiFunction.arguments.map(a => a.name);
         const payable = abiFunction.payable;
-        // TODO: force delegateable
-        // const feeDelegation = abiFunction.feeDelegation;
-        const feeDelegation = true;
+        const feeDelegation = abiFunction.feeDelegation;
 
         const runnerName = abiFunction.name;
         let runnerStyle = 'component-btn-transaction';
