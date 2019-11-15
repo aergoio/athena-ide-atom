@@ -37,6 +37,9 @@ export default class ContractRun extends React.Component {
       .map((abiFunction, index) => {
         const args = abiFunction.arguments.map(a => a.name);
         const payable = abiFunction.payable;
+        // TODO: force delegateable
+        // const feeDelegation = abiFunction.feeDelegation;
+        const feeDelegation = true;
 
         const runnerName = abiFunction.name;
         let runnerStyle = 'component-btn-transaction';
@@ -51,9 +54,10 @@ export default class ContractRun extends React.Component {
             key={index}
             args={args}
             payable={payable}
+            feeDelegation={feeDelegation}
             runnerName={runnerName}
             runnerStyle={runnerStyle}
-            runner={argsRef => runner(contractAddress, runnerName, argsRef)}
+            runner={(argsRef, delegateFeeRef) => runner(contractAddress, runnerName, argsRef, delegateFeeRef)}
           />
         );
       });

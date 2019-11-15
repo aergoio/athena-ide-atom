@@ -79,14 +79,16 @@ export default class ContractStore {
     });
   }
 
-  @action executeContract(contractAddress, functionName, args, amount) {
-    logger.debug("Execute contract with", contractAddress, functionName, args, amount);
+  @action executeContract(contractAddress, functionName, args, amount, delegationFee) {
+    logger.debug("Execute contract with", contractAddress, functionName, args, amount, delegationFee);
 
     const contractInterface = this.address2Interface.get(contractAddress);
 
     const account = this.rootStore.accountStore.currentAccount;
     const execution = contractInterface.getInvocation(functionName, ...args);
     execution.amount = amount;
+    // TODO: sync with athena
+    // execution.delegationFee = delegationFee;
     const feeLimit = this.rootStore.feeStore.limit;
 
     serviceProvider.contractService.execute(account, execution, feeLimit).then(execResult => {

@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
 import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
-import { convertToUnit, join } from '../../../utils';
+import { convertToUnit } from '../../../utils';
 
 const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
+
+const argumentsTextBoxClass = 'component-textbox-arguments';
 
 export default class Arguments extends React.Component {
 
@@ -170,15 +172,9 @@ export default class Arguments extends React.Component {
 
     const argumentDisplay = this._generateArgsDisplay();
     const amountDisplay = this._generateAmountDisplay();
-
-    const argumentsTextBoxClass = argumentDisplay === noArgumentsDisplay ?
-      join('component-textbox-no-arguments', 'component-textbox-arguments')
-      : 'component-textbox-arguments';
+    const displayArgsText = argumentDisplay + '   ' + amountDisplay;
     const trigger = (
-      <div className='component-arguments-and-amount'>
-        <TextBox class={argumentsTextBoxClass} text={argumentDisplay} />
-        <TextBox class='component-textbox-amount' text={amountDisplay} />
-      </div>
+      <TextBox class={argumentsTextBoxClass} text={displayArgsText} />
     );
 
     return (

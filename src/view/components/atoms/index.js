@@ -5,6 +5,7 @@ import Button from './button';
 import CardItem from './card-item';
 import CardRow from './card-row';
 import Card from './card';
+import CheckBox from './check-box';
 import CopyIcon from './copy-icon';
 import Description from './description';
 import Foldable from './foldable';
@@ -30,6 +31,7 @@ export {
   CardItem,
   CardRow,
   Card,
+  CheckBox,
   CopyIcon,
   Description,
   Foldable,

@@ -321,6 +321,40 @@
     -webkit-appearance: none;
   }
 
+  .component-checkbox-label {
+    padding-left: 0.3em;
+    .component-checkbox {
+      width: 13px;
+      height: 13px;
+      background-color: transparent;
+      border-radius: 3px;
+      position: relative;
+      border: solid 1px rgba(157, 165, 179, 0.65);
+      -webkit-appearance: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 12px;
+        left: 6.4px;
+        height: 2px;
+        border-radius: 1px;
+        background-color: #282c34;
+        transform-origin: 0 0;
+        opacity: 0;
+        transition: transform 0.1s cubic-bezier(0.5, 0.15, 0.2, 1), opacity 0.1s cubic-bezier(0.5, 0.15, 0.2, 1);
+      }
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:checked {
+        background-color: #7741f9;
+      }
+    }
+  }
+
   .component-textbox {
     width: 100%;
     height: 100%;
@@ -334,34 +368,11 @@
     padding: @card-row-padding;
   }
 
-  .component-arguments-and-amount {
-    margin-right: 1.8em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-  }
-
   .component-textbox-arguments {
-    width: auto;
-    text-align: left;
-    background-color: transparent;
-    color: rgba(255, 255, 255, 0.65);
-    white-space: nowrap;
+    width: ~"calc(100% - 30px)";
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .component-textbox-no-arguments {
-    color: rgba(255, 255, 255, 0.30);
-  }
-
-  .component-textbox-amount {
-    width: max-content;
-    white-space: nowrap;
     text-align: left;
-    overflow: unset;
-    background-color: transparent;
-    color: rgba(255, 255, 255, 0.65);
   }
 
   .component-btn {
