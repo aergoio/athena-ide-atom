@@ -5,7 +5,7 @@ import clipboardy from 'clipboardy';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Account, Node, Deployment, Contract } from '../organisms';
+import { Account, Node, Deployment, ContractImport } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
 import { runWithCallback } from '../../../utils';
 
@@ -108,17 +108,19 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onDeploy(argInputRef) {
+  _onDeploy(inputsRef) {
     runWithCallback.call(this, () => {
       logger.debug("Deploy contract");
-      logger.debug("Input ref", argInputRef);
+      logger.debug("Input ref", inputsRef);
       let constructorArgs = [];
+      let gasLimit = undefined;
       let amount = "0";
-      if (argInputRef.current) {
-        constructorArgs = argInputRef.current.values;
-        amount = argInputRef.current.amount;
+      if (inputsRef.current) {
+        constructorArgs = inputsRef.current.values;
+        gasLimit = inputsRef.current.gasLimit;
+        amount = inputsRef.current.amount;
       }
-      this.props.contractStore.deployContract(constructorArgs, amount);
+      this.props.contractStore.deployContract(constructorArgs, gasLimit, amount);
     }, this._onError);
   }
 
@@ -144,26 +146,24 @@ export default class RunPanel extends React.Component {
   }
 
 
-  _onAbiExec(contractAddress, targetFunction, argInputRef, delegationFeeRef) {
+  _onAbiExec(contractAddress, targetFunction, inputsRef) {
     runWithCallback.call(this, () => {
       logger.debug("Execute contract");
-      logger.debug("Input ref", argInputRef);
-      logger.debug("DelegationFee ref", delegationFeeRef);
-      const targetArgs = argInputRef.current.values;
-      const amount = argInputRef.current.amount;
-      const delegationFee = delegationFeeRef.current === null ? false
-          : delegationFeeRef.current.checked;
-      logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, amount, delegationFee);
+      logger.debug("Input ref", inputsRef);
+      const targetArgs = inputsRef.current.values;
+      const gasLimit = inputsRef.current.gasLimit;
+      const amount = inputsRef.current.amount;
+      const feeDelegation = inputsRef.current.feeDelegation;
+      this.props.contractStore.executeContract(contractAddress, targetFunction,
+          targetArgs, gasLimit, amount, feeDelegation);
     }, this._onError);
   }
 
-  _onAbiQuery(contractAddress, targetFunction, argInputRef) {
+  _onAbiQuery(contractAddress, targetFunction, inputRefs) {
     runWithCallback.call(this, () => {
       logger.debug("Query contract");
-      logger.debug("Input ref", argInputRef);
-      const targetArgs = argInputRef.current.values;
-      logger.info("Query contract", targetFunction, "with args", targetArgs);
+      logger.debug("Input ref", inputRefs);
+      const targetArgs = inputRefs.current.values;
       this.props.contractStore.queryContract(contractAddress, targetFunction, targetArgs);
     }, this._onError);
   }
@@ -242,7 +242,7 @@ export default class RunPanel extends React.Component {
           onCompile={onCompile}
           onDeploy={onDeploy}
         />
-        <Contract
+        <ContractImport
           onContractImport={onContractImport}
           onContractCopy={onContractCopy}
           onContractRemove={onContractRemove}

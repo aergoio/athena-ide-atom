@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { CopyIcon, TrashIcon } from '../atoms';
-import { CardTitle, ArgumentsAndRunner, FoldableCard } from '../molecules';
+
+import { CardRow, CardItem, Title, CopyIcon, TrashIcon } from '../atoms';
+import { ArgumentsAndRunner, FoldableCard } from '../molecules';
 
 const blacklist = [ 'constructor', 'default', 'check_delegation' ];
 
@@ -39,13 +40,13 @@ export default class ContractRun extends React.Component {
       .map((abiFunction, index) => {
         const args = abiFunction.arguments.map(a => a.name);
         const payable = abiFunction.payable;
-        const feeDelegation = abiFunction.feeDelegation;
-
+        const feeDelegatable = abiFunction.feeDelegation;
         const runnerName = abiFunction.name;
-        let runnerStyle = 'component-btn-transaction';
+
         let runner = onAbiExec;
+        let gasConsumable = true;
         if (abiFunction.view) {
-          runnerStyle = '';
+          gasConsumable = false;
           runner = onAbiQuery;
         }
 
@@ -53,20 +54,25 @@ export default class ContractRun extends React.Component {
           <ArgumentsAndRunner
             key={index}
             args={args}
+            gasConsumable={gasConsumable}
             payable={payable}
-            feeDelegation={feeDelegation}
+            feeDelegatable={feeDelegatable}
             runnerName={runnerName}
-            runnerStyle={runnerStyle}
-            runner={(argsRef, delegateFeeRef) => runner(contractAddress, runnerName, argsRef, delegateFeeRef)}
+            runner={(argsRef) => runner(contractAddress, runnerName, argsRef)}
           />
         );
       });
 
     const trigger = (
-      <CardTitle title={contractAddress} titleClass='component-contract-run-title'>
-        <CopyIcon onClick={(e) => { e.stopPropagation(); onContractCopy(contractAddress)} } />
-        <TrashIcon onClick={(e) => { e.stopPropagation(); onContractRemove(contractAddress)} } />
-      </CardTitle>
+      <CardRow>
+        <CardItem ratio={1} hideOverflow>
+          <Title title={contractAddress} class='component-contract-run-title' />
+        </CardItem>
+        <CardItem ratio={0}>
+          <CopyIcon onClick={(e) => { e.stopPropagation(); onContractCopy(contractAddress)} } />
+          <TrashIcon onClick={(e) => { e.stopPropagation(); onContractRemove(contractAddress)} } />
+        </CardItem>
+      </CardRow>
     );
     return (
       <FoldableCard foldableClass='before-component-foldable' trigger={trigger} transitionTime={1} >

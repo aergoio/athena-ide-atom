@@ -7,7 +7,6 @@ import ConstructorArguments from './constructor-arguments';
 import GasPrice from './gas-price';
 import ContractSelect from './contract-select';
 import FoldableCard from './foldable-card';
-import GasLimit from './gas-limit';
 import Height from './height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
@@ -24,7 +23,6 @@ export {
   GasPrice,
   ContractSelect,
   FoldableCard,
-  GasLimit,
   Height,
   NodeSelect,
   Nonce,

@@ -9,6 +9,7 @@ export default class CheckBox extends React.Component {
   static get propTypes() {
     return {
       text: PropTypes.string,
+      onChange: PropTypes.func,
     };
   }
 
@@ -33,7 +34,12 @@ export default class CheckBox extends React.Component {
 
   render() {
     const text = this.props.text;
-    const onChange = this._onCheckChange;
+    const onChange = (e) => {
+      this._onCheckChange(e);
+      if (this.props.onChange) {
+        this.props.onChange(e);
+      }
+    }
     return (
       <label className={checkBoxLabelClass} >
         <input

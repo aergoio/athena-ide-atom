@@ -1,57 +1,47 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { Flex, Box } from 'reflexbox';
-import { CardRow, Button, CheckBox } from '../atoms';
+import { CardRow, CardItem, Button } from '../atoms';
 import Arguments from './arguments';
+
+const transactionButtonClass = 'component-btn-transaction';
 
 const ArgumentsAndRunner = (props) => {
   const args = props.args;
+  const gasConsumable = props.gasConsumable;
   const payable = props.payable;
-  const feeDelegation = props.feeDelegation;
-  const runnerName = props.runnerName;
-  const runnerStyle = props.runnerStyle;
-  const runner = props.runner;
-
+  const feeDelegatable = props.feeDelegatable;
   const argsRef = React.createRef();
-  const delegateFeeRef = React.createRef();
 
-  let delegateFeeBoxOrNot;
-  if (true === feeDelegation) {
-    delegateFeeBoxOrNot = (
-      <Box>
-        <CheckBox text="Delegate fee" ref={delegateFeeRef} />
-      </Box>
-    );
-  } else {
-    delegateFeeBoxOrNot = <div></div>;
-  }
+  const runnerName = props.runnerName;
+  const runnerClass = gasConsumable ? transactionButtonClass : "";
+  const runner = props.runner;
   return (
-    <CardRow style={{ flexDirection: 'column' }}>
-      <Box>
-        <Arguments args={args} payable={payable} ref={argsRef} />
-      </Box>
-      <Box style={{ paddingTop: '5px' }}>
-        <Flex align='right' justify='space-between'>
-          {delegateFeeBoxOrNot}
-          <Box>
-            <Button
-              name={runnerName}
-              class={runnerStyle}
-              onClick={() => runner(argsRef, delegateFeeRef)}
-            />
-          </Box>
-        </Flex>
-      </Box>
+    <CardRow>
+      <CardItem ratio={1} hideOverflow>
+        <Arguments
+          args={args}
+          gasConsumable={gasConsumable}
+          payable={payable}
+          feeDelegatable={feeDelegatable}
+          ref={argsRef} />
+      </CardItem>
+      <CardItem ratio={0}>
+        <Button
+          name={runnerName}
+          class={runnerClass}
+          onClick={() => runner(argsRef)}
+        />
+      </CardItem>
     </CardRow>
   );
 }
 
 ArgumentsAndRunner.propTypes = {
   args: PropTypes.array,
+  gasConsumable: PropTypes.bool,
   payable: PropTypes.bool,
-  feeDelegation: PropTypes.bool,
+  feeDelegatable: PropTypes.bool,
   runnerName: PropTypes.string,
-  runnerStyle: PropTypes.string,
   runner: PropTypes.func
 }
 

@@ -47,8 +47,8 @@ export default class ContractStore {
     });
   }
 
-  @action deployContract(constructorArgs, amount, gasLimit) {
-    logger.debug("Deploy contract with", constructorArgs, amount);
+  @action deployContract(constructorArgs, gasLimit, amount) {
+    logger.debug("Deploy contract with", constructorArgs, gasLimit, amount);
 
     const account = this.rootStore.accountStore.currentAccount;
     const redeployTarget = this.rootStore.deployTargetStore.currentContract;

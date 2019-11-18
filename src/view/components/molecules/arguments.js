@@ -2,10 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox } from '../atoms';
+import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox, CheckBox } from '../atoms';
 import { convertToUnit } from '../../../utils';
 
-const noArgumentsDisplay = "No arguments provided";
 const units = [ "aer", "gaer", "aergo" ];
 
 const argumentsTextBoxClass = 'component-textbox-arguments';
@@ -16,7 +15,9 @@ export default class Arguments extends React.Component {
     return {
       resetState: PropTypes.bool,
       args: PropTypes.array.isRequired,
+      gasConsumable: PropTypes.bool,
       payable: PropTypes.bool,
+      feeDelegatable: PropTypes.bool,
     };
   }
 
@@ -25,8 +26,10 @@ export default class Arguments extends React.Component {
     this.state = {
       isFocused: false,
       args: new Array(props.args.length).fill(""),
+      gasLimit: "",
       amount: "",
       unit: "aer",
+      feeDelegation: false
     };
 
     // hack to clean value when reset
@@ -35,8 +38,10 @@ export default class Arguments extends React.Component {
     this._onFocusOnAnyInput = this._onFocusOnAnyInput.bind(this);
     this._onBrurOnAnyInput = this._onBrurOnAnyInput.bind(this);
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
+    this._onGasLimitChange = this._onGasLimitChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
     this._onUnitChange = this._onUnitChange.bind(this);
+    this._onFeeDelegationChange = this._onFeeDelegationChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -44,8 +49,10 @@ export default class Arguments extends React.Component {
       this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
       this.setState({
         args: new Array(nextProps.args.length).fill(""),
+        gasLimit: "",
         amount: "",
-        unit: "aer"
+        unit: "aer",
+        feeDelegation: false,
       });
     }
   }
@@ -68,9 +75,18 @@ export default class Arguments extends React.Component {
     return jsonProcessed;
   }
 
+  get gasLimit() {
+    return this.state.gasLimit;
+  }
+
   get amount() {
     const amount = "" === this.state.amount ? "0" : this.state.amount;
-    return convertToUnit(amount, 'aer', this.state.unit);
+    const amountInAer = convertToUnit(amount, this.state.unit, 'aer');
+    return amountInAer;
+  }
+
+  get feeDelegation() {
+    return this.state.feeDelegation;
   }
 
   _onArgumentValueChange(e, index) {
@@ -82,6 +98,11 @@ export default class Arguments extends React.Component {
     this.setState({ args: newArgs });
   }
 
+  _onGasLimitChange(e) {
+    const newValue = e.target.value;
+    this.setState({ gasLimit: newValue.toString() });
+  }
+
   _onAmountChange(e) {
     const newValue = e.target.value;
     this.setState({ amount: newValue.toString() });
@@ -91,8 +112,22 @@ export default class Arguments extends React.Component {
     this.setState({ unit: newUnit });
   }
 
-  _generateArgsDisplay() {
-    let argumentDisplay = noArgumentsDisplay;
+  _onFeeDelegationChange(e) {
+    const newValue = e.target.checked;
+    this.setState({ feeDelegation: newValue });
+  }
+
+  _getSummary() {
+    const args = this._getArgsSummary();
+    const limit = this._getGasLimitSummary();
+    const amount = this._getAmountSummary();
+    const feeDelegation = this._getFeeDelegationSummary();
+    const extraSummary = [ limit, amount, feeDelegation ].filter(v => "" !== v).join(', ');
+    return args + ("" !== extraSummary ? ' (' + extraSummary + ')' : "");
+  }
+
+  _getArgsSummary() {
+    let argumentDisplay = "[]";
 
     if (this.state.args.map(a => a.trim())
           .filter(a => "" !== a)
@@ -103,8 +138,18 @@ export default class Arguments extends React.Component {
     return argumentDisplay;
   }
 
-  _generateAmountDisplay() {
-    return "" !== this.state.amount ? (this.state.amount + " " + this.state.unit) : "";
+  _getGasLimitSummary() {
+    return this.props.gasConsumable && "" !== this.state.gasLimit ?
+        ("Limit: " + this.state.gasLimit) : "";
+  }
+
+  _getAmountSummary() {
+    return this.props.payable && "" !== this.state.amount ?
+        ("Amount: " + this.state.amount + " " + this.state.unit) : "";
+  }
+
+  _getFeeDelegationSummary() {
+    return this.props.feeDelegatable ? "FeeDelegation: " + this.state.feeDelegation : "";
   }
 
   _onFocusOnAnyInput() {
@@ -143,6 +188,29 @@ export default class Arguments extends React.Component {
       );
     });
 
+    // gas limit
+    if (this.props.gasConsumable) {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.push(inputRef);
+
+      argumentComponents.push((
+        <ArgumentRow>
+          <ArgumentName name="Gas Limit" />
+          <InputBox
+            tabIndex={tabIndexProvider()}
+            type="number"
+            class='component-inputbox-argument'
+            onChange={this._onGasLimitChange}
+            onFocus={this._onFocusOnAnyInput}
+            onBlur={this._onBrurOnAnyInput}
+            ref={inputRef}
+          />
+        </ArgumentRow>
+      ));
+    }
+
+    // (optional) amount
     if (this.props.payable) {
       // hack to clean value when reset
       const inputRef = React.createRef();
@@ -168,13 +236,20 @@ export default class Arguments extends React.Component {
           />
         </ArgumentRow>
       ));
+
+      // (optional) delegation fee
+      if (this.props.feeDelegatable) {
+        argumentComponents.push((
+          <ArgumentRow>
+            <CheckBox text="Delegate fee" onChange={this._onFeeDelegationChange} />
+          </ArgumentRow>
+        ));
+      }
     }
 
-    const argumentDisplay = this._generateArgsDisplay();
-    const amountDisplay = this._generateAmountDisplay();
-    const displayArgsText = argumentDisplay + '   ' + amountDisplay;
+    const summary = this._getSummary();
     const trigger = (
-      <TextBox class={argumentsTextBoxClass} text={displayArgsText} />
+      <TextBox class={argumentsTextBoxClass} text={summary} />
     );
 
     return (

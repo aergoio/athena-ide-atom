@@ -41,7 +41,7 @@ export default class ContractService {
   async execute(account, invocation, fee) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(invocation, "Invocation is empty");
-    assertNotEmpty(fee, "Contract deploy fee is empty");
+    assertNotEmpty(fee, "Contract invocation fee is empty");
 
     logger.debug("Execution with", account.address, invocation, fee);
     const executeResult = await this.client.execute(account, invocation, fee);

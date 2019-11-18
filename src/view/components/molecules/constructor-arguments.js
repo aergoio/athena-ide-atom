@@ -13,7 +13,7 @@ const ConstructorArguments = (props) => {
         <Description description="Args" />
       </CardItem>
       <CardItem ratio={1} hideOverflow>
-        <Arguments args={args} payable={payable} ref={argsRef} />
+        <Arguments args={args} gasConsumable payable={payable} ref={argsRef} />
       </CardItem>
     </CardRow>
   );

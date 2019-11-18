@@ -6,7 +6,7 @@ import { Card, CardRow, Description, InputBox, Button } from '../atoms';
 import { CardTitle } from '../molecules';
 import ContractRun from './contract-run';
 
-export const Contract = (props) => {
+export const ContractImport = (props) => {
   const onContractImport = props.onContractImport;
   const onContractCopy = props.onContractCopy;
   const onContractRemove = props.onContractRemove;
@@ -55,7 +55,7 @@ export const Contract = (props) => {
   );
 }
 
-Contract.propTypes = {
+ContractImport.propTypes = {
   onContractImport: PropTypes.func,
   onContractCopy: PropTypes.func,
   onContractRemove: PropTypes.func,
@@ -64,4 +64,4 @@ Contract.propTypes = {
   onAbiQuery: PropTypes.func,
 }
 
-export default Contract;
+export default ContractImport;
