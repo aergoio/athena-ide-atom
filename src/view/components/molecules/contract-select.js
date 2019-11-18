@@ -2,7 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { CardRow, CardItem, Description, SelectBox } from '../atoms';
 
+// FIXME: hard coded one
+const noContractComment = "No contract selected";
+
 export const ContractSelect = (props) => {
+  const contract = props.contract;
+  const contracts = JSON.parse(JSON.stringify(props.contracts));
+  if (contracts.length !== 0) {
+    contracts.unshift(noContractComment); // add empty option
+  }
+  const onChange = props.onChange;
   return (
     <CardRow>
       <CardItem ratio={0}>
@@ -10,9 +19,9 @@ export const ContractSelect = (props) => {
       </CardItem>
       <CardItem ratio={1} hideOverflow>
         <SelectBox
-          value={props.contract}
-          options={props.contracts}
-          onChange={props.onChange}
+          value={contract}
+          options={contracts}
+          onChange={onChange}
           placeholder={"select contract if you want to redeploy"}
         />
       </CardItem>

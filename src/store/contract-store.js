@@ -3,6 +3,9 @@ import logger from 'loglevel';
 
 import serviceProvider from '../service';
 
+// FIXME: hard coded one
+const noContractComment = "No contract selected";
+
 export default class ContractStore {
 
   @observable address2Interface = new Map();
@@ -54,29 +57,46 @@ export default class ContractStore {
       args: constructorArgs,
       amount: amount
     }
-    if ("" !== redeployTarget) {
-      logger.debug("Redeploy to", redeployTarget);
-      // TODO: set redeploy
-    }
     const feeLimit = this.rootStore.feeStore.limit
 
-    serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
-      this.rootStore.accountStore.updateAccountState();
+    if ("" === redeployTarget || noContractComment === redeployTarget) {
+      serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
+        this.rootStore.accountStore.updateAccountState();
 
-      const contractAddress = deployResult.contractAddress;
-      const contractInterface = deployResult.contractInterface;
-      const txHash = deployResult.txHash;
-      this.address2Interface.set(contractAddress, contractInterface);
+        const contractAddress = deployResult.contractAddress;
+        const contractInterface = deployResult.contractInterface;
+        const txHash = deployResult.txHash;
+        this.address2Interface.set(contractAddress, contractInterface);
 
-      this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
-      this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
-      this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
-    }).catch(err => {
-      this.rootStore.accountStore.updateAccountState();
-      logger.error(err);
-      this.rootStore.consoleStore.log(err, "error");
-      this.rootStore.notificationStore.notify("Deploying contract failed", "error");
-    });
+        this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
+        this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
+        this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
+      }).catch(err => {
+        this.rootStore.accountStore.updateAccountState();
+        logger.error(err);
+        this.rootStore.consoleStore.log(err, "error");
+        this.rootStore.notificationStore.notify("Deploying contract failed", "error");
+      });
+    } else {
+      serviceProvider.contractService.redeploy(account, redeployTarget, deployment, feeLimit).then(deployResult => {
+        this.rootStore.accountStore.updateAccountState();
+
+        const contractAddress = deployResult.contractAddress;
+        const contractInterface = deployResult.contractInterface;
+        const txHash = deployResult.txHash;
+        this.address2Interface.set(contractAddress, contractInterface);
+
+        this.rootStore.consoleStore.log("ReDeploy TxHash: " + txHash, "info");
+        this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
+        this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
+      }).catch(err => {
+        this.rootStore.accountStore.updateAccountState();
+        logger.error(err);
+        this.rootStore.consoleStore.log(err, "error");
+        this.rootStore.notificationStore.notify("ReDeploying contract failed", "error");
+      });
+    }
+
   }
 
   @action executeContract(contractAddress, functionName, args, amount, feeDelegation) {

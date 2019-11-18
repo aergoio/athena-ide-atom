@@ -25,6 +25,19 @@ export default class ContractService {
     return deployResult;
   }
 
+  async redeploy(account, redeployTarget, redeployment, fee) {
+    assertNotEmpty(account, "Selected account is empty");
+    assertNotEmpty(redeployTarget, "ReDeployment is empty");
+    assertNotEmpty(redeployment, "ReDeployment is empty");
+    assertNotEmpty(redeployment.payload, "ReDeploy target is empty");
+    assertNotEmpty(fee, "Contract redeploy fee is empty");
+
+    logger.debug("ReDeploy with", account.address, redeployTarget, redeployment, fee);
+    const redeployResult = await this.client.redeploy(account, redeployTarget, redeployment, fee);
+
+    return redeployResult;
+  }
+
   async execute(account, invocation, fee) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(invocation, "Invocation is empty");
