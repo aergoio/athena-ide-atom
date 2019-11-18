@@ -64,6 +64,7 @@ export default class RunPanel extends React.Component {
   _onRefresh() {
     logger.info("Sync status");
     this.props.nodeStore.updateNodeState();
+    this.props.feeStore.updatePrice();
     this.props.accountStore.updateAccountState();
   }
 
@@ -203,7 +204,7 @@ export default class RunPanel extends React.Component {
     const onAddressCopy = this._onAddressCopy;
     const balance = this.props.accountStore.currentBalance;
     // const nonce = this.props.accountStore.currentNonce;
-    const price = 100; // TODO: integrate price
+    const price = this.props.feeStore.price;
     const onLimitChange = this._onLimitChange;
 
     // deployment target

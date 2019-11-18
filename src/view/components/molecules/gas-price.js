@@ -17,8 +17,6 @@ export default class GasPrice extends React.Component {
     super(props);
 
     this.state = {
-      price: props.price,
-      displayPrice: props.price,
       unit: 'aer'
     };
     this._onUnitChange = this._onUnitChange.bind(this);
@@ -26,12 +24,13 @@ export default class GasPrice extends React.Component {
 
   _onUnitChange(newUnit) {
     this.setState({
-      displayPrice: convertToUnit(this.state.price, 'aer', newUnit),
       unit: newUnit
     });
   }
 
   render() {
+    const originPrice = this.props.price;
+    const displayPrice = convertToUnit(originPrice, 'aer', this.state.unit);
     const onChange = this._onUnitChange;
     return (
       <CardRow>
@@ -39,7 +38,7 @@ export default class GasPrice extends React.Component {
           <Description description='Gas Price' />
         </CardItem>
         <CardItem ratio={1}>
-          <TextBox text={this.state.displayPrice} />
+          <TextBox text={displayPrice} />
         </CardItem>
         <CardItem ratio={0}>
           <SelectBox
