@@ -156,7 +156,7 @@ export default class RunPanel extends React.Component {
       logger.debug("DelegationFee ref", delegationFeeRef);
       const targetArgs = argInputRef.current.values;
       const amount = argInputRef.current.amount;
-      const delegationFee = typeof delegationFeeRef === "undefined" ? false 
+      const delegationFee = delegationFeeRef.current === null ? false
           : delegationFeeRef.current.checked;
       logger.info("Execute contract", targetFunction, "with args", targetArgs);
       this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, amount, delegationFee);
