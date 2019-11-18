@@ -8,16 +8,18 @@ import { CardTitle, FoldableCard, ConstructorArguments, TargetSelect, ContractSe
 export const Deployment = (props) => {
   const currentTarget = props.currentTarget;
   const targets = props.targets;
-  const onTargetChange = props.onTargetChange;
+  const onDeployTargetChange = props.onDeployTargetChange;
 
   const constructorArgs = props.constructorArgs;
   const payable = props.payable;
   const argsRef = React.createRef();
-  const onDeploy = props.onDeploy;
 
   const currentContract = props.currentContract;
   const contracts = props.contracts;
-  const onContractChange = props.onContractChange;
+  const onRedeployTargetChange = props.onRedeployTargetChange;
+
+  const onDeploy = props.onDeploy;
+  const onCompile = props.onCompile;
 
   let constructorOrNot;
   if (constructorArgs.length > 0 || payable === true) {
@@ -31,17 +33,23 @@ export const Deployment = (props) => {
       <TargetSelect
         target={currentTarget}
         targets={targets}
-        onChange={onTargetChange}
+        onChange={onDeployTargetChange}
       />
       {constructorOrNot}
+      <CardRow class='component-card-row-border' />
       <ContractSelect
         contract={currentContract}
         contracts={contracts}
-        onChange={onContractChange}
+        onChange={onRedeployTargetChange}
       />
       <CardRow>
         <Description description='' />
         <Flex justify='flex-end' w={1}>
+          <Button
+            name='Compile'
+            class='component-btn-green'
+            onClick={onCompile}
+          />
           <Button
             name='Deploy'
             class='component-btn-transaction'
@@ -56,13 +64,14 @@ export const Deployment = (props) => {
 Deployment.propTypes = {
   currentTarget: PropTypes.string,
   targets: PropTypes.array,
-  onTargetChange: PropTypes.func,
+  onDeployTargetChange: PropTypes.func,
   constructorArgs: PropTypes.array,
   payable: PropTypes.bool,
-  onDeploy: PropTypes.func,
   currentContract: PropTypes.string,
   contracts: PropTypes.array,
-  onContractChange: PropTypes.func,
+  onRedeployTargetChange: PropTypes.func,
+  onDeploy: PropTypes.func,
+  onCompile: PropTypes.func,
 }
 
 export default Deployment;

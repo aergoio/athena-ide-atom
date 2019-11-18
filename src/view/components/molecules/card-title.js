@@ -6,7 +6,6 @@ export const CardTitle = (props) => {
   return (
     <CardRow>
       <Title title={props.title} class={props.titleClass} />
-      {props.children}
     </CardRow>
   );
 };

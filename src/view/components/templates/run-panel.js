@@ -5,11 +5,11 @@ import clipboardy from 'clipboardy';
 import logger from 'loglevel';
 
 import { Panel } from '../atoms';
-import { Summary, TopBar, Account, Node, Deployment, Contract } from '../organisms';
+import { Account, Node, Deployment, Contract } from '../organisms';
 import { editor, SaveConfirmView } from '../..';
-import { formatInteger, convertAerPretty, runWithCallback } from '../../../utils';
+import { runWithCallback } from '../../../utils';
 
-@inject('nodeStore', 'accountStore', 'feeStore', 'notificationStore', 'contractStore', 'deployTargetStore')
+@inject('nodeStore', 'accountStore', 'notificationStore', 'contractStore', 'deployTargetStore')
 @observer
 export default class RunPanel extends React.Component {
 
@@ -17,7 +17,6 @@ export default class RunPanel extends React.Component {
     return {
       nodeStore: PropTypes.any,
       accountStore: PropTypes.any,
-      feeStore: PropTypes.any,
       notificationStore: PropTypes.any,
       contractStore: PropTypes.any,
       deployTargetStore: PropTypes.any
@@ -27,18 +26,16 @@ export default class RunPanel extends React.Component {
   constructor(props) {
     super(props);
 
-    this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
-    this._onRefresh = this._onRefresh.bind(this);
-
+    this._onSync = this._onSync.bind(this);
     this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
 
     this._onAddressChange = this._onAddressChange.bind(this);
     this._onAddressCopy = this._onAddressCopy.bind(this);
-    this._onLimitChange = this._onLimitChange.bind(this);
 
-    this._onFileChange = this._onFileChange.bind(this);
-    this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
-    this._onContractChange = this._onContractChange.bind(this);
+    this._onDeployTargetChange = this._onDeployTargetChange.bind(this);
+    this._onRedeployTargetChange = this._onRedeployTargetChange.bind(this);
+    this._onCompile = this._onCompile.bind(this);
+    this._onDeploy = this._onDeploy.bind(this);
 
     this._onContractImport = this._onContractImport.bind(this);
     this._onContractCopy = this._onContractCopy.bind(this);
@@ -50,34 +47,24 @@ export default class RunPanel extends React.Component {
     this._onError = this._onError.bind(this);
   }
 
-  _onCompileButtonClicked() {
-    runWithCallback.call(this, () => {
-      logger.debug("Compile contract");
-      if (editor.isAnyEditorDirty()) {
-        new SaveConfirmView(() => this._compile()).show();
-      } else {
-        this._compile();
-      }
-    }, this._onError);
-  }
 
-  _onRefresh() {
+  _onSync() {
     logger.info("Sync status");
     this.props.nodeStore.updateNodeState();
-    this.props.feeStore.updatePrice();
     this.props.accountStore.updateAccountState();
   }
 
   _onNodeUrlChange(selectedNode) {
     logger.info("Node change", selectedNode);
     this.props.nodeStore.changeNode(selectedNode);
-    this._onRefresh();
+    this._onSync();
   }
+
 
   _onAddressChange(selectedAddress) {
     logger.info("Account address change to", selectedAddress);
     this.props.accountStore.changeAccount(selectedAddress);
-    this._onRefresh();
+    this._onSync();
   }
 
   _onAddressCopy(accountAddress) {
@@ -87,17 +74,29 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onLimitChange(limit) {
+
+  _onDeployTargetChange(selectedFile) {
     runWithCallback.call(this, () => {
-      logger.debug("Change limit", limit);
-      this.props.feeStore.changeLimit(limit);
+      logger.debug("Compiled deploy target", selectedFile);
+      this.props.deployTargetStore.changeTarget(selectedFile);
     }, this._onError);
   }
 
-  _onFileChange(selectedFile) {
+  _onRedeployTargetChange(selectedContract) {
     runWithCallback.call(this, () => {
-      logger.debug("Compiled file change", selectedFile);
-      this.props.deployTargetStore.changeTarget(selectedFile);
+      logger.debug("Change redeploy target", selectedContract);
+      this.props.deployTargetStore.changeContract(selectedContract);
+    }, this._onError);
+  }
+
+  _onCompile() {
+    runWithCallback.call(this, () => {
+      logger.debug("Compile contract");
+      if (editor.isAnyEditorDirty()) {
+        new SaveConfirmView(() => this._compile()).show();
+      } else {
+        this._compile();
+      }
     }, this._onError);
   }
 
@@ -109,7 +108,7 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onDeployButtonClicked(argInputRef) {
+  _onDeploy(argInputRef) {
     runWithCallback.call(this, () => {
       logger.debug("Deploy contract");
       logger.debug("Input ref", argInputRef);
@@ -123,12 +122,6 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
-  _onContractChange(selectedContract) {
-    runWithCallback.call(this, () => {
-      logger.debug("Change contract target", selectedContract);
-      this.props.deployTargetStore.changeContract(selectedContract);
-    }, this._onError);
-  }
 
   _onContractImport(contractInputRef) {
     logger.debug("Import contract button clicked");
@@ -149,6 +142,7 @@ export default class RunPanel extends React.Component {
       this.props.contractStore.removeContract(contractAddress);
     }, this._onError);
   }
+
 
   _onAbiExec(contractAddress, targetFunction, argInputRef, delegationFeeRef) {
     runWithCallback.call(this, () => {
@@ -174,49 +168,41 @@ export default class RunPanel extends React.Component {
     }, this._onError);
   }
 
+
   _onError(error) {
     logger.error(error);
     this.props.notificationStore.notify(error, "error");
   }
 
+
   render() {
-    // summary
-    const node = this.props.nodeStore.currentNode;
-    const address = this.props.accountStore.currentAddress;
-    const height = formatInteger(this.props.nodeStore.currentHeight);
-    const balanceWithUnit = convertAerPretty(this.props.accountStore.currentBalance);
-    const nonce = this.props.accountStore.currentNonce;
-
-    // sync
-    const onCompile = this._onCompileButtonClicked;
-    const onRefresh= this._onRefresh
-
     // node
-    // const node = this.props.nodeStore.currentNode;
+    const onSync= this._onSync
+    const node = this.props.nodeStore.currentNode;
     const nodes = this.props.nodeStore.nodes;
-    // const height = formatInteger(this.props.nodeStore.currentHeight);
+    const height = this.props.nodeStore.currentHeight;
+    const gasPrice = this.props.nodeStore.gasPrice;
     const onNodeChange = this._onNodeUrlChange;
 
-    // address
-    // const accountAddress = this.props.accountStore.currentAddress;
+    // account
+    const address = this.props.accountStore.currentAddress;
     const addresses = this.props.accountStore.addresses;
     const onAddressChange = this._onAddressChange;
     const onAddressCopy = this._onAddressCopy;
     const balance = this.props.accountStore.currentBalance;
-    // const nonce = this.props.accountStore.currentNonce;
-    const price = this.props.feeStore.price;
-    const onLimitChange = this._onLimitChange;
+    const nonce = this.props.accountStore.currentNonce;
 
     // deployment target
     const currentTarget = this.props.deployTargetStore.currentTarget;
     const targets = this.props.deployTargetStore.targets;
-    const onTargetChange = this._onFileChange;
-    const onDeploy = this._onDeployButtonClicked;
+    const onDeployTargetChange = this._onDeployTargetChange;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
     const payable = this.props.deployTargetStore.isPayable;
     const currentContract = this.props.deployTargetStore.currentContract;
     const contracts = this.props.contractStore.contractAddresses;
-    const onContractChange = this._onContractChange;
+    const onRedeployTargetChange = this._onRedeployTargetChange;
+    const onCompile = this._onCompile;
+    const onDeploy = this._onDeploy;
 
     // contract
     const onContractImport = this._onContractImport
@@ -228,21 +214,12 @@ export default class RunPanel extends React.Component {
 
     return (
       <Panel>
-        <Summary
-          node={node}
-          address={address}
-          height={height}
-          balanceWithUnit={balanceWithUnit}
-          nonce={nonce}
-        />
-        <TopBar
-          onCompile={onCompile}
-          onRefresh={onRefresh}
-        />
         <Node
+          onSync={onSync}
           node={node}
           nodes={nodes}
           height={height}
+          gasPrice={gasPrice}
           onNodeChange={onNodeChange}
         />
         <Account
@@ -252,19 +229,18 @@ export default class RunPanel extends React.Component {
           onAddressCopy={onAddressCopy}
           balance={balance}
           nonce={nonce}
-          price={price}
-          onLimitChange={onLimitChange}
         />
         <Deployment
           currentTarget={currentTarget}
           targets={targets}
-          onTargetChange={onTargetChange}
+          onDeployTargetChange={onDeployTargetChange}
           constructorArgs={constructorArgs}
           payable={payable}
-          onDeploy={onDeploy}
           currentContract={currentContract}
           contracts={contracts}
-          onContractChange={onContractChange}
+          onRedeployTargetChange={onRedeployTargetChange}
+          onCompile={onCompile}
+          onDeploy={onDeploy}
         />
         <Contract
           onContractImport={onContractImport}

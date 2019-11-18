@@ -4,7 +4,6 @@ import AccountStore from './account-store';
 import ConsoleStore from './console-store';
 import ContractStore from './contract-store';
 import DeployTargetStore from './deploy-target-store';
-import FeeStore from './fee-store';
 import NodeStore from './node-store';
 import NotificationStore from './notification-store';
 
@@ -16,7 +15,6 @@ export default class RootStore {
       consoleStore: new ConsoleStore(this),
       contractStore: new ContractStore(this),
       deployTargetStore: new DeployTargetStore(this),
-      feeStore: new FeeStore(this),
       nodeStore: new NodeStore(this),
       notificationStore: new NotificationStore(this),
     };
@@ -48,10 +46,6 @@ export default class RootStore {
 
   get deployTargetStore() {
     return this.stores.deployTargetStore;
-  }
-
-  get feeStore() {
-    return this.stores.feeStore;
   }
 
   get nodeStore() {

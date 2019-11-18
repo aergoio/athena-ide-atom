@@ -1,4 +1,4 @@
-import {observable, action, computed} from 'mobx';
+import { observable, action, computed } from 'mobx';
 import logger from 'loglevel';
 
 import serviceProvider from '../service';
@@ -8,6 +8,7 @@ export default class NodeStore {
   @observable currentNode = "localhost:7845";
   @observable currentHeight = "unknown";
   @observable bestHash = "unknown";
+  @observable gasPrice = "unknown";
   @observable nodeSet = new Set(["localhost:7845", "testnet-api.aergo.io:7845"]);
 
   constructor(rootStore) {
@@ -52,12 +53,17 @@ export default class NodeStore {
 
   @action updateNodeState() {
     logger.debug("Update node state of", this.currentNode);
-    serviceProvider.setEndpoint(this.currentNode);
-    serviceProvider.nodeService.blockchainStatus().then(status => {
-      this.currentHeight = "unknown" !== status.height ? status.height : "unknown";
-      this.bestHash = "unknown" !== status.hash ? status.hash : "unknown";
-    })
-    this.rootStore.accountStore.updateAccountState();
+    if ("" !== this.currentNode) {
+      serviceProvider.setEndpoint(this.currentNode);
+      serviceProvider.nodeService.blockchainStatus().then(status => {
+        this.currentHeight = status.height;
+        this.bestHash = status.hash;
+      })
+      serviceProvider.nodeService.gasPrice().then(gasPrice => {
+        this.gasPrice = gasPrice;
+      })
+      this.rootStore.accountStore.updateAccountState();
+    }
   }
 
   @action removeNode(node) {

@@ -47,7 +47,7 @@ export default class ContractStore {
     });
   }
 
-  @action deployContract(constructorArgs, amount) {
+  @action deployContract(constructorArgs, amount, gasLimit) {
     logger.debug("Deploy contract with", constructorArgs, amount);
 
     const account = this.rootStore.accountStore.currentAccount;
@@ -57,10 +57,9 @@ export default class ContractStore {
       args: constructorArgs,
       amount: amount
     }
-    const feeLimit = this.rootStore.feeStore.limit
 
     if ("" === redeployTarget || noContractComment === redeployTarget) {
-      serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
+      serviceProvider.contractService.deploy(account, deployment, gasLimit).then(deployResult => {
         this.rootStore.accountStore.updateAccountState();
 
         const contractAddress = deployResult.contractAddress;
@@ -78,7 +77,7 @@ export default class ContractStore {
         this.rootStore.notificationStore.notify("Deploying contract failed", "error");
       });
     } else {
-      serviceProvider.contractService.redeploy(account, redeployTarget, deployment, feeLimit).then(deployResult => {
+      serviceProvider.contractService.redeploy(account, redeployTarget, deployment, gasLimit).then(deployResult => {
         this.rootStore.accountStore.updateAccountState();
 
         const contractAddress = deployResult.contractAddress;
@@ -99,8 +98,8 @@ export default class ContractStore {
 
   }
 
-  @action executeContract(contractAddress, functionName, args, amount, feeDelegation) {
-    logger.debug("Execute contract with", contractAddress, functionName, args, amount, feeDelegation);
+  @action executeContract(contractAddress, functionName, args, gasLimit, amount, feeDelegation) {
+    logger.debug("Execute contract with", contractAddress, functionName, args, gasLimit, amount, feeDelegation);
 
     const contractInterface = this.address2Interface.get(contractAddress);
 
@@ -110,9 +109,8 @@ export default class ContractStore {
     if (true === feeDelegation) {
       execution.feeDelegation = feeDelegation;
     }
-    const feeLimit = this.rootStore.feeStore.limit;
 
-    serviceProvider.contractService.execute(account, execution, feeLimit).then(execResult => {
+    serviceProvider.contractService.execute(account, execution, gasLimit).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
 
       const txHash = execResult.txHash;

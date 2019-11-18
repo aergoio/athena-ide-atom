@@ -18,7 +18,6 @@ export default class AtheneIdeView {
       consoleStore: rootStore.consoleStore,
       contractStore: rootStore.contractStore,
       deployTargetStore: rootStore.deployTargetStore,
-      feeStore: rootStore.feeStore,
       nodeStore: rootStore.nodeStore,
       notificationStore: rootStore.notificationStore
     }

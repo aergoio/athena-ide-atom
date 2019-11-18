@@ -12,11 +12,6 @@ import Foldable from './foldable';
 import InputBox from './input-box';
 import Panel from './panel';
 import SelectBox from './select-box';
-import StarCell from './star-cell';
-import StarContent from './star-content';
-import StarTitle from './star-title';
-import StarsRow from './stars-row';
-import Stars from './stars';
 import SyncIcon from './sync-icon';
 import TextBox from './text-box';
 import Title from './title';
@@ -38,11 +33,6 @@ export {
   InputBox,
   Panel,
   SelectBox,
-  StarCell,
-  StarContent,
-  StarTitle,
-  StarsRow,
-  Stars,
   SyncIcon,
   TextBox,
   Title,
