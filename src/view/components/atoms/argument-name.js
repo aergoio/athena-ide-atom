@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { join } from '../../../utils';
-
 const argumentNameClass = 'component-argument-name';
 
 export const ArgumentName = (props) => {
   return (
-    <div className={join('inline-block', argumentNameClass)}>
+    <div className={['inline-block', argumentNameClass].join(' ')}>
       {props.name}
     </div>
   );

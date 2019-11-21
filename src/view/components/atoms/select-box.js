@@ -2,8 +2,6 @@ import React from 'react';
 import Dropdown from 'react-dropdown';
 import PropTypes from 'prop-types';
 
-import {join} from '../../../utils';
-
 const selectBoxClass = 'component-selectbox';
 
 export const SelectBox = (props) => {
@@ -15,7 +13,7 @@ export const SelectBox = (props) => {
   const arrowClassName = selectBoxClass + '__arrow';
   return (
     <Dropdown // main dropdown component
-      className={join('inline-block', selectBoxClass, injectedClass)}
+      className={['inline-block', selectBoxClass, injectedClass].join(' ')}
       controlClassName={selectBoxClass + '__control'}
       placeholderClassName={selectBoxClass + '__placeholder'}
       menuClassName={selectBoxClass + '__menu'}

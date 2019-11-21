@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { join } from '../../../utils';
-
 const cardRowClass = 'component-card-row';
 
 export const CardRow = (props) => {
   return (
-    <div className={join(cardRowClass, props.class)} style={props.style}>
+    <div className={[cardRowClass, props.class].join(' ')} style={props.style}>
       {props.children}
     </div>
   );

@@ -16,7 +16,6 @@ import SyncIcon from './sync-icon';
 import TextBox from './text-box';
 import Title from './title';
 import TrashIcon from './trash-icon';
-import Void from './void';
 
 export {
   AddIcon,
@@ -37,5 +36,4 @@ export {
   TextBox,
   Title,
   TrashIcon,
-  Void
 };

@@ -18,12 +18,6 @@
   min-width: 45vh;
   overflow: scroll;
 
-  .void {
-    background-color: #131621;
-    padding: 0.5em;
-    width: 100%;
-  }
-
   .foldable {
     width: 100%;
     margin-right: 10px;
@@ -102,9 +96,9 @@
   }
 
   .component-card-row-border {
+    padding: 0px;
     border-top: 0.15em solid #4b515c;
-    margin: 0px 7px;
-    margin-top: 0.9em;
+    margin: 5px 7px;
   }
 
   .component-card-row-top-bar {
@@ -120,6 +114,16 @@
   }
 
   .component-title {
+    justify-content: center;
+    font-weight: bold
+  }
+
+  .component-title-amount {
+    justify-content: center;
+    font-weight: bold
+  }
+
+  .component-title-gaslimit {
     justify-content: center;
     font-weight: bold
   }
@@ -159,7 +163,14 @@
     padding-top: 6px;
   }
 
+  .argument-row-border {
+    padding: 0px;
+    margin: 2px 5px;
+    border-top: 2px solid #4b515c;
+  }
+
   .component-argument-name {
+
     min-width: 5em;
     padding: 0.3em 0em;
     height: 100%;

@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {join} from '../../../utils';
-
 const inputBoxClass = 'component-inputbox';
 const inputBoxNumberClass = 'component-inputbox-number';
 
@@ -48,8 +46,8 @@ export default class InputBox extends React.Component {
     const inputRef = this.inputRef;
     return (
       <input
-        className={join('inline-block', 'native-key-bindings',
-            inputBoxClass, numberTypeClass, injectedClass)}
+        className={['inline-block', 'native-key-bindings',
+            inputBoxClass, numberTypeClass, injectedClass].join(' ')}
         tabIndex={tabIndex}
         type={type}
         placeHolder={placeHolder}

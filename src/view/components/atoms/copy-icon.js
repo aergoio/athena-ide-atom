@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {join} from '../../../utils';
-
 export const CopyIcon = (props) => {
   return (
     <div
-      className={join('inline-block', 'icon-clippy', 'component-icon')}
+      className={['inline-block', 'icon-clippy', 'component-icon'].join(' ')}
       onClick={props.onClick}>
     </div>
   );

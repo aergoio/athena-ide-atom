@@ -13,38 +13,38 @@ export default class ContractService {
     return await this.client.getContractInterface(contractAddress);
   }
 
-  async deploy(account, deployment, fee) {
+  async deploy(account, deployment, gasLimit) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(deployment, "Deployment is empty");
     assertNotEmpty(deployment.payload, "Deploy target is empty");
-    assertNotEmpty(fee, "Contract deploy fee is empty");
+    assertNotEmpty(gasLimit, "Contract deploy gas limit is empty");
 
-    logger.debug("Deploy with", account.address, deployment, fee);
-    const deployResult = await this.client.deploy(account, deployment, fee);
+    logger.debug("Deploy with", account.address, deployment, gasLimit);
+    const deployResult = await this.client.deploy(account, deployment, gasLimit);
 
     return deployResult;
   }
 
-  async redeploy(account, redeployTarget, redeployment, fee) {
+  async redeploy(account, redeployTarget, redeployment, gasLimit) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(redeployTarget, "ReDeployment is empty");
     assertNotEmpty(redeployment, "ReDeployment is empty");
     assertNotEmpty(redeployment.payload, "ReDeploy target is empty");
-    assertNotEmpty(fee, "Contract redeploy fee is empty");
+    assertNotEmpty(gasLimit, "Contract redeploy gas limit is empty");
 
-    logger.debug("ReDeploy with", account.address, redeployTarget, redeployment, fee);
-    const redeployResult = await this.client.redeploy(account, redeployTarget, redeployment, fee);
+    logger.debug("ReDeploy with", account.address, redeployTarget, redeployment, gasLimit);
+    const redeployResult = await this.client.redeploy(account, redeployTarget, redeployment, gasLimit);
 
     return redeployResult;
   }
 
-  async execute(account, invocation, fee) {
+  async execute(account, invocation, gasLimit) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(invocation, "Invocation is empty");
-    assertNotEmpty(fee, "Contract invocation fee is empty");
+    assertNotEmpty(gasLimit, "Contract invocation gas limit is empty");
 
-    logger.debug("Execution with", account.address, invocation, fee);
-    const executeResult = await this.client.execute(account, invocation, fee);
+    logger.debug("Execution with", account.address, invocation, gasLimit);
+    const executeResult = await this.client.execute(account, invocation, gasLimit);
 
     return executeResult;
   }

@@ -1,7 +1,3 @@
-export function join() {
-  return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
-}
-
 export function formatInteger(num) {
   if (Number.isNaN(num)) {
     throw num + " is not an number";

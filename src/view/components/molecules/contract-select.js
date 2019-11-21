@@ -22,7 +22,7 @@ export const ContractSelect = (props) => {
           value={contract}
           options={contracts}
           onChange={onChange}
-          placeholder={"select contract if you want to redeploy"}
+          placeholder={"select contract to redeploy"}
         />
       </CardItem>
     </CardRow>

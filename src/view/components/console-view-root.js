@@ -5,8 +5,6 @@ import PropTypes from 'prop-types';
 import { inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
 
-import { join } from '../../utils';
-
 @inject('consoleStore')
 @observer
 export default class ConsoleViewRoot extends React.Component {
@@ -48,7 +46,7 @@ export default class ConsoleViewRoot extends React.Component {
 
 const TopBar = (props) => {
   return (
-    <div className={join('top-bar')}>
+    <div className={'top-bar'}>
       {props.children}
     </div>
   )
@@ -57,7 +55,7 @@ const TopBar = (props) => {
 const TopBarItem = (props) => {
   return (
     <div
-      className={join('top-bar-item', props.className)}
+      className={['top-bar-item', props.className].join(' ')}
       onClick={props.onClick}>
     </div>
   );
@@ -98,7 +96,7 @@ class BottomBar extends React.Component {
       }
     });
     return (
-      <div className={join('bottom-bar')}>
+      <div className={'bottom-bar'}>
         {logsView}
       </div>
     )
@@ -112,7 +110,7 @@ const Log = (props) => {
   const level = props.level;
   const innerRef = props.innerRef;
   return (
-    <div className={join('log')} ref={innerRef}>
+    <div className={'log'} ref={innerRef}>
       <Time time={time} />
       <Message message={message} level={level} />
     </div>
@@ -127,7 +125,7 @@ Log.propTypes = {
 const Time = (props) => {
   const time = props.time;
   return (
-    <div className={join('time')}>
+    <div className={'time'}>
       {time}
     </div>
   )
@@ -140,7 +138,7 @@ const Message = (props) => {
   const message = props.message;
   const level = typeof props.level === "undefined" ? "info" : props.level;
   return (
-    <div className={join('message', 'level-' + level)}>
+    <div className={['message', ('level-' + level)].join(' ')}>
       {message}
     </div>
   )

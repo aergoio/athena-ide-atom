@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { join } from '../../../utils';
-
 const descriptionClass = 'component-description';
 
 export const Description = (props) => {
   return (
-    <div className={join('inline-block', descriptionClass)}>
+    <div className={['inline-block', descriptionClass].join(' ')}>
       {props.description}
     </div>
   );

@@ -8,6 +8,7 @@ import { convertToUnit } from '../../../utils';
 const units = [ "aer", "gaer", "aergo" ];
 
 const argumentsTextBoxClass = 'component-textbox-arguments';
+const argumentsRowBorderClass = 'argument-row-border';
 
 export default class Arguments extends React.Component {
 
@@ -188,11 +189,18 @@ export default class Arguments extends React.Component {
       );
     });
 
-    // gas limit
+    let optionalAdded = false;
+
+    // (optional) gas limit
     if (this.props.gasConsumable) {
       // hack to clean value when reset
       const inputRef = React.createRef();
       this.inputRefs.push(inputRef);
+
+      if (!optionalAdded) {
+        optionalAdded = true;
+        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
+      }
 
       argumentComponents.push((
         <ArgumentRow>
@@ -216,6 +224,11 @@ export default class Arguments extends React.Component {
       const inputRef = React.createRef();
       this.inputRefs.push(inputRef);
 
+      if (!optionalAdded) {
+        optionalAdded = true;
+        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
+      }
+
       argumentComponents.push((
         <ArgumentRow>
           <ArgumentName name="Amount" />
@@ -236,15 +249,20 @@ export default class Arguments extends React.Component {
           />
         </ArgumentRow>
       ));
+    }
 
-      // (optional) delegation fee
-      if (this.props.feeDelegatable) {
-        argumentComponents.push((
-          <ArgumentRow>
-            <CheckBox text="Delegate fee" onChange={this._onFeeDelegationChange} />
-          </ArgumentRow>
-        ));
+    // (optional) delegation fee
+    if (this.props.feeDelegatable) {
+      if (!optionalAdded) {
+        optionalAdded = true;
+        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
       }
+
+      argumentComponents.push((
+        <ArgumentRow>
+          <CheckBox text="Delegate fee" onChange={this._onFeeDelegationChange} />
+        </ArgumentRow>
+      ));
     }
 
     const summary = this._getSummary();

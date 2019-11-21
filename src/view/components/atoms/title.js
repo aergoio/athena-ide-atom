@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { join } from '../../../utils';
-
 const titleClass = 'component-title';
 
 export const Title = (props) => {
   return (
-    <div className={join('inline-block', titleClass, props.class)}>
+    <div className={['inline-block', titleClass, props.class].join(' ')}>
       {props.title}
     </div>
   );
