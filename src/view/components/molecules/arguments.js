@@ -77,7 +77,7 @@ export default class Arguments extends React.Component {
   }
 
   get gasLimit() {
-    return this.state.gasLimit;
+    return "" !== this.state.gasLimit ? this.state.gasLimit : "0";
   }
 
   get amount() {
@@ -209,6 +209,7 @@ export default class Arguments extends React.Component {
             tabIndex={tabIndexProvider()}
             type="number"
             class='component-inputbox-argument'
+            placeHolder='(default: 0)'
             onChange={this._onGasLimitChange}
             onFocus={this._onFocusOnAnyInput}
             onBlur={this._onBrurOnAnyInput}
