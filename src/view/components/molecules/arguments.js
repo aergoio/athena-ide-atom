@@ -197,7 +197,7 @@ export default class Arguments extends React.Component {
       const inputRef = React.createRef();
       this.inputRefs.push(inputRef);
 
-      if (!optionalAdded) {
+      if (!optionalAdded && 0 !== argumentComponents.length) {
         optionalAdded = true;
         argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
       }
@@ -224,7 +224,7 @@ export default class Arguments extends React.Component {
       const inputRef = React.createRef();
       this.inputRefs.push(inputRef);
 
-      if (!optionalAdded) {
+      if (!optionalAdded && 0 !== argumentComponents.length) {
         optionalAdded = true;
         argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
       }
@@ -253,7 +253,7 @@ export default class Arguments extends React.Component {
 
     // (optional) delegation fee
     if (this.props.feeDelegatable) {
-      if (!optionalAdded) {
+      if (!optionalAdded && 0 !== argumentComponents.length) {
         optionalAdded = true;
         argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
       }

@@ -21,13 +21,6 @@ export const Deployment = (props) => {
   const onDeploy = props.onDeploy;
   const onCompile = props.onCompile;
 
-  let constructorOrNot;
-  if (constructorArgs.length > 0 || payable === true) {
-    constructorOrNot = <ConstructorArguments args={constructorArgs} payable={payable} argsRef={argsRef} />;
-  } else {
-    constructorOrNot = <div></div>;
-  }
-
   return (
     <FoldableCard trigger={<CardTitle title='Deploy' />}>
       <TargetSelect
@@ -35,7 +28,7 @@ export const Deployment = (props) => {
         targets={targets}
         onChange={onDeployTargetChange}
       />
-      {constructorOrNot}
+      <ConstructorArguments args={constructorArgs} payable={payable} argsRef={argsRef} />
       <CardRow class='component-card-row-border' />
       <ContractSelect
         contract={currentContract}
