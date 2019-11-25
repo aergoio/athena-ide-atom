@@ -33,7 +33,7 @@
   "homepage": "https://github.com/aergoio/athena-ide-atom#readme",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.28.0 <=1.41.0"
+    "atom": ">=1.28.0 <=2.0.0"
   },
   "providedServices": {
     "autocomplete.provider": {
@@ -78,9 +78,9 @@
     "rollup-plugin-replace": "^2.2.0"
   },
   "dependencies": {
-    "@aergo/athena-analysis": "0.1.1",
-    "@aergo/athena-client": "0.1.2",
-    "@aergo/athena-compiler": "0.1.4",
+    "@aergo/athena-analysis": "0.1.2",
+    "@aergo/athena-client": "0.2.0",
+    "@aergo/athena-compiler": "0.2.0",
     "atom-package-deps": "^5.1.0",
     "clipboardy": "^2.1.0",
     "lodash": "^4.17.15",
