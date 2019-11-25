@@ -7,12 +7,17 @@ export const CardItem = (props) => {
   const ratio = typeof props.ratio === "undefined" ? 0 : props.ratio;
   const hideOverflow = typeof props.hideOverflow === "undefined" ? false : props.hideOverflow;
 
-  const inlineStyle = {
+  let inlineStyle = {
     flex: [ratio, ratio, "auto"].join(' '),
   };
+  if (typeof props.style !== "undefined") {
+    inlineStyle = Object.assign(inlineStyle, props.style);
+  }
+
   if (hideOverflow) {
     inlineStyle.width = "1px";
   }
+
   return (
     <div style={inlineStyle} className={[cardItemClass, "inline-block", props.class].join(' ')}>
       {props.children}
@@ -24,7 +29,8 @@ CardItem.propTypes = {
   children: PropTypes.element.isRequired,
   ratio: PropTypes.number,
   hideOverflow: PropTypes.bool,
-  class: PropTypes.class
+  class: PropTypes.class,
+  style: PropTypes.class
 };
 
 export default CardItem;

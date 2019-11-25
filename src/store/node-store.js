@@ -9,7 +9,11 @@ export default class NodeStore {
   @observable currentHeight = "unknown";
   @observable bestHash = "unknown";
   @observable gasPrice = "unknown";
-  @observable nodeSet = new Set(["localhost:7845", "testnet-api.aergo.io:7845"]);
+  @observable nodeSet = new Set([
+    "localhost:7845",
+    "testnet-api.aergo.io:7845",
+    "alpha-api.aergo.io:7845",
+  ]);
 
   constructor(rootStore) {
     this.rootStore = rootStore;

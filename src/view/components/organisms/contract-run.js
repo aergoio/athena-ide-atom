@@ -63,9 +63,13 @@ export default class ContractRun extends React.Component {
         );
       });
 
+    const titleClass = {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    }
     const trigger = (
       <CardRow>
-        <CardItem ratio={1} hideOverflow>
+        <CardItem ratio={1} hideOverflow style={titleClass} >
           <Title title={contractAddress} class='component-contract-run-title' />
         </CardItem>
         <CardItem ratio={0}>
