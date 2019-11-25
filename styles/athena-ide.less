@@ -286,37 +286,75 @@
     -webkit-appearance: none;
   }
 
-  .component-checkbox-label {
-    padding-left: 0.3em;
-    .component-checkbox {
-      width: 13px;
-      height: 13px;
-      background-color: transparent;
-      border-radius: 3px;
+  // see also https://codepen.io/Vestride/pen/dABHx
+  .component-checkbox {
+    position: absolute; // take it out of document flow
+    opacity: 0; // hide it
+
+    & + label {
       position: relative;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    // Box.
+    & + label:before {
+      content: '';
+      margin-right: 5px;
+      display: inline-block;
+      vertical-align: text-top;
+      width: 15px;
+      height: 15px;
+      border-radius: 3px;
       border: solid 1px rgba(157, 165, 179, 0.65);
-      -webkit-appearance: none;
+      background-color: transparent;
+    }
 
-      &::before {
-        content: "";
-        position: absolute;
-        top: 12px;
-        left: 6.4px;
-        height: 2px;
-        border-radius: 1px;
-        background-color: #282c34;
-        transform-origin: 0 0;
-        opacity: 0;
-        transition: transform 0.1s cubic-bezier(0.5, 0.15, 0.2, 1), opacity 0.1s cubic-bezier(0.5, 0.15, 0.2, 1);
-      }
+    // Box hover
+    &:hover + label:before {
+      background: #7741f9;
+    }
 
-      &:focus {
-        outline: 0;
-      }
+    // Box focus
+    &:focus + label:before {
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+    }
 
-      &:checked {
-        background-color: #7741f9;
-      }
+    // Box checked
+    &:checked + label:before {
+      background: #7741f9;
+    }
+
+    // Disabled state label.
+    &:disabled + label {
+      color: #b8b8b8;
+      cursor: auto;
+    }
+
+    // Disabled box.
+    &:disabled + label:before {
+      box-shadow: none;
+      background: #ddd;
+    }
+
+    @mark-ratio: 1.8;
+    // Checkmark. Could be replaced with an image
+    &:checked + label:after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 8px;
+      background: white;
+      width: 2px;
+      height: 2px;
+      box-shadow:
+        (@mark-ratio * 1px) 0 0 white,
+        (@mark-ratio * 2px) 0 0 white,
+        (@mark-ratio * 2px) -(@mark-ratio * 1px) 0 white,
+        (@mark-ratio * 2px) -(@mark-ratio * 2px) 0 white,
+        (@mark-ratio * 2px) -(@mark-ratio * 3px) 0 white,
+        (@mark-ratio * 2px) -(@mark-ratio * 4px) 0 white;
+      transform: rotate(45deg);
     }
   }
 

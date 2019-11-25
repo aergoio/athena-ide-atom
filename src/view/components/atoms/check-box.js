@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
 
-const checkBoxLabelClass = 'component-checkbox-label';
 const checkBoxClass = 'component-checkbox';
 
 export default class CheckBox extends React.Component {
@@ -40,15 +40,17 @@ export default class CheckBox extends React.Component {
         this.props.onChange(e);
       }
     }
+    const id = uuid();
     return (
-      <label className={checkBoxLabelClass} >
+      <div>
         <input
           className={checkBoxClass}
           type='checkbox'
+          id={id}
           onChange={onChange}
         />
-        {"  " + text}
-      </label>
+        <label htmlFor={id}>{text}</label>
+      </div>
     );
   }
 
