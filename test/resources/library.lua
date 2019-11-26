@@ -1,8 +1,3 @@
-local libraryVariable
-
-function libraryFunc (arg1, arg2)
-  local variable7 = arg1 / arg2
-  return variable7
+function libraryFunc (v1, v2)
+  return v1 / v2
 end
-
-local libraryTable = { field1 = "11", ["field2"] = "22" }
