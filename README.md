@@ -10,7 +10,7 @@ A package for writing smart contract in aergo using atom
 ## Compatibility
 
 - Atom: v1.28 or higher
-- Aergo: v1.3.0 or higher
+- Aergo: v2.0.x
 
 Need to rebuild for atom compatible electron version for grpc native modules in a herajs
 
@@ -31,10 +31,9 @@ Check [release notes of atom](https://github.com/atom/atom/releases)
 - [X] Deploy smart contract
 - [X] Execute smart contract
 - [X] Query smart contract result
+- [X] Fee delegation
+- [X] Re-deploy smart contract (private mode only)
 - [X] Advanced autocomplete (lua specific, nested table)
-
-- [ ] Advanced linter (recommandation)
-- [ ] Simulation
 
 `./screenshots` holds all the supported features
 
@@ -55,6 +54,7 @@ Check [release notes of atom](https://github.com/atom/atom/releases)
 
 - [Atom](https://atom.io/)
 - [Git bash (windows only)](https://git-scm.com/downloads)
+- [Aergo smart contract guide](https://docs.aergo.io/en/latest/smart-contracts/lua/index.html)
 
 ### Install
 
@@ -66,7 +66,7 @@ With atom package manager
 
 With atom ui
 
-![install_with_atom_ui](./screenshots/1.install_with_atom_ui.gif)
+![install-with-atom-ui](./screenshots/install-with-atom-ui.gif)
 
 With installer (use gitbash in windows)
 
@@ -78,95 +78,119 @@ With installer (use gitbash in windows)
 
 ### Open panel
 
-Open Athena Ide View: `Alt + Shift + L`
+With shortcut: `Alt + Shift + L`
 
-![open_with_shortcut](./screenshots/2.open_with_shortcut.gif)
+![open-with-shortcut](./screenshots/open-with-shortcut.gif)
 
-Open with menu bar
+With menu bar
 
-![open_with_menubar](./screenshots/3.open_with_menubar.gif)
+![open-with-menubar](./screenshots/open-with-menubar.gif)
 
-### AutoComplete
+### Editor
 
-![autocomplete](./screenshots/4.autocomplete.gif)
+AutoComplete
 
-### Lint
+![editor-autocomplete](./screenshots/editor-autocomplete.gif)
 
-![lint](./screenshots/5.lint.gif)
+Lint
 
-### Node Managing
+![editor-lint](./screenshots/editor-lint.gif)
+
+### Node
 
 New
 
-![new_node](./screenshots/6.new_node.gif)
+![node-new](./screenshots/node-new.gif)
 
 Remove
 
-![remove_node](./screenshots/7.remove_node.gif)
+![node-remove](./screenshots/node-remove.gif)
 
-### Account Managing
+### Account
 
 New
 
-![new_account](./screenshots/8.new_account.gif)
+![account-new](./screenshots/account-new.gif)
 
 Import
 
-![import_account](./screenshots/9.import_account.gif)
+![account-import](./screenshots/account-import.gif)
 
 Export
 
-![export_account](./screenshots/10.export_account.gif)
+![account-export](./screenshots/account-export.gif)
 
 Remove
 
-![remove_account](./screenshots/11.remove_account.gif)
+![account-remove](./screenshots/account-remove.gif)
 
-### Compile
+### Deployment
 
-Compile current file: `f7`
+#### Compile
 
-![compile_with_shortcut](./screenshots/12.compile_with_shortcut.gif)
+With shortcut: `f7`
 
-By pressing compile button
+![compile-with-shortcut](./screenshots/compile-with-shortcut.gif)
 
-![compile_with_button](./screenshots/13.compile_with_button.gif)
+With button
 
-### Deploy & Import
+![compile-with-button](./screenshots/compile-with-button.gif)
 
-Deploy without constructor arguments
+#### Deploy
 
-![deploy_without_constructor](./screenshots/14.deploy_without_constructor.gif)
+Without args
 
-Deploy with constructor arguments
+![deploy-without-args](./screenshots/deploy-without-args.gif)
 
-![deploy_with_constructor](./screenshots/15.deploy_with_constructor.gif)
+Without args with gas limit
 
-Deploy With constructor arguments and amount
+![deploy-without-args-with-gas-limit](./screenshots/deploy-without-args-with-gas-limit.gif)
 
-![deploy_with_constructor_and_amount](./screenshots/16.deploy_with_constructor_and_amount.gif)
+Without args with amount
 
-Import already deployed contract
+![deploy-without-args-with-amount](./screenshots/deploy-without-args-with-amount.gif)
 
-![import_contract](./screenshots/17.import_contract.gif)
+With args
+
+![deploy-with-args](./screenshots/deploy-with-args.gif)
+
+### Import / Remove
+
+Import deployed contract
+
+![import-deployed-contract](./screenshots/import-deployed-contract.gif)
 
 Remove contract
 
-![remove_contract](./screenshots/18.remove_contract.gif)
+![remove-contract](./screenshots/remove-contract.gif)
 
 ### Execute / Query
 
 Execute contract
 
-![execute_contract](./screenshots/19.execute_contract.gif)
+![execute-contract](./screenshots/execute-contract.gif)
+
+Execute contract set gas limit
+
+![execute-contract-set-gas-limit](./screenshots/execute-contract-set-gas-limit.gif)
+
+Execute contract with fee delegation
+
+![execute-contract-with-fee-delegation](./screenshots/execute-contract-with-fee-delegation.gif)
 
 Execute contract with amount
 
-![execute_contract_with_amount](./screenshots/20.execute_contract_with_amount.gif)
+![execute-contract-with-amount](./screenshots/execute-contract-with-amount.gif)
 
-Query contract
+Query contract state
 
-![query_contract](./screenshots/21.query_contract.gif)
+![query-contract-state](./screenshots/query-contract-state.gif)
+
+### Redeploy (private mode only)
+
+Redeploy to already deployed one (Deployer must be an origin deployer)
+
+![redeploy](./screenshots/redeploy.gif)
 
 ## Contribution
 
