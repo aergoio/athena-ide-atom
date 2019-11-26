@@ -13,13 +13,13 @@ var React = _interopDefault(require('react'));
 var ReactDOM = _interopDefault(require('react-dom'));
 var mobxReact = require('mobx-react');
 var clipboardy = _interopDefault(require('clipboardy'));
+var crypto = _interopDefault(require('crypto'));
 var Collapsible = _interopDefault(require('react-collapsible'));
 var Dropdown = _interopDefault(require('react-dropdown'));
 var reflexbox = require('reflexbox');
 var Popup = _interopDefault(require('reactjs-popup'));
 var atom$1 = require('atom');
 var os = _interopDefault(require('os'));
-var crypto = _interopDefault(require('crypto'));
 var ua = _interopDefault(require('universal-analytics'));
 
 function _initializerDefineProperty(target, property, descriptor, context) {
@@ -138,9 +138,6 @@ class CompileService {
 
 }
 
-function join() {
-  return Array.from(arguments).reduce((acc, val) => acc.concat(val), []).join(' ');
-}
 function formatInteger(num) {
   if (Number.isNaN(num)) {
     throw num + " is not an number";
@@ -170,7 +167,8 @@ function runWithCallback(invoke, onError) {
   } catch (err) {
     onError(err);
   }
-}
+} // lazy loading (herajs which used by athena client is too heavy)
+
 let Amount = undefined;
 
 const loadAmount = () => {
@@ -182,7 +180,11 @@ const loadAmount = () => {
 };
 
 let units = undefined;
-function formatAergoBalance(balance) {
+function convertAerPretty(balance) {
+  if (isNaN(balance)) {
+    return balance;
+  }
+
   let Amount = loadAmount();
 
   if (isUndefined(units)) {
@@ -201,9 +203,13 @@ function formatAergoBalance(balance) {
 
   return amount.toUnit(unit).toString();
 }
-function convertToAerAmountWithUnit(amount, unit) {
+function convertToUnit(amount, originUnit, newUnit) {
+  if (isNaN(amount)) {
+    return amount;
+  }
+
   let Amount = loadAmount();
-  return new Amount(amount, unit).toUnit("aer").formatNumber();
+  return new Amount(amount, originUnit).toUnit(newUnit).formatNumber();
 }
 function isUndefined(o) {
   return null == o || typeof o === "undefined";
@@ -219,22 +225,33 @@ class ContractService {
     return await this.client.getContractInterface(contractAddress);
   }
 
-  async deploy(account, deployment, fee) {
+  async deploy(account, deployment, gasLimit) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(deployment, "Deployment is empty");
     assertNotEmpty(deployment.payload, "Deploy target is empty");
-    assertNotEmpty(fee, "Contract deploy fee is empty");
-    logger.debug("Deploy with", account.address, deployment, fee);
-    const deployResult = await this.client.deploy(account, deployment, fee);
+    assertNotEmpty(gasLimit, "Contract deploy gas limit is empty");
+    logger.debug("Deploy with", account.address, deployment, gasLimit);
+    const deployResult = await this.client.deploy(account, deployment, gasLimit);
     return deployResult;
   }
 
-  async execute(account, invocation, fee) {
+  async redeploy(account, redeployTarget, redeployment, gasLimit) {
+    assertNotEmpty(account, "Selected account is empty");
+    assertNotEmpty(redeployTarget, "ReDeployment is empty");
+    assertNotEmpty(redeployment, "ReDeployment is empty");
+    assertNotEmpty(redeployment.payload, "ReDeploy target is empty");
+    assertNotEmpty(gasLimit, "Contract redeploy gas limit is empty");
+    logger.debug("ReDeploy with", account.address, redeployTarget, redeployment, gasLimit);
+    const redeployResult = await this.client.redeploy(account, redeployTarget, redeployment, gasLimit);
+    return redeployResult;
+  }
+
+  async execute(account, invocation, gasLimit) {
     assertNotEmpty(account, "Selected account is empty");
     assertNotEmpty(invocation, "Invocation is empty");
-    assertNotEmpty(fee, "Contract deploy fee is empty");
-    logger.debug("Execution with", account.address, invocation, fee);
-    const executeResult = await this.client.execute(account, invocation, fee);
+    assertNotEmpty(gasLimit, "Contract invocation gas limit is empty");
+    logger.debug("Execution with", account.address, invocation, gasLimit);
+    const executeResult = await this.client.execute(account, invocation, gasLimit);
     return executeResult;
   }
 
@@ -254,7 +271,7 @@ class NodeService {
 
   async blockchainStatus() {
     return await this.client.getBlockchainStatus().then(blockchainStatus => {
-      logger.debug("Quried node state", blockchainStatus);
+      logger.debug("Queried node state", blockchainStatus);
       return {
         height: blockchainStatus.bestHeight,
         hash: blockchainStatus.bestBlockHash
@@ -265,6 +282,16 @@ class NodeService {
         height: "unknown",
         hash: "unknown"
       };
+    });
+  }
+
+  async gasPrice() {
+    return await this.client.getGasPrice().then(price => {
+      logger.debug("Queried gas price", price);
+      return price;
+    })["catch"](err => {
+      logger.error(err);
+      return "unknown";
     });
   }
 
@@ -334,7 +361,7 @@ class ServiceProvider {
 }
 var serviceProvider = new ServiceProvider();
 
-var _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _temp;
+var _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _temp;
 let Account = undefined;
 
 const loadAccount = () => {
@@ -351,11 +378,9 @@ let AccountStore = (_class = (_temp = class AccountStore {
 
     _initializerDefineProperty(this, "currentBalance", _descriptor2, this);
 
-    _initializerDefineProperty(this, "currentBalanceWithUnit", _descriptor3, this);
+    _initializerDefineProperty(this, "currentNonce", _descriptor3, this);
 
-    _initializerDefineProperty(this, "currentNonce", _descriptor4, this);
-
-    _initializerDefineProperty(this, "address2Account", _descriptor5, this);
+    _initializerDefineProperty(this, "address2Account", _descriptor4, this);
 
     this.rootStore = rootStore;
   }
@@ -415,9 +440,8 @@ let AccountStore = (_class = (_temp = class AccountStore {
   updateAccountState() {
     logger.debug("Update account state of", this.currentAddress);
     serviceProvider.accountService.getAccountState(this.currentAddress).then(state => {
-      this.currentBalance = "unknown" === state.balance ? state.balance : formatInteger(state.balance);
-      this.currentBalanceWithUnit = "unknown" === state.balance ? state.balance : formatAergoBalance(state.balance);
-      this.currentNonce = state.nonce;
+      this.currentBalance = "unknown" !== state.balance ? state.balance : "unknown";
+      this.currentNonce = "unknown" !== state.nonce ? state.nonce : "unknown";
     });
   }
 
@@ -448,7 +472,9 @@ let AccountStore = (_class = (_temp = class AccountStore {
     }
 
     this.address2Account["delete"](address);
-    this.changeAccount("");
+    this.currentAddress = "";
+    this.currentBalance = "unknown";
+    this.currentNonce = "unknown";
   }
 
 }, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, "currentAddress", [mobx.observable], {
@@ -463,23 +489,16 @@ let AccountStore = (_class = (_temp = class AccountStore {
   enumerable: true,
   writable: true,
   initializer: function () {
-    return "";
+    return "unknown";
   }
-}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, "currentBalanceWithUnit", [mobx.observable], {
+}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, "currentNonce", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
-    return "";
+    return "unknown";
   }
-}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, "currentNonce", [mobx.observable], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return "";
-  }
-}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, "address2Account", [mobx.observable], {
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, "address2Account", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -540,6 +559,8 @@ let ConsoleStore = (_class$1 = (_temp$1 = class ConsoleStore {
 }), _applyDecoratedDescriptor(_class$1.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "deserialize"), _class$1.prototype), _applyDecoratedDescriptor(_class$1.prototype, "log", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "log"), _class$1.prototype), _applyDecoratedDescriptor(_class$1.prototype, "clear", [mobx.action], Object.getOwnPropertyDescriptor(_class$1.prototype, "clear"), _class$1.prototype)), _class$1);
 
 var _class$2, _descriptor$2, _temp$2;
+
+const noContractComment = "No contract selected";
 let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   constructor(rootStore) {
     _initializerDefineProperty(this, "address2Interface", _descriptor$2, this);
@@ -555,6 +576,10 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
     const address2AbiInArray = Array.from(this.address2Interface.toJS()).map(([address, i]) => [address, i.abi]);
     const address2Abi = new Map(address2AbiInArray);
     return address2Abi;
+  }
+
+  get contractAddresses() {
+    return Array.from(this.address2Interface.toJS()).map(([address]) => address);
   }
 
   deserialize(data) {
@@ -575,40 +600,63 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
     });
   }
 
-  deployContract(constructorArgs, amount) {
-    logger.debug("Deploy contract with", constructorArgs, amount);
+  deployContract(constructorArgs, gasLimit, amount) {
+    logger.debug("Deploy contract with", constructorArgs, gasLimit, amount);
     const account = this.rootStore.accountStore.currentAccount;
+    const redeployTarget = this.rootStore.deployTargetStore.currentContract;
     const deployment = {
       payload: this.rootStore.deployTargetStore.compileResult.payload.trim(),
       args: constructorArgs,
       amount: amount
     };
-    const feeLimit = this.rootStore.feeStore.limit;
-    serviceProvider.contractService.deploy(account, deployment, feeLimit).then(deployResult => {
-      this.rootStore.accountStore.updateAccountState();
-      const contractAddress = deployResult.contractAddress;
-      const contractInterface = deployResult.contractInterface;
-      const txHash = deployResult.txHash;
-      this.address2Interface.set(contractAddress, contractInterface);
-      this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
-      this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
-      this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
-    })["catch"](err => {
-      this.rootStore.accountStore.updateAccountState();
-      logger.error(err);
-      this.rootStore.consoleStore.log(err, "error");
-      this.rootStore.notificationStore.notify("Deploying contract failed", "error");
-    });
+
+    if ("" === redeployTarget || noContractComment === redeployTarget) {
+      serviceProvider.contractService.deploy(account, deployment, gasLimit).then(deployResult => {
+        this.rootStore.accountStore.updateAccountState();
+        const contractAddress = deployResult.contractAddress;
+        const contractInterface = deployResult.contractInterface;
+        const txHash = deployResult.txHash;
+        this.address2Interface.set(contractAddress, contractInterface);
+        this.rootStore.consoleStore.log("Deploy TxHash: " + txHash, "info");
+        this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
+        this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
+      })["catch"](err => {
+        this.rootStore.accountStore.updateAccountState();
+        logger.error(err);
+        this.rootStore.consoleStore.log(err, "error");
+        this.rootStore.notificationStore.notify("Deploying contract failed", "error");
+      });
+    } else {
+      serviceProvider.contractService.redeploy(account, redeployTarget, deployment, gasLimit).then(deployResult => {
+        this.rootStore.accountStore.updateAccountState();
+        const contractAddress = deployResult.contractAddress;
+        const contractInterface = deployResult.contractInterface;
+        const txHash = deployResult.txHash;
+        this.address2Interface.set(contractAddress, contractInterface);
+        this.rootStore.consoleStore.log("ReDeploy TxHash: " + txHash, "info");
+        this.rootStore.consoleStore.log("ContractAddress: " + contractAddress, "info");
+        this.rootStore.notificationStore.notify("Successfully deployed contract", "success");
+      })["catch"](err => {
+        this.rootStore.accountStore.updateAccountState();
+        logger.error(err);
+        this.rootStore.consoleStore.log(err, "error");
+        this.rootStore.notificationStore.notify("ReDeploying contract failed", "error");
+      });
+    }
   }
 
-  executeContract(contractAddress, functionName, args, amount) {
-    logger.debug("Execute contract with", contractAddress, functionName, args, amount);
+  executeContract(contractAddress, functionName, args, gasLimit, amount, feeDelegation) {
+    logger.debug("Execute contract with", contractAddress, functionName, args, gasLimit, amount, feeDelegation);
     const contractInterface = this.address2Interface.get(contractAddress);
     const account = this.rootStore.accountStore.currentAccount;
     const execution = contractInterface.getInvocation(functionName, ...args);
     execution.amount = amount;
-    const feeLimit = this.rootStore.feeStore.limit;
-    serviceProvider.contractService.execute(account, execution, feeLimit).then(execResult => {
+
+    if (true === feeDelegation) {
+      execution.feeDelegation = feeDelegation;
+    }
+
+    serviceProvider.contractService.execute(account, execution, gasLimit).then(execResult => {
       this.rootStore.accountStore.updateAccountState();
       const txHash = execResult.txHash;
       const result = execResult.result;
@@ -644,6 +692,7 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
     }
 
     this.address2Interface["delete"](contractAddress);
+    this.rootStore.deployTargetStore.removeContract();
   }
 
 }, _temp$2), (_descriptor$2 = _applyDecoratedDescriptor(_class$2.prototype, "address2Interface", [mobx.observable], {
@@ -653,14 +702,16 @@ let ContractStore = (_class$2 = (_temp$2 = class ContractStore {
   initializer: function () {
     return new Map();
   }
-}), _applyDecoratedDescriptor(_class$2.prototype, "contractAddress2Abi", [mobx.computed], Object.getOwnPropertyDescriptor(_class$2.prototype, "contractAddress2Abi"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "deserialize"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "addContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "addContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "deployContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "deployContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "executeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "executeContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "queryContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "queryContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "removeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "removeContract"), _class$2.prototype)), _class$2);
+}), _applyDecoratedDescriptor(_class$2.prototype, "contractAddress2Abi", [mobx.computed], Object.getOwnPropertyDescriptor(_class$2.prototype, "contractAddress2Abi"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "contractAddresses", [mobx.computed], Object.getOwnPropertyDescriptor(_class$2.prototype, "contractAddresses"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "deserialize"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "addContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "addContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "deployContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "deployContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "executeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "executeContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "queryContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "queryContract"), _class$2.prototype), _applyDecoratedDescriptor(_class$2.prototype, "removeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$2.prototype, "removeContract"), _class$2.prototype)), _class$2);
 
-var _class$3, _descriptor$3, _descriptor2$1, _temp$3;
+var _class$3, _descriptor$3, _descriptor2$1, _descriptor3$1, _temp$3;
 let DeployTargetStore = (_class$3 = (_temp$3 = class DeployTargetStore {
   constructor(rootStore) {
     _initializerDefineProperty(this, "currentTarget", _descriptor$3, this);
 
     _initializerDefineProperty(this, "target2CompileResult", _descriptor2$1, this);
+
+    _initializerDefineProperty(this, "currentContract", _descriptor3$1, this);
 
     this.rootStore = rootStore;
   }
@@ -744,6 +795,16 @@ let DeployTargetStore = (_class$3 = (_temp$3 = class DeployTargetStore {
     this.target2CompileResult["delete"](target);
   }
 
+  changeContract(contract) {
+    logger.debug("Change contract to", contract);
+    this.currentContract = contract;
+  }
+
+  removeContract() {
+    logger.debug("Remove deploy contract");
+    this.currentContract = "";
+  }
+
 }, _temp$3), (_descriptor$3 = _applyDecoratedDescriptor(_class$3.prototype, "currentTarget", [mobx.observable], {
   configurable: true,
   enumerable: true,
@@ -758,47 +819,27 @@ let DeployTargetStore = (_class$3 = (_temp$3 = class DeployTargetStore {
   initializer: function () {
     return new Map();
   }
-}), _applyDecoratedDescriptor(_class$3.prototype, "compileResult", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "compileResult"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "constructorArgs", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "constructorArgs"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "isPayable", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "isPayable"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "targets", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "targets"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "deserialize"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "addTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "addTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "changeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "changeTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "removeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "removeTarget"), _class$3.prototype)), _class$3);
-
-var _class$4, _descriptor$4, _temp$4;
-let FeeStore = (_class$4 = (_temp$4 = class FeeStore {
-  constructor(rootStore) {
-    _initializerDefineProperty(this, "limit", _descriptor$4, this);
-
-    this.rootStore = rootStore;
-  }
-
-  serialize() {
-    return {};
-  }
-
-  deserialize(data) {
-    logger.debug("Deserialize", data);
-  }
-
-  setLimit(limit) {
-    this.limit = limit;
-  }
-
-}, _temp$4), (_descriptor$4 = _applyDecoratedDescriptor(_class$4.prototype, "limit", [mobx.observable], {
+}), _descriptor3$1 = _applyDecoratedDescriptor(_class$3.prototype, "currentContract", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
-    return 0;
+    return "";
   }
-}), _applyDecoratedDescriptor(_class$4.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "deserialize"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "setLimit", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "setLimit"), _class$4.prototype)), _class$4);
+}), _applyDecoratedDescriptor(_class$3.prototype, "compileResult", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "compileResult"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "constructorArgs", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "constructorArgs"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "isPayable", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "isPayable"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "targets", [mobx.computed], Object.getOwnPropertyDescriptor(_class$3.prototype, "targets"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "deserialize"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "addTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "addTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "changeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "changeTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "removeTarget", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "removeTarget"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "changeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "changeContract"), _class$3.prototype), _applyDecoratedDescriptor(_class$3.prototype, "removeContract", [mobx.action], Object.getOwnPropertyDescriptor(_class$3.prototype, "removeContract"), _class$3.prototype)), _class$3);
 
-var _class$5, _descriptor$5, _descriptor2$2, _descriptor3$1, _descriptor4$1, _temp$5;
-let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
+var _class$4, _descriptor$4, _descriptor2$2, _descriptor3$2, _descriptor4$1, _descriptor5, _temp$4;
+let NodeStore = (_class$4 = (_temp$4 = class NodeStore {
   constructor(rootStore) {
-    _initializerDefineProperty(this, "currentNode", _descriptor$5, this);
+    _initializerDefineProperty(this, "currentNode", _descriptor$4, this);
 
     _initializerDefineProperty(this, "currentHeight", _descriptor2$2, this);
 
-    _initializerDefineProperty(this, "bestHash", _descriptor3$1, this);
+    _initializerDefineProperty(this, "bestHash", _descriptor3$2, this);
 
-    _initializerDefineProperty(this, "nodeSet", _descriptor4$1, this);
+    _initializerDefineProperty(this, "gasPrice", _descriptor4$1, this);
+
+    _initializerDefineProperty(this, "nodeSet", _descriptor5, this);
 
     this.rootStore = rootStore;
   }
@@ -843,12 +884,18 @@ let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
 
   updateNodeState() {
     logger.debug("Update node state of", this.currentNode);
-    serviceProvider.setEndpoint(this.currentNode);
-    serviceProvider.nodeService.blockchainStatus().then(status => {
-      this.currentHeight = "unknown" === status.height ? status.height : formatInteger(status.height);
-      this.bestHash = status.hash;
-    });
-    this.rootStore.accountStore.updateAccountState();
+
+    if ("" !== this.currentNode) {
+      serviceProvider.setEndpoint(this.currentNode);
+      serviceProvider.nodeService.blockchainStatus().then(status => {
+        this.currentHeight = status.height;
+        this.bestHash = status.hash;
+      });
+      serviceProvider.nodeService.gasPrice().then(gasPrice => {
+        this.gasPrice = gasPrice;
+      });
+      this.rootStore.accountStore.updateAccountState();
+    }
   }
 
   removeNode(node) {
@@ -859,43 +906,53 @@ let NodeStore = (_class$5 = (_temp$5 = class NodeStore {
     }
 
     this.nodeSet["delete"](node);
-    this.changeNode("");
+    this.currentNode = "";
+    this.currentHeight = "unknown";
+    this.bestHash = "unknown";
+    this.gasPrice = "unknown";
   }
 
-}, _temp$5), (_descriptor$5 = _applyDecoratedDescriptor(_class$5.prototype, "currentNode", [mobx.observable], {
+}, _temp$4), (_descriptor$4 = _applyDecoratedDescriptor(_class$4.prototype, "currentNode", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return "localhost:7845";
   }
-}), _descriptor2$2 = _applyDecoratedDescriptor(_class$5.prototype, "currentHeight", [mobx.observable], {
+}), _descriptor2$2 = _applyDecoratedDescriptor(_class$4.prototype, "currentHeight", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return "unknown";
   }
-}), _descriptor3$1 = _applyDecoratedDescriptor(_class$5.prototype, "bestHash", [mobx.observable], {
+}), _descriptor3$2 = _applyDecoratedDescriptor(_class$4.prototype, "bestHash", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
     return "unknown";
   }
-}), _descriptor4$1 = _applyDecoratedDescriptor(_class$5.prototype, "nodeSet", [mobx.observable], {
+}), _descriptor4$1 = _applyDecoratedDescriptor(_class$4.prototype, "gasPrice", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
   initializer: function () {
-    return new Set(["localhost:7845", "testnet-api.aergo.io:7845"]);
+    return "unknown";
   }
-}), _applyDecoratedDescriptor(_class$5.prototype, "nodes", [mobx.computed], Object.getOwnPropertyDescriptor(_class$5.prototype, "nodes"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "deserialize"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "addNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "addNode"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "changeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "changeNode"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "updateNodeState", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "updateNodeState"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "removeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "removeNode"), _class$5.prototype)), _class$5);
+}), _descriptor5 = _applyDecoratedDescriptor(_class$4.prototype, "nodeSet", [mobx.observable], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return new Set(["localhost:7845", "testnet-api.aergo.io:7845", "alpha-api.aergo.io:7845"]);
+  }
+}), _applyDecoratedDescriptor(_class$4.prototype, "nodes", [mobx.computed], Object.getOwnPropertyDescriptor(_class$4.prototype, "nodes"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "deserialize"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "addNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "addNode"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "changeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "changeNode"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "updateNodeState", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "updateNodeState"), _class$4.prototype), _applyDecoratedDescriptor(_class$4.prototype, "removeNode", [mobx.action], Object.getOwnPropertyDescriptor(_class$4.prototype, "removeNode"), _class$4.prototype)), _class$4);
 
-var _class$6, _descriptor$6, _temp$6;
-let NotificationStore = (_class$6 = (_temp$6 = class NotificationStore {
+var _class$5, _descriptor$5, _temp$5;
+let NotificationStore = (_class$5 = (_temp$5 = class NotificationStore {
   constructor(rootStore) {
-    _initializerDefineProperty(this, "recent", _descriptor$6, this);
+    _initializerDefineProperty(this, "recent", _descriptor$5, this);
 
     this.rootStore = rootStore;
   }
@@ -915,7 +972,7 @@ let NotificationStore = (_class$6 = (_temp$6 = class NotificationStore {
     };
   }
 
-}, _temp$6), (_descriptor$6 = _applyDecoratedDescriptor(_class$6.prototype, "recent", [mobx.observable], {
+}, _temp$5), (_descriptor$5 = _applyDecoratedDescriptor(_class$5.prototype, "recent", [mobx.observable], {
   configurable: true,
   enumerable: true,
   writable: true,
@@ -925,7 +982,7 @@ let NotificationStore = (_class$6 = (_temp$6 = class NotificationStore {
       level: ""
     };
   }
-}), _applyDecoratedDescriptor(_class$6.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$6.prototype, "deserialize"), _class$6.prototype), _applyDecoratedDescriptor(_class$6.prototype, "notify", [mobx.action], Object.getOwnPropertyDescriptor(_class$6.prototype, "notify"), _class$6.prototype)), _class$6);
+}), _applyDecoratedDescriptor(_class$5.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "deserialize"), _class$5.prototype), _applyDecoratedDescriptor(_class$5.prototype, "notify", [mobx.action], Object.getOwnPropertyDescriptor(_class$5.prototype, "notify"), _class$5.prototype)), _class$5);
 
 class RootStore {
   constructor() {
@@ -934,7 +991,6 @@ class RootStore {
       consoleStore: new ConsoleStore(this),
       contractStore: new ContractStore(this),
       deployTargetStore: new DeployTargetStore(this),
-      feeStore: new FeeStore(this),
       nodeStore: new NodeStore(this),
       notificationStore: new NotificationStore(this)
     };
@@ -968,10 +1024,6 @@ class RootStore {
 
   get deployTargetStore() {
     return this.stores.deployTargetStore;
-  }
-
-  get feeStore() {
-    return this.stores.feeStore;
   }
 
   get nodeStore() {
@@ -2087,7 +2139,7 @@ var propTypes = createCommonjsModule(function (module) {
 
 const AddIcon = props => {
   return React.createElement("div", {
-    className: join('inline-block', 'icon-diff-added', 'component-icon'),
+    className: ['inline-block', 'icon-diff-added', 'component-icon'].join(' '),
     onClick: props.onClick
   });
 };
@@ -2098,7 +2150,7 @@ AddIcon.propTypes = {
 const argumentNameClass = 'component-argument-name';
 const ArgumentName = props => {
   return React.createElement("div", {
-    className: join('inline-block', argumentNameClass)
+    className: ['inline-block', argumentNameClass].join(' ')
   }, props.name);
 };
 ArgumentName.propTypes = {
@@ -2108,7 +2160,7 @@ ArgumentName.propTypes = {
 const argumentRowClass = 'argument-row';
 const ArgumentRow = props => {
   return React.createElement("div", {
-    className: join(argumentRowClass, props["class"])
+    className: [argumentRowClass, props["class"]].join(' ')
   }, props.children);
 };
 ArgumentRow.propTypes = {
@@ -2123,10 +2175,10 @@ const Button = props => {
   let onClick;
 
   if (typeof props.disabled === "undefined" || !props.disabled) {
-    classes = join('inline-block', buttonClass, props["class"], buttonClass);
+    classes = ['inline-block', buttonClass, props["class"], buttonClass].join(' ');
     onClick = props.onClick;
   } else {
-    classes = join('inline-block', buttonClass, props["class"], disabledButtonClass);
+    classes = ['inline-block', buttonClass, props["class"], disabledButtonClass].join(' ');
     onClick = undefined;
   }
 
@@ -2146,9 +2198,13 @@ const cardItemClass = 'component-card-item';
 const CardItem = props => {
   const ratio = typeof props.ratio === "undefined" ? 0 : props.ratio;
   const hideOverflow = typeof props.hideOverflow === "undefined" ? false : props.hideOverflow;
-  const inlineStyle = {
-    flex: join(ratio, ratio, "auto")
+  let inlineStyle = {
+    flex: [ratio, ratio, "auto"].join(' ')
   };
+
+  if (typeof props.style !== "undefined") {
+    inlineStyle = Object.assign(inlineStyle, props.style);
+  }
 
   if (hideOverflow) {
     inlineStyle.width = "1px";
@@ -2156,31 +2212,34 @@ const CardItem = props => {
 
   return React.createElement("div", {
     style: inlineStyle,
-    className: join(cardItemClass, "inline-block", props["class"])
+    className: [cardItemClass, "inline-block", props["class"]].join(' ')
   }, props.children);
 };
 CardItem.propTypes = {
   children: propTypes.element.isRequired,
   ratio: propTypes.number,
   hideOverflow: propTypes.bool,
-  "class": propTypes["class"]
+  "class": propTypes["class"],
+  style: propTypes["class"]
 };
 
 const cardRowClass = 'component-card-row';
 const CardRow = props => {
   return React.createElement("div", {
-    className: join(cardRowClass, props["class"])
+    className: [cardRowClass, props["class"]].join(' '),
+    style: props.style
   }, props.children);
 };
 CardRow.propTypes = {
   children: propTypes.element.isRequired,
-  "class": propTypes["class"]
+  "class": propTypes["class"],
+  style: propTypes.object
 };
 
 const cardClass = 'card';
 const Card = props => {
   return React.createElement("div", {
-    className: join('inset-panel', cardClass, props["class"])
+    className: ['inset-panel', cardClass, props["class"]].join(' ')
   }, props.children);
 };
 Card.propTypes = {
@@ -2188,9 +2247,121 @@ Card.propTypes = {
   children: propTypes.element.isRequired
 };
 
+// Unique ID creation requires a high quality random # generator.  In node.js
+// this is pretty straight-forward - we use the crypto API.
+
+
+
+var rng = function nodeRNG() {
+  return crypto.randomBytes(16);
+};
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
+}
+
+var bytesToUuid_1 = bytesToUuid;
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid_1(rnds);
+}
+
+var v4_1 = v4;
+
+const checkBoxClass = 'component-checkbox';
+class CheckBox extends React.Component {
+  static get propTypes() {
+    return {
+      text: propTypes.string,
+      onChange: propTypes.func
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      checked: false
+    };
+    this._onCheckChange = this._onCheckChange.bind(this);
+  }
+
+  get checked() {
+    return this.state.checked;
+  }
+
+  _onCheckChange(e) {
+    this.setState({
+      checked: e.target.checked
+    });
+  }
+
+  render() {
+    const text = this.props.text;
+
+    const onChange = e => {
+      this._onCheckChange(e);
+
+      if (this.props.onChange) {
+        this.props.onChange(e);
+      }
+    };
+
+    const id = v4_1();
+    return React.createElement("div", null, React.createElement("input", {
+      className: checkBoxClass,
+      type: "checkbox",
+      id: id,
+      onChange: onChange
+    }), React.createElement("label", {
+      htmlFor: id
+    }, text));
+  }
+
+}
+
 const CopyIcon = props => {
   return React.createElement("div", {
-    className: join('inline-block', 'icon-clippy', 'component-icon'),
+    className: ['inline-block', 'icon-clippy', 'component-icon'].join(' '),
     onClick: props.onClick
   });
 };
@@ -2201,7 +2372,7 @@ CopyIcon.propTypes = {
 const descriptionClass = 'component-description';
 const Description = props => {
   return React.createElement("div", {
-    className: join('inline-block', descriptionClass)
+    className: ['inline-block', descriptionClass].join(' ')
   }, props.description);
 };
 Description.propTypes = {
@@ -2276,7 +2447,7 @@ class InputBox extends React.Component {
     const numberTypeClass = this.props.type === "number" ? inputBoxNumberClass : "";
     const inputRef = this.inputRef;
     return React.createElement("input", {
-      className: join('inline-block', 'native-key-bindings', inputBoxClass, numberTypeClass, injectedClass),
+      className: ['inline-block', 'native-key-bindings', inputBoxClass, numberTypeClass, injectedClass].join(' '),
       tabIndex: tabIndex,
       type: type,
       placeHolder: placeHolder,
@@ -2310,7 +2481,7 @@ const SelectBox = props => {
   const arrowClassName = selectBoxClass + '__arrow';
   return React.createElement(Dropdown // main dropdown component
   , {
-    className: join('inline-block', selectBoxClass, injectedClass),
+    className: ['inline-block', selectBoxClass, injectedClass].join(' '),
     controlClassName: selectBoxClass + '__control',
     placeholderClassName: selectBoxClass + '__placeholder',
     menuClassName: selectBoxClass + '__menu',
@@ -2329,70 +2500,9 @@ SelectBox.propTypes = {
   onChange: propTypes.func
 };
 
-const starsCellClass = 'star-cell';
-const StarsCell = props => {
-  const rowspan = typeof props.rowspan == "undefined" ? "1" : props.rowspan;
-  const colspan = typeof props.colspan == "undefined" ? "1" : props.colspan;
-  return React.createElement("td", {
-    rolspan: rowspan,
-    colSpan: colspan,
-    className: join(starsCellClass, props["class"])
-  }, props.children);
-};
-StarsCell.propTypes = {
-  "class": propTypes["class"],
-  rowspan: propTypes.number,
-  colspan: propTypes.number,
-  children: propTypes.element.isRequired
-};
-
-const starContentClass = 'star-content';
-const StarContent = props => {
-  return React.createElement("div", {
-    className: join(starContentClass, props["class"])
-  }, props.content);
-};
-StarContent.propTypes = {
-  "class": propTypes["class"],
-  content: propTypes.string
-};
-
-const starTitleClass = 'star-title';
-const StarTitle = props => {
-  return React.createElement("div", {
-    className: join(starTitleClass, props["class"])
-  }, props.title);
-};
-StarTitle.propTypes = {
-  "class": propTypes["class"],
-  title: propTypes.string
-};
-
-const starsRowClass = 'stars-row';
-const StarsRow = props => {
-  return React.createElement("tr", {
-    className: join(starsRowClass, props["class"])
-  }, props.children);
-};
-StarsRow.propTypes = {
-  "class": propTypes["class"],
-  children: propTypes.element.isRequired
-};
-
-const starsClass = 'stars';
-const Stars = props => {
-  return React.createElement("table", {
-    className: join(starsClass, props["class"])
-  }, props.children);
-};
-Stars.propTypes = {
-  "class": propTypes["class"],
-  children: propTypes.element.isRequired
-};
-
 const SyncIcon = props => {
   return React.createElement("div", {
-    className: join('inline-block', 'icon-sync', 'component-icon'),
+    className: ['inline-block', 'icon-sync', 'component-icon'].join(' '),
     onClick: props.onClick
   });
 };
@@ -2403,7 +2513,7 @@ SyncIcon.propTypes = {
 const testBoxClass = 'component-textbox';
 const TextBox = props => {
   return React.createElement("div", {
-    className: join('inline-block', testBoxClass, props["class"])
+    className: ['inline-block', testBoxClass, props["class"]].join(' ')
   }, props.text);
 };
 TextBox.propTypes = {
@@ -2414,7 +2524,7 @@ TextBox.propTypes = {
 const titleClass = 'component-title';
 const Title = props => {
   return React.createElement("div", {
-    className: join('inline-block', titleClass, props["class"])
+    className: ['inline-block', titleClass, props["class"]].join(' ')
   }, props.title);
 };
 Title.propTypes = {
@@ -2424,23 +2534,12 @@ Title.propTypes = {
 
 const TrashIcon = props => {
   return React.createElement("div", {
-    className: join('inline-block', 'icon-trashcan', 'component-icon'),
+    className: ['inline-block', 'icon-trashcan', 'component-icon'].join(' '),
     onClick: props.onClick
   });
 };
 TrashIcon.propTypes = {
   onClick: propTypes.func
-};
-
-const voidClass = 'void';
-const Void = props => {
-  return React.createElement("div", {
-    className: join(voidClass, props["class"])
-  }, props.children);
-};
-Void.propTypes = {
-  "class": propTypes["class"],
-  children: propTypes.element.isRequired
 };
 
 const AddressSelect = props => {
@@ -2475,14 +2574,17 @@ AddressSelect.propTypes = {
   onAddressCopy: propTypes.func
 };
 
-const noArgumentsDisplay = "No arguments provided";
 const units$1 = ["aer", "gaer", "aergo"];
+const argumentsTextBoxClass = 'component-textbox-arguments';
+const argumentsRowBorderClass = 'argument-row-border';
 class Arguments extends React.Component {
   static get propTypes() {
     return {
       resetState: propTypes.bool,
       args: propTypes.array.isRequired,
-      payable: propTypes.bool
+      gasConsumable: propTypes.bool,
+      payable: propTypes.bool,
+      feeDelegatable: propTypes.bool
     };
   }
 
@@ -2491,27 +2593,37 @@ class Arguments extends React.Component {
     this.state = {
       isFocused: false,
       args: new Array(props.args.length).fill(""),
+      gasLimit: "",
       amount: "",
-      unit: "aer"
+      unit: "aer",
+      feeDelegation: false
     }; // hack to clean value when reset
 
     this.inputRefs = [];
     this._onFocusOnAnyInput = this._onFocusOnAnyInput.bind(this);
     this._onBrurOnAnyInput = this._onBrurOnAnyInput.bind(this);
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
+    this._onGasLimitChange = this._onGasLimitChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
     this._onUnitChange = this._onUnitChange.bind(this);
+    this._onFeeDelegationChange = this._onFeeDelegationChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.args.length !== nextProps.args.length) {
+    if (this.isStateDifferent(this.props, nextProps)) {
       this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
       this.setState({
         args: new Array(nextProps.args.length).fill(""),
+        gasLimit: "",
         amount: "",
-        unit: "aer"
+        unit: "aer",
+        feeDelegation: false
       });
     }
+  }
+
+  isStateDifferent(preProps, nextProps) {
+    return preProps.args.length !== nextProps.args.length || preProps.gasConsumable !== nextProps.gasConsumable || preProps.payable !== nextProps.payable || preProps.feeDelegatable !== nextProps.feeDelegatable;
   }
 
   get values() {
@@ -2533,9 +2645,18 @@ class Arguments extends React.Component {
     return jsonProcessed;
   }
 
+  get gasLimit() {
+    return "" !== this.state.gasLimit ? this.state.gasLimit : "0";
+  }
+
   get amount() {
     const amount = "" === this.state.amount ? "0" : this.state.amount;
-    return convertToAerAmountWithUnit(amount, this.state.unit);
+    const amountInAer = convertToUnit(amount, this.state.unit, 'aer');
+    return amountInAer;
+  }
+
+  get feeDelegation() {
+    return this.state.feeDelegation;
   }
 
   _onArgumentValueChange(e, index) {
@@ -2546,6 +2667,13 @@ class Arguments extends React.Component {
     logger.debug("new arguments", index, newValue, newArgs);
     this.setState({
       args: newArgs
+    });
+  }
+
+  _onGasLimitChange(e) {
+    const newValue = e.target.value;
+    this.setState({
+      gasLimit: newValue.toString()
     });
   }
 
@@ -2562,8 +2690,28 @@ class Arguments extends React.Component {
     });
   }
 
-  _generateArgsDisplay() {
-    let argumentDisplay = noArgumentsDisplay;
+  _onFeeDelegationChange(e) {
+    const newValue = e.target.checked;
+    this.setState({
+      feeDelegation: newValue
+    });
+  }
+
+  _getSummary() {
+    const args = this._getArgsSummary();
+
+    const limit = this._getGasLimitSummary();
+
+    const amount = this._getAmountSummary();
+
+    const feeDelegation = this._getFeeDelegationSummary();
+
+    const extraSummary = [limit, amount, feeDelegation].filter(v => "" !== v).join(', ');
+    return args + ("" !== extraSummary ? ' (' + extraSummary + ')' : "");
+  }
+
+  _getArgsSummary() {
+    let argumentDisplay = "[]";
 
     if (this.state.args.map(a => a.trim()).filter(a => "" !== a).length > 0) {
       argumentDisplay = "[" + this.state.args.join(", ") + "]";
@@ -2572,8 +2720,16 @@ class Arguments extends React.Component {
     return argumentDisplay;
   }
 
-  _generateAmountDisplay() {
-    return "" !== this.state.amount ? this.state.amount + " " + this.state.unit : "";
+  _getGasLimitSummary() {
+    return this.props.gasConsumable && "" !== this.state.gasLimit ? "Limit: " + this.state.gasLimit : "";
+  }
+
+  _getAmountSummary() {
+    return this.props.payable && "" !== this.state.amount ? "Amount: " + this.state.amount + " " + this.state.unit : "";
+  }
+
+  _getFeeDelegationSummary() {
+    return this.props.feeDelegatable ? "FeeDelegation: " + this.state.feeDelegation : "";
   }
 
   _onFocusOnAnyInput() {
@@ -2614,11 +2770,47 @@ class Arguments extends React.Component {
         ref: inputRef
       }));
     });
+    let optionalAdded = false; // (optional) gas limit
+
+    if (this.props.gasConsumable) {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.push(inputRef);
+
+      if (!optionalAdded && 0 !== argumentComponents.length) {
+        optionalAdded = true;
+        argumentComponents.push(React.createElement(ArgumentRow, {
+          "class": argumentsRowBorderClass
+        }));
+      }
+
+      argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+        name: "Gas Limit"
+      }), React.createElement(InputBox, {
+        tabIndex: tabIndexProvider(),
+        type: "number",
+        "class": "component-inputbox-argument",
+        placeHolder: "(default: 0)",
+        onChange: this._onGasLimitChange,
+        onFocus: this._onFocusOnAnyInput,
+        onBlur: this._onBrurOnAnyInput,
+        ref: inputRef
+      })));
+    } // (optional) amount
+
 
     if (this.props.payable) {
       // hack to clean value when reset
       const inputRef = React.createRef();
       this.inputRefs.push(inputRef);
+
+      if (!optionalAdded && 0 !== argumentComponents.length) {
+        optionalAdded = true;
+        argumentComponents.push(React.createElement(ArgumentRow, {
+          "class": argumentsRowBorderClass
+        }));
+      }
+
       argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
         name: "Amount"
       }), React.createElement(InputBox, {
@@ -2635,22 +2827,29 @@ class Arguments extends React.Component {
         options: units$1,
         onChange: this._onUnitChange
       })));
+    } // (optional) delegation fee
+
+
+    if (this.props.feeDelegatable) {
+      if (!optionalAdded && 0 !== argumentComponents.length) {
+        optionalAdded = true;
+        argumentComponents.push(React.createElement(ArgumentRow, {
+          "class": argumentsRowBorderClass
+        }));
+      }
+
+      argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(CheckBox, {
+        text: "Delegate fee",
+        onChange: this._onFeeDelegationChange
+      })));
     }
 
-    const argumentDisplay = this._generateArgsDisplay();
+    const summary = this._getSummary();
 
-    const amountDisplay = this._generateAmountDisplay();
-
-    const argumentsTextBoxClass = argumentDisplay === noArgumentsDisplay ? join('component-textbox-no-arguments', 'component-textbox-arguments') : 'component-textbox-arguments';
-    const trigger = React.createElement("div", {
-      className: "component-arguments-and-amount"
-    }, React.createElement(TextBox, {
+    const trigger = React.createElement(TextBox, {
       "class": argumentsTextBoxClass,
-      text: argumentDisplay
-    }), React.createElement(TextBox, {
-      "class": "component-textbox-amount",
-      text: amountDisplay
-    }));
+      text: summary
+    });
     return React.createElement(Foldable, {
       isOpen: false,
       transitionTime: 1,
@@ -2660,40 +2859,46 @@ class Arguments extends React.Component {
 
 }
 
+const transactionButtonClass = 'component-btn-transaction';
+
 const ArgumentsAndRunner = props => {
   const args = props.args;
+  const gasConsumable = props.gasConsumable;
   const payable = props.payable;
-  const runnerName = props.runnerName;
-  const runnerStyle = props.runnerStyle;
-  const runner = props.runner;
+  const feeDelegatable = props.feeDelegatable;
   const argsRef = React.createRef();
-  return React.createElement(CardRow, {
-    "class": "component-card-row-argument"
-  }, React.createElement(CardItem, {
+  const runnerName = props.runnerName;
+  const runnerClass = gasConsumable ? transactionButtonClass : "";
+  const runner = props.runner;
+  return React.createElement(CardRow, null, React.createElement(CardItem, {
     ratio: 1,
     hideOverflow: true
   }, React.createElement(Arguments, {
     args: args,
+    gasConsumable: gasConsumable,
     payable: payable,
+    feeDelegatable: feeDelegatable,
     ref: argsRef
   })), React.createElement(CardItem, {
     ratio: 0
   }, React.createElement(Button, {
     name: runnerName,
-    "class": runnerStyle,
+    "class": runnerClass,
     onClick: () => runner(argsRef)
   })));
 };
 
 ArgumentsAndRunner.propTypes = {
   args: propTypes.array,
+  gasConsumable: propTypes.bool,
   payable: propTypes.bool,
+  feeDelegatable: propTypes.bool,
   runnerName: propTypes.string,
-  runnerStyle: propTypes.string,
   runner: propTypes.func
 };
 
 const Balance = props => {
+  const balance = convertAerPretty(props.balance);
   return React.createElement(CardRow, null, React.createElement(CardItem, {
     ratio: 0
   }, React.createElement(Description, {
@@ -2701,7 +2906,7 @@ const Balance = props => {
   })), React.createElement(CardItem, {
     ratio: 1
   }, React.createElement(TextBox, {
-    text: props.balance
+    text: balance
   })));
 };
 Balance.propTypes = {
@@ -2712,7 +2917,7 @@ const CardTitle = props => {
   return React.createElement(CardRow, null, React.createElement(Title, {
     title: props.title,
     "class": props.titleClass
-  }), props.children);
+  }));
 };
 CardTitle.propTypes = {
   title: propTypes.string.isRequired,
@@ -2733,6 +2938,7 @@ const ConstructorArguments = props => {
     hideOverflow: true
   }, React.createElement(Arguments, {
     args: args,
+    gasConsumable: true,
     payable: payable,
     ref: argsRef
   })));
@@ -2742,6 +2948,82 @@ ConstructorArguments.propTypes = {
   args: propTypes.array,
   payable: propTypes.bool,
   argsRef: propTypes.any
+};
+
+const units$2 = ["aer", "gaer", "aergo"];
+class GasPrice extends React.Component {
+  static get propTypes() {
+    return {
+      price: propTypes.string
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      unit: 'aer'
+    };
+    this._onUnitChange = this._onUnitChange.bind(this);
+  }
+
+  _onUnitChange(newUnit) {
+    this.setState({
+      unit: newUnit
+    });
+  }
+
+  render() {
+    const originPrice = this.props.price;
+    const displayPrice = convertToUnit(originPrice, 'aer', this.state.unit);
+    const onChange = this._onUnitChange;
+    return React.createElement(CardRow, null, React.createElement(CardItem, {
+      ratio: 0
+    }, React.createElement(Description, {
+      description: "Gas Price"
+    })), React.createElement(CardItem, {
+      ratio: 1
+    }, React.createElement(TextBox, {
+      text: displayPrice
+    })), React.createElement(CardItem, {
+      ratio: 0
+    }, React.createElement(SelectBox, {
+      "class": "component-selectbox-unit",
+      value: this.state.unit,
+      options: units$2,
+      onChange: onChange
+    })));
+  }
+
+}
+
+const noContractComment$1 = "No contract selected";
+const ContractSelect = props => {
+  const contract = props.contract;
+  const contracts = JSON.parse(JSON.stringify(props.contracts));
+
+  if (contracts.length !== 0) {
+    contracts.unshift(noContractComment$1); // add empty option
+  }
+
+  const onChange = props.onChange;
+  return React.createElement(CardRow, null, React.createElement(CardItem, {
+    ratio: 0
+  }, React.createElement(Description, {
+    description: "Contract"
+  })), React.createElement(CardItem, {
+    ratio: 1,
+    hideOverflow: true
+  }, React.createElement(SelectBox, {
+    value: contract,
+    options: contracts,
+    onChange: onChange,
+    placeholder: "select contract to redeploy"
+  })));
+};
+ContractSelect.propTypes = {
+  contract: propTypes.string,
+  contracts: propTypes.array,
+  onChange: propTypes.func
 };
 
 const FoldableCard = props => {
@@ -2764,6 +3046,7 @@ FoldableCard.propTypes = {
 };
 
 const Height = props => {
+  const height = formatInteger(props.height);
   return React.createElement(CardRow, null, React.createElement(CardItem, {
     ratio: 0
   }, React.createElement(Description, {
@@ -2771,7 +3054,7 @@ const Height = props => {
   })), React.createElement(CardItem, {
     ratio: 1
   }, React.createElement(TextBox, {
-    text: props.height
+    text: height
   })));
 };
 Height.propTypes = {
@@ -2825,21 +3108,6 @@ Payload.propTypes = {
   payload: propTypes.string
 };
 
-const starClass = 'star';
-const Star = props => {
-  return React.createElement("div", {
-    className: starClass
-  }, React.createElement(StarTitle, {
-    title: props.title
-  }), React.createElement(StarContent, {
-    content: props.content
-  }));
-};
-Star.propTypes = {
-  title: propTypes.string,
-  content: propTypes.string
-};
-
 const TargetSelect = props => {
   return React.createElement(CardRow, null, React.createElement(CardItem, {
     ratio: 0
@@ -2860,8 +3128,8 @@ TargetSelect.propTypes = {
   onChange: propTypes.func
 };
 
-var _dec, _class$7;
-let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$7 = mobxReact.observer(_class$7 = class ExportAccountModal extends React.Component {
+var _dec, _class$6;
+let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$6 = mobxReact.observer(_class$6 = class ExportAccountModal extends React.Component {
   static get propTypes() {
     return {
       accountStore: propTypes.any
@@ -2912,10 +3180,10 @@ let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$7
     })))));
   }
 
-}) || _class$7) || _class$7);
+}) || _class$6) || _class$6);
 
-var _dec$1, _class$8;
-let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_class$8 = mobxReact.observer(_class$8 = class ImportAccountModal extends React.Component {
+var _dec$1, _class$7;
+let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_class$7 = mobxReact.observer(_class$7 = class ImportAccountModal extends React.Component {
   static get propTypes() {
     return {
       accountStore: propTypes.any
@@ -2974,10 +3242,10 @@ let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_cla
     })))));
   }
 
-}) || _class$8) || _class$8);
+}) || _class$7) || _class$7);
 
-var _dec$2, _class$9;
-let NewAccountModal = (_dec$2 = mobxReact.inject('accountStore'), _dec$2(_class$9 = mobxReact.observer(_class$9 = class NewAccountModal extends React.Component {
+var _dec$2, _class$8;
+let NewAccountModal = (_dec$2 = mobxReact.inject('accountStore'), _dec$2(_class$8 = mobxReact.observer(_class$8 = class NewAccountModal extends React.Component {
   static get propTypes() {
     return {
       accountStore: propTypes.any
@@ -3021,10 +3289,10 @@ let NewAccountModal = (_dec$2 = mobxReact.inject('accountStore'), _dec$2(_class$
     })))));
   }
 
-}) || _class$9) || _class$9);
+}) || _class$8) || _class$8);
 
-var _dec$3, _class$a;
-let NewNodeModal = (_dec$3 = mobxReact.inject('nodeStore'), _dec$3(_class$a = mobxReact.observer(_class$a = class NewNodeModal extends React.Component {
+var _dec$3, _class$9;
+let NewNodeModal = (_dec$3 = mobxReact.inject('nodeStore'), _dec$3(_class$9 = mobxReact.observer(_class$9 = class NewNodeModal extends React.Component {
   static get propTypes() {
     return {
       nodeStore: propTypes.any
@@ -3075,10 +3343,10 @@ let NewNodeModal = (_dec$3 = mobxReact.inject('nodeStore'), _dec$3(_class$a = mo
     })))));
   }
 
-}) || _class$a) || _class$a);
+}) || _class$9) || _class$9);
 
-var _dec$4, _class$b;
-let RemoveAccountModal = (_dec$4 = mobxReact.inject('accountStore'), _dec$4(_class$b = mobxReact.observer(_class$b = class RemoveAccountModal extends React.Component {
+var _dec$4, _class$a;
+let RemoveAccountModal = (_dec$4 = mobxReact.inject('accountStore'), _dec$4(_class$a = mobxReact.observer(_class$a = class RemoveAccountModal extends React.Component {
   static get propTypes() {
     return {
       accountStore: propTypes.any
@@ -3124,10 +3392,10 @@ let RemoveAccountModal = (_dec$4 = mobxReact.inject('accountStore'), _dec$4(_cla
     })))));
   }
 
-}) || _class$b) || _class$b);
+}) || _class$a) || _class$a);
 
-var _dec$5, _class$c;
-let RemoveNodeModal = (_dec$5 = mobxReact.inject('nodeStore'), _dec$5(_class$c = mobxReact.observer(_class$c = class RemoveNodeModal extends React.Component {
+var _dec$5, _class$b;
+let RemoveNodeModal = (_dec$5 = mobxReact.inject('nodeStore'), _dec$5(_class$b = mobxReact.observer(_class$b = class RemoveNodeModal extends React.Component {
   static get propTypes() {
     return {
       nodeStore: propTypes.any
@@ -3173,7 +3441,7 @@ let RemoveNodeModal = (_dec$5 = mobxReact.inject('nodeStore'), _dec$5(_class$c =
     })))));
   }
 
-}) || _class$c) || _class$c);
+}) || _class$b) || _class$b);
 
 const Account$1 = props => {
   const address = props.address;
@@ -3181,7 +3449,9 @@ const Account$1 = props => {
   const onAddressChange = props.onAddressChange;
   const onAddressCopy = props.onAddressCopy;
   const balance = props.balance;
-  const nonce = props.nonce;
+  const nonce = props.nonce; // const limitRef = React.createRef();
+  // const onLimitChange = props.onLimitChange;
+
   return React.createElement(FoldableCard, {
     trigger: React.createElement(CardTitle, {
       title: "Account"
@@ -3211,6 +3481,7 @@ Account$1.propTypes = {
   nonce: propTypes.number
 };
 
+const blacklist = ['constructor', 'default', 'check_delegation'];
 class ContractRun extends React.Component {
   static get propTypes() {
     return {
@@ -3240,30 +3511,42 @@ class ContractRun extends React.Component {
       return React.createElement("div", null);
     }
 
-    const abiCalls = abiFunctions.filter(f => "constructor" !== f.name).map((abiFunction, index) => {
+    const abiCalls = abiFunctions.filter(f => blacklist.indexOf(f.name) === -1).map((abiFunction, index) => {
       const args = abiFunction.arguments.map(a => a.name);
       const payable = abiFunction.payable;
+      const feeDelegatable = abiFunction.feeDelegation;
       const runnerName = abiFunction.name;
-      let runnerStyle = 'component-btn-transaction';
       let runner = onAbiExec;
+      let gasConsumable = true;
 
       if (abiFunction.view) {
-        runnerStyle = '';
+        gasConsumable = false;
         runner = onAbiQuery;
       }
 
       return React.createElement(ArgumentsAndRunner, {
         key: index,
         args: args,
+        gasConsumable: gasConsumable,
         payable: payable,
+        feeDelegatable: feeDelegatable,
         runnerName: runnerName,
-        runnerStyle: runnerStyle,
         runner: argsRef => runner(contractAddress, runnerName, argsRef)
       });
     });
-    const trigger = React.createElement(CardTitle, {
+    const titleClass = {
+      overflow: "hidden",
+      textOverflow: "ellipsis"
+    };
+    const trigger = React.createElement(CardRow, null, React.createElement(CardItem, {
+      ratio: 1,
+      hideOverflow: true,
+      style: titleClass
+    }, React.createElement(Title, {
       title: contractAddress,
-      titleClass: "component-contract-run-title"
+      "class": "component-contract-run-title"
+    })), React.createElement(CardItem, {
+      ratio: 0
     }, React.createElement(CopyIcon, {
       onClick: e => {
         e.stopPropagation();
@@ -3274,7 +3557,7 @@ class ContractRun extends React.Component {
         e.stopPropagation();
         onContractRemove(contractAddress);
       }
-    }));
+    })));
     return React.createElement(FoldableCard, {
       foldableClass: "before-component-foldable",
       trigger: trigger,
@@ -3284,7 +3567,7 @@ class ContractRun extends React.Component {
 
 }
 
-const Contract = props => {
+const ContractImport = props => {
   const onContractImport = props.onContractImport;
   const onContractCopy = props.onContractCopy;
   const onContractRemove = props.onContractRemove;
@@ -3330,7 +3613,7 @@ const Contract = props => {
     onClick: () => onContractImport(contractInputRef)
   }))), border, contractRuns);
 };
-Contract.propTypes = {
+ContractImport.propTypes = {
   onContractImport: propTypes.func,
   onContractCopy: propTypes.func,
   onContractRemove: propTypes.func,
@@ -3342,23 +3625,15 @@ Contract.propTypes = {
 const Deployment = props => {
   const currentTarget = props.currentTarget;
   const targets = props.targets;
-  const onTargetChange = props.onTargetChange;
+  const onDeployTargetChange = props.onDeployTargetChange;
   const constructorArgs = props.constructorArgs;
   const payable = props.payable;
   const argsRef = React.createRef();
+  const currentContract = props.currentContract;
+  const contracts = props.contracts;
+  const onRedeployTargetChange = props.onRedeployTargetChange;
   const onDeploy = props.onDeploy;
-  let constructorOrNot;
-
-  if (constructorArgs.length > 0 || payable === true) {
-    constructorOrNot = React.createElement(ConstructorArguments, {
-      args: constructorArgs,
-      payable: payable,
-      argsRef: argsRef
-    });
-  } else {
-    constructorOrNot = React.createElement("div", null);
-  }
-
+  const onCompile = props.onCompile;
   return React.createElement(FoldableCard, {
     trigger: React.createElement(CardTitle, {
       title: "Deploy"
@@ -3366,13 +3641,27 @@ const Deployment = props => {
   }, React.createElement(TargetSelect, {
     target: currentTarget,
     targets: targets,
-    onChange: onTargetChange
-  }), constructorOrNot, React.createElement(CardRow, null, React.createElement(Description, {
+    onChange: onDeployTargetChange
+  }), React.createElement(ConstructorArguments, {
+    args: constructorArgs,
+    payable: payable,
+    argsRef: argsRef
+  }), React.createElement(CardRow, {
+    "class": "component-card-row-border"
+  }), React.createElement(ContractSelect, {
+    contract: currentContract,
+    contracts: contracts,
+    onChange: onRedeployTargetChange
+  }), React.createElement(CardRow, null, React.createElement(Description, {
     description: ""
   }), React.createElement(reflexbox.Flex, {
     justify: "flex-end",
     w: 1
   }, React.createElement(Button, {
+    name: "Compile",
+    "class": "component-btn-green",
+    onClick: onCompile
+  }), React.createElement(Button, {
     name: "Deploy",
     "class": "component-btn-transaction",
     onClick: () => onDeploy(argsRef)
@@ -3381,27 +3670,38 @@ const Deployment = props => {
 Deployment.propTypes = {
   currentTarget: propTypes.string,
   targets: propTypes.array,
-  onTargetChange: propTypes.func,
+  onDeployTargetChange: propTypes.func,
   constructorArgs: propTypes.array,
   payable: propTypes.bool,
-  onDeploy: propTypes.func
+  currentContract: propTypes.string,
+  contracts: propTypes.array,
+  onRedeployTargetChange: propTypes.func,
+  onDeploy: propTypes.func,
+  onCompile: propTypes.func
 };
 
 const Node = props => {
+  const onSync = props.onSync;
   const node = props.node;
   const nodes = props.nodes;
   const height = props.height;
+  const price = props.gasPrice;
   const onNodeChange = props.onNodeChange;
-  return React.createElement(FoldableCard, {
-    trigger: React.createElement(CardTitle, {
-      title: "Node"
-    })
-  }, React.createElement(NodeSelect, {
+  return React.createElement(Card, null, React.createElement(CardRow, null, React.createElement(Title, {
+    title: "Node"
+  }), React.createElement(reflexbox.Flex, {
+    justify: "flex-end",
+    w: 1
+  }, React.createElement(SyncIcon, {
+    onClick: onSync
+  }))), React.createElement(NodeSelect, {
     node: node,
     nodes: nodes,
     onChange: onNodeChange
   }), React.createElement(Height, {
     height: height
+  }), React.createElement(GasPrice, {
+    price: price
   }), React.createElement(CardRow, null, React.createElement(Description, {
     description: ""
   }), React.createElement(reflexbox.Flex, {
@@ -3413,66 +3713,13 @@ Node.propTypes = {
   node: propTypes.string,
   nodes: propTypes.array,
   height: propTypes.number,
+  gasPrice: propTypes.number,
+  onSync: propTypes.func,
   onNodeChange: propTypes.func
 };
 
-const Summary = props => {
-  const node = props.node;
-  const address = props.address;
-  const height = props.height;
-  const balanceWithUnit = props.balanceWithUnit;
-  const nonce = props.nonce;
-  return React.createElement(Void, null, React.createElement(Stars, null, React.createElement(StarsRow, null, React.createElement(StarsCell, null, React.createElement(Star, {
-    title: "Node",
-    content: node
-  })), React.createElement(StarsCell, {
-    colspan: "2"
-  }, React.createElement(Star, {
-    title: "Account",
-    content: address
-  }))), React.createElement(StarsRow, null, React.createElement(StarsCell, null, React.createElement(Star, {
-    title: "Height",
-    content: height
-  })), React.createElement(StarsCell, null, React.createElement(Star, {
-    title: "Balance",
-    content: balanceWithUnit
-  })), React.createElement(StarsCell, null, React.createElement(Star, {
-    title: "Nonce",
-    content: nonce
-  })))));
-};
-Summary.propTypes = {
-  node: propTypes.string,
-  address: propTypes.string,
-  height: propTypes.number,
-  balanceWithUnit: propTypes.number,
-  nonce: propTypes.number
-};
-
-const TopBar = props => {
-  const onCompile = props.onCompile;
-  const onRefresh = props.onRefresh;
-  return React.createElement(Card, {
-    "class": "transparent-background"
-  }, React.createElement(CardRow, {
-    "class": "component-card-row-top-bar"
-  }, React.createElement(Button, {
-    name: "Compile",
-    "class": "component-btn-top-bar",
-    onClick: onCompile
-  }), React.createElement(Button, {
-    name: "Refresh",
-    "class": "component-btn-top-bar",
-    onClick: onRefresh
-  })));
-};
-TopBar.propTypes = {
-  onCompile: propTypes.func,
-  onRefresh: propTypes.func
-};
-
-var _dec$6, _class$d;
-let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notificationStore', 'contractStore', 'deployTargetStore'), _dec$6(_class$d = mobxReact.observer(_class$d = class RunPanel extends React.Component {
+var _dec$6, _class$c;
+let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notificationStore', 'contractStore', 'deployTargetStore'), _dec$6(_class$c = mobxReact.observer(_class$c = class RunPanel extends React.Component {
   static get propTypes() {
     return {
       nodeStore: propTypes.any,
@@ -3485,13 +3732,14 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
 
   constructor(props) {
     super(props);
-    this._onCompileButtonClicked = this._onCompileButtonClicked.bind(this);
-    this._onRefresh = this._onRefresh.bind(this);
+    this._onSync = this._onSync.bind(this);
     this._onNodeUrlChange = this._onNodeUrlChange.bind(this);
     this._onAddressChange = this._onAddressChange.bind(this);
     this._onAddressCopy = this._onAddressCopy.bind(this);
-    this._onFileChange = this._onFileChange.bind(this);
-    this._onDeployButtonClicked = this._onDeployButtonClicked.bind(this);
+    this._onDeployTargetChange = this._onDeployTargetChange.bind(this);
+    this._onRedeployTargetChange = this._onRedeployTargetChange.bind(this);
+    this._onCompile = this._onCompile.bind(this);
+    this._onDeploy = this._onDeploy.bind(this);
     this._onContractImport = this._onContractImport.bind(this);
     this._onContractCopy = this._onContractCopy.bind(this);
     this._onContractRemove = this._onContractRemove.bind(this);
@@ -3500,7 +3748,48 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     this._onError = this._onError.bind(this);
   }
 
-  _onCompileButtonClicked() {
+  _onSync() {
+    logger.info("Sync status");
+    this.props.nodeStore.updateNodeState();
+    this.props.accountStore.updateAccountState();
+  }
+
+  _onNodeUrlChange(selectedNode) {
+    logger.info("Node change", selectedNode);
+    this.props.nodeStore.changeNode(selectedNode);
+
+    this._onSync();
+  }
+
+  _onAddressChange(selectedAddress) {
+    logger.info("Account address change to", selectedAddress);
+    this.props.accountStore.changeAccount(selectedAddress);
+
+    this._onSync();
+  }
+
+  _onAddressCopy(accountAddress) {
+    runWithCallback.call(this, () => {
+      logger.debug("Copy address", accountAddress);
+      clipboardy.writeSync(accountAddress);
+    }, this._onError);
+  }
+
+  _onDeployTargetChange(selectedFile) {
+    runWithCallback.call(this, () => {
+      logger.debug("Compiled deploy target", selectedFile);
+      this.props.deployTargetStore.changeTarget(selectedFile);
+    }, this._onError);
+  }
+
+  _onRedeployTargetChange(selectedContract) {
+    runWithCallback.call(this, () => {
+      logger.debug("Change redeploy target", selectedContract);
+      this.props.deployTargetStore.changeContract(selectedContract);
+    }, this._onError);
+  }
+
+  _onCompile() {
     runWithCallback.call(this, () => {
       logger.debug("Compile contract");
 
@@ -3512,40 +3801,6 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }, this._onError);
   }
 
-  _onRefresh() {
-    logger.info("Sync status");
-    this.props.nodeStore.updateNodeState();
-    this.props.accountStore.updateAccountState();
-  }
-
-  _onNodeUrlChange(selectedNode) {
-    logger.info("Node change", selectedNode);
-    this.props.nodeStore.changeNode(selectedNode);
-
-    this._onRefresh();
-  }
-
-  _onAddressChange(selectedAddress) {
-    logger.info("Account address change to", selectedAddress);
-    this.props.accountStore.changeAccount(selectedAddress);
-
-    this._onRefresh();
-  }
-
-  _onAddressCopy(accountAddress) {
-    runWithCallback.call(this, () => {
-      logger.debug("Copy address", accountAddress);
-      clipboardy.writeSync(accountAddress);
-    }, this._onError);
-  }
-
-  _onFileChange(selectedFile) {
-    runWithCallback.call(this, () => {
-      logger.debug("Compiled file change", selectedFile);
-      this.props.deployTargetStore.changeTarget(selectedFile);
-    }, this._onError);
-  }
-
   _compile() {
     runWithCallback.call(this, () => {
       const baseDir = editor.getProjectRootDir();
@@ -3554,19 +3809,21 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }, this._onError);
   }
 
-  _onDeployButtonClicked(argInputRef) {
+  _onDeploy(inputsRef) {
     runWithCallback.call(this, () => {
       logger.debug("Deploy contract");
-      logger.debug("Input ref", argInputRef);
+      logger.debug("Input ref", inputsRef);
       let constructorArgs = [];
+      let gasLimit = undefined;
       let amount = "0";
 
-      if (argInputRef.current) {
-        constructorArgs = argInputRef.current.values;
-        amount = argInputRef.current.amount;
+      if (inputsRef.current) {
+        constructorArgs = inputsRef.current.values;
+        gasLimit = inputsRef.current.gasLimit;
+        amount = inputsRef.current.amount;
       }
 
-      this.props.contractStore.deployContract(constructorArgs, amount);
+      this.props.contractStore.deployContract(constructorArgs, gasLimit, amount);
     }, this._onError);
   }
 
@@ -3590,23 +3847,23 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }, this._onError);
   }
 
-  _onAbiExec(contractAddress, targetFunction, argInputRef) {
+  _onAbiExec(contractAddress, targetFunction, inputsRef) {
     runWithCallback.call(this, () => {
       logger.debug("Execute contract");
-      logger.debug("Input ref", argInputRef);
-      const targetArgs = argInputRef.current.values;
-      const amount = argInputRef.current.amount;
-      logger.info("Execute contract", targetFunction, "with args", targetArgs);
-      this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, amount);
+      logger.debug("Input ref", inputsRef);
+      const targetArgs = inputsRef.current.values;
+      const gasLimit = inputsRef.current.gasLimit;
+      const amount = inputsRef.current.amount;
+      const feeDelegation = inputsRef.current.feeDelegation;
+      this.props.contractStore.executeContract(contractAddress, targetFunction, targetArgs, gasLimit, amount, feeDelegation);
     }, this._onError);
   }
 
-  _onAbiQuery(contractAddress, targetFunction, argInputRef) {
+  _onAbiQuery(contractAddress, targetFunction, inputRefs) {
     runWithCallback.call(this, () => {
       logger.debug("Query contract");
-      logger.debug("Input ref", argInputRef);
-      const targetArgs = argInputRef.current.values;
-      logger.info("Query contract", targetFunction, "with args", targetArgs);
+      logger.debug("Input ref", inputRefs);
+      const targetArgs = inputRefs.current.values;
       this.props.contractStore.queryContract(contractAddress, targetFunction, targetArgs);
     }, this._onError);
   }
@@ -3617,34 +3874,31 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
   }
 
   render() {
-    // summary
+    // node
+    const onSync = this._onSync;
     const node = this.props.nodeStore.currentNode;
-    const address = this.props.accountStore.currentAddress;
+    const nodes = this.props.nodeStore.nodes;
     const height = this.props.nodeStore.currentHeight;
-    const balanceWithUnit = this.props.accountStore.currentBalanceWithUnit;
-    const nonce = this.props.accountStore.currentNonce; // sync
+    const gasPrice = this.props.nodeStore.gasPrice;
+    const onNodeChange = this._onNodeUrlChange; // account
 
-    const onCompile = this._onCompileButtonClicked;
-    const onRefresh = this._onRefresh; // node
-    // const node = this.props.nodeStore.currentNode;
-
-    const nodes = this.props.nodeStore.nodes; // const height = this.props.nodeStore.currentHeight;
-
-    const onNodeChange = this._onNodeUrlChange; // address
-    // const accountAddress = this.props.accountStore.currentAddress;
-
+    const address = this.props.accountStore.currentAddress;
     const addresses = this.props.accountStore.addresses;
     const onAddressChange = this._onAddressChange;
     const onAddressCopy = this._onAddressCopy;
-    const balance = this.props.accountStore.currentBalance; // const nonce = this.props.accountStore.currentNonce;
-    // deployment target
+    const balance = this.props.accountStore.currentBalance;
+    const nonce = this.props.accountStore.currentNonce; // deployment target
 
     const currentTarget = this.props.deployTargetStore.currentTarget;
     const targets = this.props.deployTargetStore.targets;
-    const onTargetChange = this._onFileChange;
-    const onDeploy = this._onDeployButtonClicked;
+    const onDeployTargetChange = this._onDeployTargetChange;
     const constructorArgs = this.props.deployTargetStore.constructorArgs;
-    const payable = this.props.deployTargetStore.isPayable; // contract
+    const payable = this.props.deployTargetStore.isPayable;
+    const currentContract = this.props.deployTargetStore.currentContract;
+    const contracts = this.props.contractStore.contractAddresses;
+    const onRedeployTargetChange = this._onRedeployTargetChange;
+    const onCompile = this._onCompile;
+    const onDeploy = this._onDeploy; // contract
 
     const onContractImport = this._onContractImport;
     const onContractCopy = this._onContractCopy;
@@ -3652,19 +3906,12 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     const contractAddress2Abi = this.props.contractStore.contractAddress2Abi;
     const onAbiExec = this._onAbiExec;
     const onAbiQuery = this._onAbiQuery;
-    return React.createElement(Panel, null, React.createElement(Summary, {
-      node: node,
-      address: address,
-      height: height,
-      balanceWithUnit: balanceWithUnit,
-      nonce: nonce
-    }), React.createElement(TopBar, {
-      onCompile: onCompile,
-      onRefresh: onRefresh
-    }), React.createElement(Node, {
+    return React.createElement(Panel, null, React.createElement(Node, {
+      onSync: onSync,
       node: node,
       nodes: nodes,
       height: height,
+      gasPrice: gasPrice,
       onNodeChange: onNodeChange
     }), React.createElement(Account$1, {
       address: address,
@@ -3676,11 +3923,15 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }), React.createElement(Deployment, {
       currentTarget: currentTarget,
       targets: targets,
-      onTargetChange: onTargetChange,
+      onDeployTargetChange: onDeployTargetChange,
       constructorArgs: constructorArgs,
       payable: payable,
+      currentContract: currentContract,
+      contracts: contracts,
+      onRedeployTargetChange: onRedeployTargetChange,
+      onCompile: onCompile,
       onDeploy: onDeploy
-    }), React.createElement(Contract, {
+    }), React.createElement(ContractImport, {
       onContractImport: onContractImport,
       onContractCopy: onContractCopy,
       onContractRemove: onContractRemove,
@@ -3690,7 +3941,7 @@ let RunPanel = (_dec$6 = mobxReact.inject('nodeStore', 'accountStore', 'notifica
     }));
   }
 
-}) || _class$d) || _class$d);
+}) || _class$c) || _class$c);
 
 class AthenaIdeViewRoot extends React.Component {
   constructor(props) {
@@ -3717,7 +3968,6 @@ class AtheneIdeView {
       consoleStore: rootStore.consoleStore,
       contractStore: rootStore.contractStore,
       deployTargetStore: rootStore.deployTargetStore,
-      feeStore: rootStore.feeStore,
       nodeStore: rootStore.nodeStore,
       notificationStore: rootStore.notificationStore
     };
@@ -3775,8 +4025,8 @@ class AtheneIdeView {
 
 }
 
-var _dec$7, _class$e;
-let ConsoleViewRoot = (_dec$7 = mobxReact.inject('consoleStore'), _dec$7(_class$e = mobxReact.observer(_class$e = class ConsoleViewRoot extends React.Component {
+var _dec$7, _class$d;
+let ConsoleViewRoot = (_dec$7 = mobxReact.inject('consoleStore'), _dec$7(_class$d = mobxReact.observer(_class$d = class ConsoleViewRoot extends React.Component {
   static get propTypes() {
     return {
       consoleStore: propTypes.any
@@ -3798,7 +4048,7 @@ let ConsoleViewRoot = (_dec$7 = mobxReact.inject('consoleStore'), _dec$7(_class$
     const logs = mobx.toJS(this.props.consoleStore.logs);
     return React.createElement("div", {
       "class": "console-view-root"
-    }, React.createElement(TopBar$1, null, React.createElement(TopBarItem, {
+    }, React.createElement(TopBar, null, React.createElement(TopBarItem, {
       className: "icon-x",
       onClick: onClearClick
     })), React.createElement(BottomBar, {
@@ -3806,17 +4056,17 @@ let ConsoleViewRoot = (_dec$7 = mobxReact.inject('consoleStore'), _dec$7(_class$
     }));
   }
 
-}) || _class$e) || _class$e);
+}) || _class$d) || _class$d);
 
-const TopBar$1 = props => {
+const TopBar = props => {
   return React.createElement("div", {
-    className: join('top-bar')
+    className: 'top-bar'
   }, props.children);
 };
 
 const TopBarItem = props => {
   return React.createElement("div", {
-    className: join('top-bar-item', props.className),
+    className: ['top-bar-item', props.className].join(' '),
     onClick: props.onClick
   });
 };
@@ -3866,7 +4116,7 @@ class BottomBar extends React.Component {
       }
     });
     return React.createElement("div", {
-      className: join('bottom-bar')
+      className: 'bottom-bar'
     }, logsView);
   }
 
@@ -3878,7 +4128,7 @@ const Log = props => {
   const level = props.level;
   const innerRef = props.innerRef;
   return React.createElement("div", {
-    className: join('log'),
+    className: 'log',
     ref: innerRef
   }, React.createElement(Time, {
     time: time
@@ -3897,7 +4147,7 @@ Log.propTypes = {
 const Time = props => {
   const time = props.time;
   return React.createElement("div", {
-    className: join('time')
+    className: 'time'
   }, time);
 };
 
@@ -3909,7 +4159,7 @@ const Message = props => {
   const message = props.message;
   const level = typeof props.level === "undefined" ? "info" : props.level;
   return React.createElement("div", {
-    className: join('message', 'level-' + level)
+    className: ['message', 'level-' + level].join(' ')
   }, message);
 };
 
@@ -6329,67 +6579,6 @@ function isFastBuffer (obj) {
 function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isFastBuffer(obj.slice(0, 0))
 }
-
-// Unique ID creation requires a high quality random # generator.  In node.js
-// this is pretty straight-forward - we use the crypto API.
-
-
-
-var rng = function nodeRNG() {
-  return crypto.randomBytes(16);
-};
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([bth[buf[i++]], bth[buf[i++]], 
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]]]).join('');
-}
-
-var bytesToUuid_1 = bytesToUuid;
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid_1(rnds);
-}
-
-var v4_1 = v4;
 
 var assertString_1 = createCommonjsModule(function (module, exports) {
 
