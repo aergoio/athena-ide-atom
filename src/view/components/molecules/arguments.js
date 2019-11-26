@@ -46,7 +46,7 @@ export default class Arguments extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.args.length !== nextProps.args.length) {
+    if (this.isStateDifferent(this.props, nextProps)) {
       this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
       this.setState({
         args: new Array(nextProps.args.length).fill(""),
@@ -56,6 +56,14 @@ export default class Arguments extends React.Component {
         feeDelegation: false,
       });
     }
+  }
+
+  isStateDifferent(preProps, nextProps) {
+    return preProps.args.length !== nextProps.args.length ||
+            preProps.gasConsumable !== nextProps.gasConsumable ||
+            preProps.payable !== nextProps.payable ||
+            preProps.feeDelegatable !== nextProps.feeDelegatable;
+
   }
 
   get values() {
