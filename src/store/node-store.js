@@ -77,7 +77,10 @@ export default class NodeStore {
     }
 
     this.nodeSet.delete(node);
-    this.changeNode("");
+    this.currentNode = "";
+    this.currentHeight = "unknown";
+    this.bestHash = "unknown";
+    this.gasPrice = "unknown";
   }
 
 }

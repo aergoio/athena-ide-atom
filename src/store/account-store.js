@@ -111,7 +111,9 @@ export default class AccountStore {
     }
 
     this.address2Account.delete(address);
-    this.changeAccount("");
+    this.currentAddress = "";
+    this.currentBalance = "unknown";
+    this.currentNonce = "unknown";
   }
 
 }
