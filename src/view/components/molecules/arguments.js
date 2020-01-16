@@ -386,6 +386,7 @@ const Argument = (props) => {
         onBlur={onBlur}
         ref={inputRef}
       />
+      <div className='component-argument-right-margin' ></div>
     </ArgumentRow>
   );
 }
