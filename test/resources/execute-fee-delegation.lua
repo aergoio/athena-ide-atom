@@ -1,6 +1,7 @@
 -- should run with delegation fee not consume aergo of executor
+-- should keep fee delegation state on checked and remove varargs
 
-function run()
+function run(arg, ...)
 end
 
 function check_delegation()

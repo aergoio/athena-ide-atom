@@ -9,44 +9,31 @@ export default class CheckBox extends React.Component {
   static get propTypes() {
     return {
       text: PropTypes.string,
+      checked: PropTypes.boolean,
       onChange: PropTypes.func,
     };
   }
 
   constructor(props) {
     super(props);
-    this.state = {
-      checked: false
-    };
 
-    this._onCheckChange = this._onCheckChange.bind(this);
-  }
-
-  get checked() {
-    return this.state.checked;
-  }
-
-  _onCheckChange(e) {
-    this.setState({
-      checked: e.target.checked
-    });
+    // not used yet
+    this.inputRef = React.createRef();
   }
 
   render() {
     const text = this.props.text;
-    const onChange = (e) => {
-      this._onCheckChange(e);
-      if (this.props.onChange) {
-        this.props.onChange(e);
-      }
-    }
+    const checked = this.props.checked;
+    const onChange = this.props.onChange;
     const id = uuid();
     return (
       <div>
         <input
+          ref={this.inputRef}
           className={checkBoxClass}
           type='checkbox'
           id={id}
+          checked={checked}
           onChange={onChange}
         />
         <label htmlFor={id}>{text}</label>

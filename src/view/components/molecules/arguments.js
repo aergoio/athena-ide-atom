@@ -241,7 +241,8 @@ export default class Arguments extends React.Component {
     if (feeDelegatable) {
       components.push((
         <DelegateFee
-         onChange={this._onFeeDelegationChange}
+          checked={this.state.feeDelegation}
+          onChange={this._onFeeDelegationChange}
         />
       ));
     }
@@ -550,14 +551,19 @@ Amount.propTypes = {
 }
 
 const DelegateFee = (props) => {
+  const checked = props.checked;
   const onChange = props.onChange;
   return (
     <ArgumentRow>
-      <CheckBox text="Delegate fee" onChange={onChange} />
+      <CheckBox text="Delegate fee"
+        checked={checked}
+        onChange={onChange}
+      />
     </ArgumentRow>
   );
 }
 
 DelegateFee.propTypes = {
-  onChange: PropTypes.func
+  checked: PropTypes.bool,
+  onChange: PropTypes.func,
 }
