@@ -37,7 +37,7 @@ export default class ExportAccountModal extends React.Component {
               <CardTitle title='Enter password to decrypt private key' />
               <CardRow>
                 <Description description='Password' />
-                <InputBox ref={this.passwordInputRef} type='text'
+                <InputBox ref={this.passwordInputRef} type='password'
                     placeHolder='password to encrypt private key'/>
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
