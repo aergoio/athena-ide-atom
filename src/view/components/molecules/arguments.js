@@ -2,19 +2,24 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { ArgumentRow, Foldable, ArgumentName, InputBox, SelectBox, TextBox, CheckBox } from '../atoms';
+import {
+  ArgumentRow, Foldable, ArgumentName, InputBox,
+  SelectBox, TextBox, CheckBox, Button,
+} from '../atoms';
 import { convertToUnit } from '../../../utils';
 
-const units = [ "aer", "gaer", "aergo" ];
+const VARARG = "...";
+const VARARG_PREVIX = "arg_";
+const UNITS = [ "aer", "gaer", "aergo" ];
 
 const argumentsTextBoxClass = 'component-textbox-arguments';
 const argumentsRowBorderClass = 'argument-row-border';
 
+// FIXME: Too big.. need refactor
 export default class Arguments extends React.Component {
 
   static get propTypes() {
     return {
-      resetState: PropTypes.bool,
       args: PropTypes.array.isRequired,
       gasConsumable: PropTypes.bool,
       payable: PropTypes.bool,
@@ -24,9 +29,11 @@ export default class Arguments extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       isFocused: false,
-      args: new Array(props.args.length).fill(""),
+      args: [],
+      varArgs: [],
       gasLimit: "",
       amount: "",
       unit: "aer",
@@ -34,11 +41,17 @@ export default class Arguments extends React.Component {
     };
 
     // hack to clean value when reset
-    this.inputRefs = []
+    this.inputRefs = new Set();
 
+    // common
     this._onFocusOnAnyInput = this._onFocusOnAnyInput.bind(this);
     this._onBrurOnAnyInput = this._onBrurOnAnyInput.bind(this);
+
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
+    this._onVarArgumentValueChange = this._onVarArgumentValueChange.bind(this);
+    this._onVarArgRemove = this._onVarArgRemove.bind(this);
+    this._onVarArgAdd = this._onVarArgAdd.bind(this);
+
     this._onGasLimitChange = this._onGasLimitChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
     this._onUnitChange = this._onUnitChange.bind(this);
@@ -46,10 +59,14 @@ export default class Arguments extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.isStateDifferent(this.props, nextProps)) {
+    if (this._isStateDifferent(this.props, nextProps)) {
+      // reset input values
+      logger.debug("clean inputrefs", this.inputRefs);
       this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
+
       this.setState({
-        args: new Array(nextProps.args.length).fill(""),
+        args: [],
+        varArgs: [],
         gasLimit: "",
         amount: "",
         unit: "aer",
@@ -58,16 +75,18 @@ export default class Arguments extends React.Component {
     }
   }
 
-  isStateDifferent(preProps, nextProps) {
+  _isStateDifferent(preProps, nextProps) {
     return preProps.args.length !== nextProps.args.length ||
             preProps.gasConsumable !== nextProps.gasConsumable ||
             preProps.payable !== nextProps.payable ||
             preProps.feeDelegatable !== nextProps.feeDelegatable;
-
   }
 
   get values() {
-    const jsonProcessed = this.state.args.map(rawArg => {
+    const args = this.state.args;
+    const varArgs = this.state.varArgs;
+    const totalArgs = args.concat(varArgs);
+    const jsonProcessed = totalArgs.map(rawArg => {
       try {
         // empty -> null
         if ("" === rawArg) {
@@ -98,13 +117,186 @@ export default class Arguments extends React.Component {
     return this.state.feeDelegation;
   }
 
+  render() {
+    // clean references
+    this.inputRefs.clear();
+
+    // reactive tabindex
+    let tabIndex = 1;
+    const tabIndexProvider = () => this.state.isFocused ? tabIndex++ : -1;
+
+    let components = []
+
+    // arguments
+    logger.debug("args", this.props.args);
+    this.props.args.filter(a => a !== VARARG)
+        .forEach((a, i) => {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+
+      const value = this.state.args[i];
+      components.push(
+        <Argument
+          key={i}
+          name={a}
+          value={value}
+          tabIndex={tabIndexProvider()}
+          onChange={e => this._onArgumentValueChange(e, i)}
+          onFocus={this._onFocusOnAnyInput}
+          onBlur={this._onBrurOnAnyInput}
+          inputRef={inputRef}
+        />
+      );
+    });
+
+    // existing varargs
+    logger.debug("varArgs", this.state.varArgs);
+    this.state.varArgs.forEach((a, i) => {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+
+      const name = `${VARARG_PREVIX}${i + 1}`
+      const value = this.state.varArgs[i];
+      components.push((
+        <VarArgument
+          key={i}
+          name={name}
+          value={value}
+          tabIndex={tabIndexProvider()}
+          onChange={e => this._onVarArgumentValueChange(e, i)}
+          onFocus={this._onFocusOnAnyInput}
+          onBlur={this._onBrurOnAnyInput}
+          inputRef={inputRef}
+          onVarArgRemove={() => this._onVarArgRemove(inputRef, i)}
+        />
+      ));
+    });
+
+    // additional varargs
+    const isVarArg = (this.props.args.length !== 0) &&
+        (this.props.args[this.props.args.length - 1] === VARARG);
+    if (isVarArg) {
+      const name = `${VARARG_PREVIX}${this.state.varArgs.length + 1}`
+      components.push((
+        <OptionalVarArgument
+          name={name}
+          onVarArgAdd={this._onVarArgAdd}
+        />
+      ));
+    }
+
+    // additional
+    const gasConsumable = this.props.gasConsumable;
+    const payable = this.props.payable;
+    const feeDelegatable = this.props.feeDelegatable;
+
+    // add border
+    const additional = gasConsumable && payable && feeDelegatable;
+    if (additional) {
+      components.push(<ArgumentRow class={argumentsRowBorderClass} />);
+    }
+
+    // (optional) gas limit
+    if (gasConsumable) {
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+
+      const value = this.state.gasLimit
+      components.push((
+        <GasLimit
+          value={value}
+          tabIndex={tabIndexProvider()}
+          onChange={this._onGasLimitChange}
+          onFocus={this._onFocusOnAnyInput}
+          onBlur={this._onBrurOnAnyInput}
+          inputRef={inputRef}
+        />
+      ));
+    }
+
+    // (optional) amount
+    if (payable) {
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+
+      const value = this.state.amount;
+      components.push((
+        <Amount
+          value={value}
+          tabIndex={tabIndexProvider()}
+          onAmountChange={this._onAmountChange}
+          onFocus={this._onFocusOnAnyInput}
+          onBlur={this._onBrurOnAnyInput}
+          ref={inputRef}
+          unitValue={this.state.unit}
+          unitOptions={UNITS}
+          onUnitChange={this._onUnitChange}
+        />
+      ));
+    }
+
+    // (optional) delegation fee
+    if (feeDelegatable) {
+      components.push((
+        <DelegateFee
+         onChange={this._onFeeDelegationChange}
+        />
+      ));
+    }
+
+    // summary
+    const summary = this._getSummary();
+    const trigger = (
+      <TextBox class={argumentsTextBoxClass} text={summary} />
+    );
+
+    return (
+      <Foldable
+        isOpen={false}
+        transitionTime={1}
+        trigger={trigger}
+      >
+        {components}
+      </Foldable>
+    );
+  }
+
   _onArgumentValueChange(e, index) {
     const newValue = e.target.value;
-    const newArgs = this.state.args.map((oldValue, i) => {
-      return index === i ? newValue : oldValue;
-    });
-    logger.debug("new arguments", index, newValue, newArgs);
-    this.setState({ args: newArgs });
+    const args = this.state.args;
+    args[index] = newValue;
+    this.setState({ args: args });
+  }
+
+  _onVarArgumentValueChange(e, index) {
+    const newValue = e.target.value;
+    const varArgs = this.state.varArgs;
+    varArgs[index] = newValue;
+    this.setState({ varArgs: varArgs });
+  }
+
+  _onVarArgRemove(inputRef, index) {
+    logger.info("Remove var args");
+
+    // clean displayed value
+    inputRef.current.cleanValue();
+    this.inputRefs.delete(inputRef);
+
+    // clean saved value
+    const newVarArgs = this.state.varArgs;
+    newVarArgs.splice(index, 1);
+    logger.debug("New var args", newVarArgs);
+    this.setState({ varArgs: newVarArgs });
+  }
+
+  _onVarArgAdd() {
+    logger.info("Add var args");
+    const newVarArgs = this.state.varArgs;
+    newVarArgs.push("");
+    logger.debug("New var args", newVarArgs);
+    this.setState({ varArgs: newVarArgs });
   }
 
   _onGasLimitChange(e) {
@@ -136,15 +328,13 @@ export default class Arguments extends React.Component {
   }
 
   _getArgsSummary() {
-    let argumentDisplay = "[]";
-
-    if (this.state.args.map(a => a.trim())
+    const args = this.state.args;
+    const varArgs = this.state.varArgs;
+    logger.debug("Display args", args, "varargs", varArgs);
+    const display = args.concat(varArgs)
           .filter(a => "" !== a)
-          .length > 0) {
-      argumentDisplay = "[" + this.state.args.join(", ") + "]";
-    }
-
-    return argumentDisplay;
+          .join(", ");
+    return `[${display}]`;
   }
 
   _getGasLimitSummary() {
@@ -171,123 +361,202 @@ export default class Arguments extends React.Component {
     this.setState({ isFocused: false });
   }
 
-  render() {
-    // reactive tabindex
-    let tabIndex = 1;
-    const tabIndexProvider = () => this.state.isFocused ? tabIndex++ : -1;
+}
 
-    this.inputRefs = [];
-    const argumentComponents = this.props.args.map((arg, index) => {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
 
-      return (
-        <ArgumentRow key={index}>
-          <ArgumentName name={arg} />
-          <InputBox
-            tabIndex={tabIndexProvider()}
-            onFocus={this._onFocusOnAnyInput}
-            onBlur={this._onBrurOnAnyInput}
-            class='component-inputbox-argument'
-            onChange={e => this._onArgumentValueChange(e, index)}
-            ref={inputRef}
-          />
-        </ArgumentRow>
-      );
-    });
+// components
 
-    let optionalAdded = false;
+const Argument = (props) => {
+  const name = props.name;
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  return (
+    <ArgumentRow>
+      <ArgumentName name={name} />
+      <InputBox
+        class='component-inputbox-argument'
+        value={value}
+        tabIndex={tabIndex}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        ref={inputRef}
+      />
+    </ArgumentRow>
+  );
+}
 
-    // (optional) gas limit
-    if (this.props.gasConsumable) {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
+Argument.propTypes = {
+  name: PropTypes.string,
+  value: PropTypes.string.isRequired,
+  tabIndex: PropTypes.number,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.any,
+}
 
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
-      }
+const VarArgument = (props) => {
+  const name = props.name;
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  const onClick = props.onVarArgRemove;
+  return (
+    <ArgumentRow>
+      <ArgumentName name={name} />
+      <InputBox
+        class='component-inputbox-argument'
+        value={value}
+        tabIndex={tabIndex}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        ref={inputRef}
+      />
+      <Button
+        class='component-btn-negative'
+        onClick={onClick}
+        name='-'
+      />
+    </ArgumentRow>
+  );
+}
 
-      argumentComponents.push((
-        <ArgumentRow>
-          <ArgumentName name="Gas Limit" />
-          <InputBox
-            tabIndex={tabIndexProvider()}
-            type="number"
-            class='component-inputbox-argument'
-            placeHolder='(default: 0)'
-            onChange={this._onGasLimitChange}
-            onFocus={this._onFocusOnAnyInput}
-            onBlur={this._onBrurOnAnyInput}
-            ref={inputRef}
-          />
-        </ArgumentRow>
-      ));
-    }
+VarArgument.propTypes = {
+  name: PropTypes.string,
+  value: PropTypes.string.isRequired,
+  tabIndex: PropTypes.number,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.any,
+  onVarArgRemove: PropTypes.func,
+}
 
-    // (optional) amount
-    if (this.props.payable) {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
+const OptionalVarArgument = (props) => {
+  const name = props.name;
+  const onClick = props.onVarArgAdd;
+  return (
+    <ArgumentRow>
+      <ArgumentName name={name} />
+      <InputBox
+        class='component-inputbox-argument'
+        placeHolder='Optional'
+        disabled
+      />
+      <Button
+        class='component-btn-positive'
+        onClick={onClick}
+        name='+'
+       />
+    </ArgumentRow>
+  );
+}
 
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
-      }
+OptionalVarArgument.propTypes = {
+  name: PropTypes.string,
+  onVarArgAdd: PropTypes.func,
+}
 
-      argumentComponents.push((
-        <ArgumentRow>
-          <ArgumentName name="Amount" />
-          <InputBox
-            tabIndex={tabIndexProvider()}
-            type="number"
-            class='component-inputbox-argument'
-            onChange={this._onAmountChange}
-            onFocus={this._onFocusOnAnyInput}
-            onBlur={this._onBrurOnAnyInput}
-            ref={inputRef}
-          />
-          <SelectBox
-            class='component-selectbox-unit'
-            value={this.state.unit}
-            options={units}
-            onChange={this._onUnitChange}
-          />
-        </ArgumentRow>
-      ));
-    }
+const GasLimit = (props) => {
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  return (
+    <ArgumentRow>
+      <ArgumentName name="Gas Limit" />
+      <InputBox
+        type="number"
+        class='component-inputbox-argument'
+        placeHolder='(default: 0)'
+        value={value}
+        tabIndex={tabIndex}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        ref={inputRef}
+      />
+    </ArgumentRow>
+  );
+}
 
-    // (optional) delegation fee
-    if (this.props.feeDelegatable) {
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(<ArgumentRow class={argumentsRowBorderClass} />);
-      }
+GasLimit.propTypes = {
+  value: PropTypes.string.isRequired,
+  tabIndex: PropTypes.number,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.any,
+}
 
-      argumentComponents.push((
-        <ArgumentRow>
-          <CheckBox text="Delegate fee" onChange={this._onFeeDelegationChange} />
-        </ArgumentRow>
-      ));
-    }
+const Amount = (props) => {
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onAmountChange = props.onAmountChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
 
-    const summary = this._getSummary();
-    const trigger = (
-      <TextBox class={argumentsTextBoxClass} text={summary} />
-    );
+  const unitValue = props.unitValue;
+  const unitOptions = props.unitOptions;
+  const onUnitChange = props.onUnitChange;
 
-    return (
-      <Foldable
-        isOpen={false}
-        transitionTime={1}
-        trigger={trigger}
-      >
-        {argumentComponents}
-      </Foldable>
-    );
-  }
+  return (
+    <ArgumentRow>
+      <ArgumentName name="Amount" />
+      <InputBox
+        value={value}
+        tabIndex={tabIndex}
+        type="number"
+        class='component-inputbox-argument'
+        onChange={onAmountChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        ref={inputRef}
+      />
+      <SelectBox
+        class='component-selectbox-unit'
+        value={unitValue}
+        options={unitOptions}
+        onChange={onUnitChange}
+      />
+    </ArgumentRow>
+  );
+}
 
+Amount.propTypes = {
+  value: PropTypes.string.isRequired,
+  tabIndex: PropTypes.number,
+  onAmountChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  inputRef: PropTypes.any,
+
+  unitValue: PropTypes.string,
+  unitOptions: PropTypes.array,
+  onUnitChange: PropTypes.func,
+}
+
+const DelegateFee = (props) => {
+  const onChange = props.onChange;
+  return (
+    <ArgumentRow>
+      <CheckBox text="Delegate fee" onChange={onChange} />
+    </ArgumentRow>
+  );
+}
+
+DelegateFee.propTypes = {
+  onChange: PropTypes.func
 }
