@@ -170,6 +170,10 @@ Execute contract
 
 ![execute-contract](./screenshots/execute-contract.gif)
 
+Execute with varargs
+
+![execute-with-varargs](./screenshots/execute-with-varargs.gif)
+
 Execute contract set gas limit
 
 ![execute-contract-set-gas-limit](./screenshots/execute-contract-set-gas-limit.gif)
