@@ -62,7 +62,9 @@ export default class Arguments extends React.Component {
     if (this._isStateDifferent(this.props, nextProps)) {
       // reset input values
       logger.debug("clean inputrefs", this.inputRefs);
-      this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
+      [...this.inputRefs].map(r => r.current)
+          .filter(i => i != null)
+          .forEach(i => i.cleanValue());
 
       this.setState({
         args: [],
