@@ -1,3 +1,8 @@
+## 0.5.1 - Varargs
+
+- Add vararg processing
+- Hide password input field
+
 ## 0.5.0 - Aergo hardfork (v2.0.0)
 
 - Add fee delegation feature

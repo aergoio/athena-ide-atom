@@ -1,5 +1,5 @@
 -- should set with { key, value }
--- should get with { key }
+-- should get "value" with { key }
 
 function set(key, value)
   system.setItem(key, value)

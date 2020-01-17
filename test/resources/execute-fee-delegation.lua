@@ -1,12 +1,18 @@
--- should run with delegation fee not consume aergo of executor
--- should keep fee delegation state on checked and remove varargs
+-- NOTE that this must be tested with public mode
 
-function run(arg, ...)
+-- should deploy with 1 aergo
+-- should run with delegation fee not consume aergo of executor
+
+function constructor()
+end
+
+function run()
 end
 
 function check_delegation()
   return true
 end
 
+abi.payable(constructor)
 abi.register(run)
 abi.fee_delegation(run)

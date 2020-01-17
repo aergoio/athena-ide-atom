@@ -2313,44 +2313,28 @@ class CheckBox extends React.Component {
   static get propTypes() {
     return {
       text: propTypes.string,
+      checked: propTypes["boolean"],
       onChange: propTypes.func
     };
   }
 
   constructor(props) {
-    super(props);
-    this.state = {
-      checked: false
-    };
-    this._onCheckChange = this._onCheckChange.bind(this);
-  }
+    super(props); // not used yet
 
-  get checked() {
-    return this.state.checked;
-  }
-
-  _onCheckChange(e) {
-    this.setState({
-      checked: e.target.checked
-    });
+    this.inputRef = React.createRef();
   }
 
   render() {
     const text = this.props.text;
-
-    const onChange = e => {
-      this._onCheckChange(e);
-
-      if (this.props.onChange) {
-        this.props.onChange(e);
-      }
-    };
-
+    const checked = this.props.checked;
+    const onChange = this.props.onChange;
     const id = v4_1();
     return React.createElement("div", null, React.createElement("input", {
+      ref: this.inputRef,
       className: checkBoxClass,
       type: "checkbox",
       id: id,
+      checked: checked,
       onChange: onChange
     }), React.createElement("label", {
       htmlFor: id
@@ -2415,7 +2399,9 @@ class InputBox extends React.Component {
       tabIndex: propTypes.number,
       type: propTypes.string,
       placeHolder: propTypes.string,
+      value: propTypes.any,
       defaultValue: propTypes.any,
+      disabled: propTypes["boolean"],
       onChange: propTypes.func,
       onFocus: propTypes.func,
       onBlur: propTypes.func
@@ -2440,23 +2426,47 @@ class InputBox extends React.Component {
     const tabIndex = typeof this.props.tabIndex === "undefined" ? -1 : this.props.tabIndex;
     const type = this.props.type;
     const placeHolder = this.props.placeHolder;
+    const value = this.props.value;
     const defaultValue = typeof this.props.defaultValue === "undefined" ? "" : this.props.defaultValue;
+    const disabled = typeof this.props.disabled === "undefined" ? false : this.props.disabled;
     const onChange = this.props.onChange;
     const onFocus = this.props.onFocus;
     const onBlur = this.props.onBlur;
     const numberTypeClass = this.props.type === "number" ? inputBoxNumberClass : "";
     const inputRef = this.inputRef;
-    return React.createElement("input", {
-      className: ['inline-block', 'native-key-bindings', inputBoxClass, numberTypeClass, injectedClass].join(' '),
-      tabIndex: tabIndex,
-      type: type,
-      placeHolder: placeHolder,
-      defaultValue: defaultValue,
-      onChange: onChange,
-      onFocus: onFocus,
-      onBlur: onBlur,
-      ref: inputRef
-    });
+    let ret;
+
+    if (typeof value !== "undefined") {
+      ret = React.createElement("input", {
+        className: ['inline-block', 'native-key-bindings', inputBoxClass, numberTypeClass, injectedClass].join(' '),
+        tabIndex: tabIndex,
+        type: type,
+        placeHolder: placeHolder,
+        value: value,
+        defaultValue: defaultValue,
+        disabled: disabled,
+        onChange: onChange,
+        onFocus: onFocus,
+        onBlur: onBlur,
+        ref: inputRef
+      });
+    } else {
+      ret = React.createElement("input", {
+        className: ['inline-block', 'native-key-bindings', inputBoxClass, numberTypeClass, injectedClass].join(' '),
+        tabIndex: tabIndex,
+        type: type,
+        placeHolder: placeHolder,
+        value: value,
+        defaultValue: defaultValue,
+        disabled: disabled,
+        onChange: onChange,
+        onFocus: onFocus,
+        onBlur: onBlur,
+        ref: inputRef
+      });
+    }
+
+    return ret;
   }
 
 }
@@ -2574,13 +2584,15 @@ AddressSelect.propTypes = {
   onAddressCopy: propTypes.func
 };
 
-const units$1 = ["aer", "gaer", "aergo"];
+const VARARG = "...";
+const VARARG_PREVIX = "arg_";
+const UNITS = ["aer", "gaer", "aergo"];
 const argumentsTextBoxClass = 'component-textbox-arguments';
-const argumentsRowBorderClass = 'argument-row-border';
+const argumentsRowBorderClass = 'argument-row-border'; // FIXME: Too big.. need refactor
+
 class Arguments extends React.Component {
   static get propTypes() {
     return {
-      resetState: propTypes.bool,
       args: propTypes.array.isRequired,
       gasConsumable: propTypes.bool,
       payable: propTypes.bool,
@@ -2592,17 +2604,22 @@ class Arguments extends React.Component {
     super(props);
     this.state = {
       isFocused: false,
-      args: new Array(props.args.length).fill(""),
+      args: [],
+      varArgs: [],
       gasLimit: "",
       amount: "",
       unit: "aer",
       feeDelegation: false
     }; // hack to clean value when reset
 
-    this.inputRefs = [];
+    this.inputRefs = new Set(); // common
+
     this._onFocusOnAnyInput = this._onFocusOnAnyInput.bind(this);
     this._onBrurOnAnyInput = this._onBrurOnAnyInput.bind(this);
     this._onArgumentValueChange = this._onArgumentValueChange.bind(this);
+    this._onVarArgumentValueChange = this._onVarArgumentValueChange.bind(this);
+    this._onVarArgRemove = this._onVarArgRemove.bind(this);
+    this._onVarArgAdd = this._onVarArgAdd.bind(this);
     this._onGasLimitChange = this._onGasLimitChange.bind(this);
     this._onAmountChange = this._onAmountChange.bind(this);
     this._onUnitChange = this._onUnitChange.bind(this);
@@ -2610,10 +2627,13 @@ class Arguments extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.isStateDifferent(this.props, nextProps)) {
-      this.inputRefs.forEach(inputRef => inputRef.current.cleanValue());
+    if (this._isStateDifferent(this.props, nextProps)) {
+      // reset input values
+      logger.debug("clean inputrefs", this.inputRefs);
+      [...this.inputRefs].map(r => r.current).filter(i => i != null).forEach(i => i.cleanValue());
       this.setState({
-        args: new Array(nextProps.args.length).fill(""),
+        args: [],
+        varArgs: [],
         gasLimit: "",
         amount: "",
         unit: "aer",
@@ -2622,12 +2642,15 @@ class Arguments extends React.Component {
     }
   }
 
-  isStateDifferent(preProps, nextProps) {
+  _isStateDifferent(preProps, nextProps) {
     return preProps.args.length !== nextProps.args.length || preProps.gasConsumable !== nextProps.gasConsumable || preProps.payable !== nextProps.payable || preProps.feeDelegatable !== nextProps.feeDelegatable;
   }
 
   get values() {
-    const jsonProcessed = this.state.args.map(rawArg => {
+    const args = this.state.args;
+    const varArgs = this.state.varArgs;
+    const totalArgs = args.concat(varArgs);
+    const jsonProcessed = totalArgs.map(rawArg => {
       try {
         // empty -> null
         if ("" === rawArg) {
@@ -2642,6 +2665,7 @@ class Arguments extends React.Component {
         return rawArg;
       }
     });
+    logger.debug("Parsed arguments", jsonProcessed);
     return jsonProcessed;
   }
 
@@ -2659,14 +2683,171 @@ class Arguments extends React.Component {
     return this.state.feeDelegation;
   }
 
+  render() {
+    // clean references
+    this.inputRefs.clear(); // reactive tabindex
+
+    let tabIndex = 1;
+
+    const tabIndexProvider = () => this.state.isFocused ? tabIndex++ : -1;
+
+    let components = []; // arguments
+
+    logger.debug("args", this.props.args);
+    this.props.args.filter(a => a !== VARARG).forEach((a, i) => {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+      const value = this.state.args[i];
+      components.push(React.createElement(Argument, {
+        key: i,
+        name: a,
+        value: value,
+        tabIndex: tabIndexProvider(),
+        onChange: e => this._onArgumentValueChange(e, i),
+        onFocus: this._onFocusOnAnyInput,
+        onBlur: this._onBrurOnAnyInput,
+        inputRef: inputRef
+      }));
+    }); // existing varargs
+
+    logger.debug("varArgs", this.state.varArgs);
+    this.state.varArgs.forEach((a, i) => {
+      // hack to clean value when reset
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+      const name = `${VARARG_PREVIX}${i + 1}`;
+      const value = this.state.varArgs[i];
+      components.push(React.createElement(VarArgument, {
+        key: i,
+        name: name,
+        value: value,
+        tabIndex: tabIndexProvider(),
+        onChange: e => this._onVarArgumentValueChange(e, i),
+        onFocus: this._onFocusOnAnyInput,
+        onBlur: this._onBrurOnAnyInput,
+        inputRef: inputRef,
+        onVarArgRemove: () => this._onVarArgRemove(inputRef, i)
+      }));
+    }); // additional varargs
+
+    const isVarArg = this.props.args.length !== 0 && this.props.args[this.props.args.length - 1] === VARARG;
+
+    if (isVarArg) {
+      const name = `${VARARG_PREVIX}${this.state.varArgs.length + 1}`;
+      components.push(React.createElement(OptionalVarArgument, {
+        name: name,
+        onVarArgAdd: this._onVarArgAdd
+      }));
+    } // additional
+
+
+    const gasConsumable = this.props.gasConsumable;
+    const payable = this.props.payable;
+    const feeDelegatable = this.props.feeDelegatable; // add border
+
+    const additional = gasConsumable && payable && feeDelegatable;
+
+    if (additional) {
+      components.push(React.createElement(ArgumentRow, {
+        "class": argumentsRowBorderClass
+      }));
+    } // (optional) gas limit
+
+
+    if (gasConsumable) {
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+      const value = this.state.gasLimit;
+      components.push(React.createElement(GasLimit, {
+        value: value,
+        tabIndex: tabIndexProvider(),
+        onChange: this._onGasLimitChange,
+        onFocus: this._onFocusOnAnyInput,
+        onBlur: this._onBrurOnAnyInput,
+        inputRef: inputRef
+      }));
+    } // (optional) amount
+
+
+    if (payable) {
+      const inputRef = React.createRef();
+      this.inputRefs.add(inputRef);
+      const value = this.state.amount;
+      components.push(React.createElement(Amount$1, {
+        value: value,
+        tabIndex: tabIndexProvider(),
+        onAmountChange: this._onAmountChange,
+        onFocus: this._onFocusOnAnyInput,
+        onBlur: this._onBrurOnAnyInput,
+        ref: inputRef,
+        unitValue: this.state.unit,
+        unitOptions: UNITS,
+        onUnitChange: this._onUnitChange
+      }));
+    } // (optional) delegation fee
+
+
+    if (feeDelegatable) {
+      components.push(React.createElement(DelegateFee, {
+        checked: this.state.feeDelegation,
+        onChange: this._onFeeDelegationChange
+      }));
+    } // summary
+
+
+    const summary = this._getSummary();
+
+    const trigger = React.createElement(TextBox, {
+      "class": argumentsTextBoxClass,
+      text: summary
+    });
+    return React.createElement(Foldable, {
+      isOpen: false,
+      transitionTime: 1,
+      trigger: trigger
+    }, components);
+  }
+
   _onArgumentValueChange(e, index) {
     const newValue = e.target.value;
-    const newArgs = this.state.args.map((oldValue, i) => {
-      return index === i ? newValue : oldValue;
-    });
-    logger.debug("new arguments", index, newValue, newArgs);
+    const args = this.state.args;
+    args[index] = newValue;
     this.setState({
-      args: newArgs
+      args: args
+    });
+  }
+
+  _onVarArgumentValueChange(e, index) {
+    const newValue = e.target.value;
+    const varArgs = this.state.varArgs;
+    varArgs[index] = newValue;
+    this.setState({
+      varArgs: varArgs
+    });
+  }
+
+  _onVarArgRemove(inputRef, index) {
+    logger.info("Remove var args"); // clean displayed value
+
+    inputRef.current.cleanValue();
+    this.inputRefs["delete"](inputRef); // clean saved value
+
+    const newVarArgs = this.state.varArgs;
+    newVarArgs.splice(index, 1);
+    logger.debug("New var args", newVarArgs);
+    this.setState({
+      varArgs: newVarArgs
+    });
+  }
+
+  _onVarArgAdd() {
+    logger.info("Add var args");
+    const newVarArgs = this.state.varArgs;
+    newVarArgs.push("");
+    logger.debug("New var args", newVarArgs);
+    this.setState({
+      varArgs: newVarArgs
     });
   }
 
@@ -2711,13 +2892,11 @@ class Arguments extends React.Component {
   }
 
   _getArgsSummary() {
-    let argumentDisplay = "[]";
-
-    if (this.state.args.map(a => a.trim()).filter(a => "" !== a).length > 0) {
-      argumentDisplay = "[" + this.state.args.join(", ") + "]";
-    }
-
-    return argumentDisplay;
+    const args = this.state.args;
+    const varArgs = this.state.varArgs;
+    logger.debug("Display args", args, "varargs", varArgs);
+    const display = args.concat(varArgs).filter(a => "" !== a).join(", ");
+    return `[${display}]`;
   }
 
   _getGasLimitSummary() {
@@ -2746,118 +2925,185 @@ class Arguments extends React.Component {
     });
   }
 
-  render() {
-    // reactive tabindex
-    let tabIndex = 1;
+} // components
 
-    const tabIndexProvider = () => this.state.isFocused ? tabIndex++ : -1;
+const Argument = props => {
+  const name = props.name;
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  return React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+    name: name
+  }), React.createElement(InputBox, {
+    "class": "component-inputbox-argument",
+    value: value,
+    tabIndex: tabIndex,
+    onChange: onChange,
+    onFocus: onFocus,
+    onBlur: onBlur,
+    ref: inputRef
+  }), React.createElement("div", {
+    className: "component-argument-right-margin"
+  }));
+};
 
-    this.inputRefs = [];
-    const argumentComponents = this.props.args.map((arg, index) => {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
-      return React.createElement(ArgumentRow, {
-        key: index
-      }, React.createElement(ArgumentName, {
-        name: arg
-      }), React.createElement(InputBox, {
-        tabIndex: tabIndexProvider(),
-        onFocus: this._onFocusOnAnyInput,
-        onBlur: this._onBrurOnAnyInput,
-        "class": "component-inputbox-argument",
-        onChange: e => this._onArgumentValueChange(e, index),
-        ref: inputRef
-      }));
-    });
-    let optionalAdded = false; // (optional) gas limit
+Argument.propTypes = {
+  name: propTypes.string,
+  value: propTypes.string.isRequired,
+  tabIndex: propTypes.number,
+  onChange: propTypes.func,
+  onFocus: propTypes.func,
+  onBlur: propTypes.func,
+  inputRef: propTypes.any
+};
 
-    if (this.props.gasConsumable) {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
+const VarArgument = props => {
+  const name = props.name;
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  const onClick = props.onVarArgRemove;
+  return React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+    name: name
+  }), React.createElement(InputBox, {
+    "class": "component-inputbox-argument",
+    value: value,
+    tabIndex: tabIndex,
+    onChange: onChange,
+    onFocus: onFocus,
+    onBlur: onBlur,
+    ref: inputRef
+  }), React.createElement(Button, {
+    "class": "component-btn-negative",
+    onClick: onClick,
+    name: "-"
+  }));
+};
 
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(React.createElement(ArgumentRow, {
-          "class": argumentsRowBorderClass
-        }));
-      }
+VarArgument.propTypes = {
+  name: propTypes.string,
+  value: propTypes.string.isRequired,
+  tabIndex: propTypes.number,
+  onChange: propTypes.func,
+  onFocus: propTypes.func,
+  onBlur: propTypes.func,
+  inputRef: propTypes.any,
+  onVarArgRemove: propTypes.func
+};
 
-      argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
-        name: "Gas Limit"
-      }), React.createElement(InputBox, {
-        tabIndex: tabIndexProvider(),
-        type: "number",
-        "class": "component-inputbox-argument",
-        placeHolder: "(default: 0)",
-        onChange: this._onGasLimitChange,
-        onFocus: this._onFocusOnAnyInput,
-        onBlur: this._onBrurOnAnyInput,
-        ref: inputRef
-      })));
-    } // (optional) amount
+const OptionalVarArgument = props => {
+  const name = props.name;
+  const onClick = props.onVarArgAdd;
+  return React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+    name: name
+  }), React.createElement(InputBox, {
+    "class": "component-inputbox-argument",
+    placeHolder: "Optional",
+    disabled: true
+  }), React.createElement(Button, {
+    "class": "component-btn-positive",
+    onClick: onClick,
+    name: "+"
+  }));
+};
 
+OptionalVarArgument.propTypes = {
+  name: propTypes.string,
+  onVarArgAdd: propTypes.func
+};
 
-    if (this.props.payable) {
-      // hack to clean value when reset
-      const inputRef = React.createRef();
-      this.inputRefs.push(inputRef);
+const GasLimit = props => {
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onChange = props.onChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  return React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+    name: "Gas Limit"
+  }), React.createElement(InputBox, {
+    type: "number",
+    "class": "component-inputbox-argument",
+    placeHolder: "(default: 0)",
+    value: value,
+    tabIndex: tabIndex,
+    onChange: onChange,
+    onFocus: onFocus,
+    onBlur: onBlur,
+    ref: inputRef
+  }));
+};
 
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(React.createElement(ArgumentRow, {
-          "class": argumentsRowBorderClass
-        }));
-      }
+GasLimit.propTypes = {
+  value: propTypes.string.isRequired,
+  tabIndex: propTypes.number,
+  onChange: propTypes.func,
+  onFocus: propTypes.func,
+  onBlur: propTypes.func,
+  inputRef: propTypes.any
+};
 
-      argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
-        name: "Amount"
-      }), React.createElement(InputBox, {
-        tabIndex: tabIndexProvider(),
-        type: "number",
-        "class": "component-inputbox-argument",
-        onChange: this._onAmountChange,
-        onFocus: this._onFocusOnAnyInput,
-        onBlur: this._onBrurOnAnyInput,
-        ref: inputRef
-      }), React.createElement(SelectBox, {
-        "class": "component-selectbox-unit",
-        value: this.state.unit,
-        options: units$1,
-        onChange: this._onUnitChange
-      })));
-    } // (optional) delegation fee
+const Amount$1 = props => {
+  const value = props.value;
+  const tabIndex = props.tabIndex;
+  const onAmountChange = props.onAmountChange;
+  const onFocus = props.onFocus;
+  const onBlur = props.onBlur;
+  const inputRef = props.inputRef;
+  const unitValue = props.unitValue;
+  const unitOptions = props.unitOptions;
+  const onUnitChange = props.onUnitChange;
+  return React.createElement(ArgumentRow, null, React.createElement(ArgumentName, {
+    name: "Amount"
+  }), React.createElement(InputBox, {
+    value: value,
+    tabIndex: tabIndex,
+    type: "number",
+    "class": "component-inputbox-argument",
+    onChange: onAmountChange,
+    onFocus: onFocus,
+    onBlur: onBlur,
+    ref: inputRef
+  }), React.createElement(SelectBox, {
+    "class": "component-selectbox-unit",
+    value: unitValue,
+    options: unitOptions,
+    onChange: onUnitChange
+  }));
+};
 
+Amount$1.propTypes = {
+  value: propTypes.string.isRequired,
+  tabIndex: propTypes.number,
+  onAmountChange: propTypes.func,
+  onFocus: propTypes.func,
+  onBlur: propTypes.func,
+  inputRef: propTypes.any,
+  unitValue: propTypes.string,
+  unitOptions: propTypes.array,
+  onUnitChange: propTypes.func
+};
 
-    if (this.props.feeDelegatable) {
-      if (!optionalAdded && 0 !== argumentComponents.length) {
-        optionalAdded = true;
-        argumentComponents.push(React.createElement(ArgumentRow, {
-          "class": argumentsRowBorderClass
-        }));
-      }
+const DelegateFee = props => {
+  const checked = props.checked;
+  const onChange = props.onChange;
+  return React.createElement(ArgumentRow, null, React.createElement(CheckBox, {
+    text: "Delegate fee",
+    checked: checked,
+    onChange: onChange
+  }));
+};
 
-      argumentComponents.push(React.createElement(ArgumentRow, null, React.createElement(CheckBox, {
-        text: "Delegate fee",
-        onChange: this._onFeeDelegationChange
-      })));
-    }
-
-    const summary = this._getSummary();
-
-    const trigger = React.createElement(TextBox, {
-      "class": argumentsTextBoxClass,
-      text: summary
-    });
-    return React.createElement(Foldable, {
-      isOpen: false,
-      transitionTime: 1,
-      trigger: trigger
-    }, argumentComponents);
-  }
-
-}
+DelegateFee.propTypes = {
+  checked: propTypes.bool,
+  onChange: propTypes.func
+};
 
 const transactionButtonClass = 'component-btn-transaction';
 
@@ -2950,7 +3196,7 @@ ConstructorArguments.propTypes = {
   argsRef: propTypes.any
 };
 
-const units$2 = ["aer", "gaer", "aergo"];
+const units$1 = ["aer", "gaer", "aergo"];
 class GasPrice extends React.Component {
   static get propTypes() {
     return {
@@ -2989,7 +3235,7 @@ class GasPrice extends React.Component {
     }, React.createElement(SelectBox, {
       "class": "component-selectbox-unit",
       value: this.state.unit,
-      options: units$2,
+      options: units$1,
       onChange: onChange
     })));
   }
@@ -3162,7 +3408,7 @@ let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$6
       description: "Password"
     }), React.createElement(InputBox, {
       ref: this.passwordInputRef,
-      type: "text",
+      type: "password",
       placeHolder: "password to encrypt private key"
     })), React.createElement(CardRow, {
       "class": "component-card-row-button-modal"
@@ -3224,7 +3470,7 @@ let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_cla
       description: "Password"
     }), React.createElement(InputBox, {
       ref: this.passwordInputRef,
-      type: "text",
+      type: "password",
       placeHolder: "password to decrypt encrypted private key"
     })), React.createElement(CardRow, {
       "class": "component-card-row-button-modal"

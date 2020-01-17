@@ -1,5 +1,5 @@
--- should set with { key, 1, 2, 3, 4 }
--- should get with { key } returns "1234"
+-- should set with { key, 1, 2, 3 }
+-- should get "123" with { key }
 
 function set(key, ...)
   local s = ""

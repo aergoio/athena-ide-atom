@@ -10,7 +10,7 @@ A package for writing smart contract in aergo using atom
 ## Compatibility
 
 - Atom: v1.28 or higher
-- Aergo: v2.0.x
+- Aergo: v2.x.x
 
 Need to rebuild for atom compatible electron version for grpc native modules in a herajs
 

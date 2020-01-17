@@ -1,3 +1,5 @@
+-- NOTE that this must be tested with private mode
+
 -- should redeploy to a 'redeploy-before' add 'new' function
 
 function legacy()

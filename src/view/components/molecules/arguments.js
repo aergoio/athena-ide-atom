@@ -102,6 +102,7 @@ export default class Arguments extends React.Component {
         return rawArg;
       }
     });
+    logger.debug("Parsed arguments", jsonProcessed);
     return jsonProcessed;
   }
 
