@@ -72,6 +72,22 @@ export default class AccountStore {
     });
   }
 
+  @action addAccountWithKeyStore(json, password) {
+    logger.debug("Add account with", JSON.parse(json));
+    loadAccount().fromKeyStore(json, password).then(account => {
+      this.address2Account.set(account.address, account);
+      this.changeAccount(account.address);
+
+      const message = "Successfully imported account " + account.address;
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
+    }).catch(err => {
+      logger.error(err);
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Importing account failed", "error");
+    });
+  }
+
   @action changeAccount(address) {
     this.rootStore.consoleStore.log("Change account to " + address, "info");
     this.currentAddress = address;
@@ -86,22 +102,22 @@ export default class AccountStore {
     });
   }
 
-  @action exportAccount(password) {
+  encryptCurrentAsWif(password) {
     logger.debug("Export current account", this.currentAddress);
     if (typeof this.currentAddress === "undefined" || "" === this.currentAddress) {
-      return;
+      throw "Current account is empty"
     }
-
     const account = this.address2Account.get(this.currentAddress);
-    account.export(password).then(encrypted => {
-      const message = "exported: " + encrypted;
-      this.rootStore.consoleStore.log(message, "info");
-      this.rootStore.notificationStore.notify(message, "success");
-    }).catch(err => {
-      logger.error(err);
-      this.rootStore.consoleStore.log(err, "error");
-      this.rootStore.notificationStore.notify("Exporting account failed", "error");
-    });
+    return account.export(password);
+  }
+
+  encryptCurrentAsKeyStore(password) {
+    logger.debug("Export current account as keystore", this.currentAddress);
+    if (typeof this.currentAddress === "undefined" || "" === this.currentAddress) {
+      throw "Current account is empty"
+    }
+    const account = this.address2Account.get(this.currentAddress);
+    return account.exportAsKeyStore(password);
   }
 
   @action removeAccount(address) {

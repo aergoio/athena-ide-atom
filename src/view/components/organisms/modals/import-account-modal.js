@@ -4,8 +4,12 @@ import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { CardRow, Description, InputBox, Button } from '../../atoms';
-import { CardTitle } from '../../molecules';
+import { CardRow, Description, InputBox, Button, FileInput } from '../../atoms';
+import { CardTitle, SelectGroup } from '../../molecules';
+
+const keystoreType = "KeyStore";
+const wifType = "Wallet Import Format";
+const types = [ keystoreType, wifType ];
 
 @inject('accountStore')
 @observer
@@ -19,18 +23,71 @@ export default class ImportAccountModal extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected: keystoreType
+    };
+
+    this.keyStoreInputRef = React.createRef();
     this.privateKeyInputRef = React.createRef();
     this.passwordInputRef = React.createRef();
+
+    this._onSelectType = this._onSelectType.bind(this);
+    this._onConfirm = this._onConfirm.bind(this);
+  }
+
+  _onSelectType(item) {
+    logger.debug("select type", item);
+    this.setState({
+      selected: item
+    });
   }
 
   _onConfirm() {
-    const encryptedPrivateKey = this.privateKeyInputRef.current.value;
+    const selected = this.state.selected;
     const password = this.passwordInputRef.current.value;
-    logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
-    this.props.accountStore.addAccount(encryptedPrivateKey, password);
+    if (selected === keystoreType) {
+      const file = this.keyStoreInputRef.current.value;
+      this._readFile(file).then(json => {
+        logger.debug("json", json);
+        this.props.accountStore.addAccountWithKeyStore(json, password);
+      })
+    } else {
+      const encryptedPrivateKey = this.privateKeyInputRef.current.value;
+      this.props.accountStore.addAccount(encryptedPrivateKey, password);
+    }
   }
 
+  _readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new global.FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsText(file) ;
+      reader.onerror = (e) => reject(e);
+  })}
+
   render() {
+    const selected = this.state.selected;
+    const items = types;
+    const onSelect = this._onSelectType;
+
+    let selectedType;
+    if (this.state.selected === keystoreType) {
+      selectedType = (
+        <CardRow>
+          <Description description='File path' />
+          <FileInput ref={this.keyStoreInputRef} />
+        </CardRow>
+      );
+    } else { // wif type
+      selectedType = (
+        <CardRow>
+          <Description description='Private key' />
+          <InputBox ref={this.privateKeyInputRef} type='text'
+              placeHolder='encrypted private key'/>
+        </CardRow>
+      );
+    }
+
     return (
       <Popup modal trigger={<Button class='component-btn-ocean' name='Import' />}>
         {close =>
@@ -38,10 +95,10 @@ export default class ImportAccountModal extends React.Component {
             <div>
               <CardTitle title='Import account with encrypted private key' />
               <CardRow>
-                <Description description='Private key' />
-                <InputBox ref={this.privateKeyInputRef} type='text'
-                    placeHolder='encrypted private key'/>
+                <Description description='Select type' />
+                <SelectGroup selected={selected} items={items} onSelect={onSelect}/>
               </CardRow>
+              {selectedType}
               <CardRow>
                 <Description description='Password' />
                 <InputBox ref={this.passwordInputRef} type='password'
