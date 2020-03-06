@@ -107,8 +107,9 @@ export default class ExportAccountModal extends React.Component {
     const selected = this.state.selected;
     const items = types;
     const onSelect = this._onSelectType;
+    const disabled = "" === this.props.accountStore.currentAddress;
     return (
-      <Popup modal trigger={<Button class='component-btn-ocean' name='Export' />}>
+      <Popup modal trigger={<Button class='component-btn-ocean' name='Export' disabled={disabled} />}>
         {close =>
           <atom-panel class='modal'>
             <div>
@@ -131,7 +132,8 @@ export default class ExportAccountModal extends React.Component {
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
-                <Button class='component-btn-rightmost' name='Export' onClick={() => this._onConfirm(close)} />
+                <Button class='component-btn-rightmost' name='Export'
+                    onClick={() => this._onConfirm(close)} />
               </CardRow>
             </div>
           </atom-panel>

@@ -38,7 +38,6 @@ export default class FileInput extends React.Component {
     const id = uuid();
     const onChange = this._onChange;
     const current = typeof this.state.current === "undefined" ? "" : this.state.current.name;
-    logger.debug("current", current);
     return (
       <div className={fileInputClass}>
         <input

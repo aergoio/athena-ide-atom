@@ -116,7 +116,8 @@ export default class ImportAccountModal extends React.Component {
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
-                <Button class='component-btn-rightmost' name='Import' onClick={() => { this._onConfirm(); close(); }} />
+                <Button class='component-btn-rightmost' name='Import'
+                    onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>
             </div>
           </atom-panel>

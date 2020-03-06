@@ -389,24 +389,20 @@
     background-color: #4e5665;
     padding: 0.35em 0.85em;
     cursor: pointer;
-  }
 
-  .component-btn:hover {
-    background-color: #788295;
-  }
+    &:hover {
+      background-color: #788295;
+    }
 
-  .component-btn:active {
-    background-color: #1f2228;
-  }
+    &:active {
+      background-color: #1f2228;
+    }
 
-  .component-btn-disabled {
-    background-color: #3a3f4b;
-    cursor: not-allowed;
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  .component-btn-disabled:hover {
-    background-color: #3a3f4b;
+    &.disabled {
+      background-color: #3a3f4b;
+      cursor: not-allowed;
+      color: rgba(255, 255, 255, 0.5);
+    }
   }
 
   .component-btn-positive {
@@ -417,14 +413,14 @@
     background-color: rgba(222, 227, 237, 0.25);
     padding: 0.35em 0.85em;
     cursor: pointer;
-  }
 
-  .component-btn-positive:hover {
-    background-color: #788295;
-  }
+    &:hover {
+      background-color: #788295;
+    }
 
-  .component-btn-positive:active {
-    background-color: #1f2228;
+    &:active {
+      background-color: #1f2228;
+    }
   }
 
   .component-btn-negative {
@@ -435,62 +431,89 @@
     background-color: transparent;
     padding: 0.35em 0.85em;
     cursor: pointer;
-  }
 
-  .component-btn-negative:hover {
-    background-color: #788295;
-  }
+    &:hover {
+      background-color: #788295;
+    }
 
-  .component-btn-negative:active {
-    background-color: #1f2228;
+    &:active {
+      background-color: #1f2228;
+    }
   }
 
   .component-btn-green {
     background-color: #00c789;
-  }
 
-  .component-btn-green:hover {
-    background-color: #33d3a1;
-  }
+    &:hover {
+      background-color: #33d3a1;
+    }
 
-  .component-btn-green:active {
-    background-color: #006344;
+    &:active {
+      background-color: #006344;
+    }
+
+    &.disabled {
+      background-color: #00c789;
+      opacity: 0.3;
+      cursor: not-allowed;
+      color: #ffffff;
+    }
   }
 
   .component-btn-ocean {
     background-color: #4b4de1;
-  }
 
-  .component-btn-ocean:hover {
-    background-color: #6c6ee4;
-  }
+    &:hover {
+      background-color: #6c6ee4;
+    }
 
-  .component-btn-ocean:active {
-    background-color: #363772;
+    &:active {
+      background-color: #363772;
+    }
+
+    &.disabled {
+      background-color: rgba(75, 77, 225, 0.5);
+      cursor: not-allowed;
+      color: rgba(255, 255, 255, 0.5);
+    }
   }
 
   .component-btn-rightmost {
     background-color: dodgerblue;
-  }
 
-  .component-btn-rightmost:hover {
-    background-color: #67b1ff;
-  }
+    &:hover {
+      background-color: #67b1ff;
+    }
 
-  .component-btn-rightmost:active {
-    background-color: #102a44;
+    &:active {
+      background-color: #102a44;
+    }
+
+    &.disabled {
+      background-color: #419bf9;
+      opacity: 0.3;
+      cursor: not-allowed;
+      color: rgba(255, 255, 255, 0.65);
+    }
   }
 
   .component-btn-transaction {
     background-color: #7741f9;
-  }
 
-  .component-btn-transaction:hover {
-    background-color: #9a67ff;
-  }
+    &:hover {
+      background-color: #9a67ff;
+    }
 
-  .component-btn-transaction:active {
-    background-color: #281c44;
+    &:active {
+      background-color: #281c44;
+    }
+
+    &.disabled {
+      background-color: #7741f9;
+      opacity: 0.3;
+      cursor: not-allowed;
+      color: rgba(255, 255, 255, 0.65);
+    }
   }
 
   .component-btn-runner {

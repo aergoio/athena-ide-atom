@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const buttonClass = 'component-btn';
-const disabledButtonClass = 'component-btn-disabled';
+const disabledButtonClass = 'disabled';
 
 export const Button = (props) => {
   let classes;
   let onClick;
   if (typeof props.disabled === "undefined" || !props.disabled) {
-    classes = ['inline-block', buttonClass, props.class, buttonClass].join(' ');
+    classes = ['inline-block', buttonClass, props.class].join(' ');
     onClick = props.onClick;
   } else {
     classes = ['inline-block', buttonClass, props.class, disabledButtonClass].join(' ');

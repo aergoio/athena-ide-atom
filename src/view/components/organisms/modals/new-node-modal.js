@@ -52,7 +52,8 @@ export default class NewNodeModal extends React.Component {
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
-                <Button name='Ok' class='component-btn-rightmost' onClick={() => { this._onConfirm(); close(); }} />
+                <Button name='Ok' class='component-btn-rightmost'
+                    onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>
             </div>
           </atom-panel>
