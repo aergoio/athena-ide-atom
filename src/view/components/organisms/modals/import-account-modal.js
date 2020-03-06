@@ -4,8 +4,11 @@ import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { CardRow, Description, InputBox, Button, FileInput } from '../../atoms';
-import { CardTitle, SelectGroup } from '../../molecules';
+import {
+  CardRow, Description, InputBox, Button, FileInput,
+  ModalSummary, ModalSubSummary,
+} from '../../atoms';
+import { CardTitle, RadioButtonGroup } from '../../molecules';
 
 const keystoreType = "KeyStore";
 const wifType = "Wallet Import Format";
@@ -93,10 +96,17 @@ export default class ImportAccountModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardTitle title='Import account with encrypted private key' />
+              <CardTitle title='Import Account' />
+              <CardRow class='component-card-row-border' />
               <CardRow>
-                <Description description='Select type' />
-                <SelectGroup selected={selected} items={items} onSelect={onSelect}/>
+                <ModalSummary content='Are you sure you want to import account?' />
+              </CardRow>
+              <CardRow>
+                <ModalSubSummary content='To import, please configure an import type and password.' />
+              </CardRow>
+              <CardRow>
+                <Description description='Type' />
+                <RadioButtonGroup selected={selected} items={items} name='import_type' onSelect={onSelect}/>
               </CardRow>
               {selectedType}
               <CardRow>
@@ -106,7 +116,7 @@ export default class ImportAccountModal extends React.Component {
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
-                <Button class='component-btn-rightmost' name='Ok' onClick={() => { this._onConfirm(); close(); }} />
+                <Button class='component-btn-rightmost' name='Import' onClick={() => { this._onConfirm(); close(); }} />
               </CardRow>
             </div>
           </atom-panel>

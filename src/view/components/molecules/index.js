@@ -11,7 +11,7 @@ import Height from './height';
 import NodeSelect from './node-select';
 import Nonce from './nonce';
 import Payload from './payload';
-import SelectGroup from './select-group';
+import RadioButtonGroup from './radio-button-group';
 import TargetSelect from './target-select';
 
 export {
@@ -28,6 +28,6 @@ export {
   NodeSelect,
   Nonce,
   Payload,
-  SelectGroup,
+  RadioButtonGroup,
   TargetSelect,
 };

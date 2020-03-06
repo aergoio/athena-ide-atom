@@ -13,7 +13,6 @@ export const CardTitle = (props) => {
 CardTitle.propTypes = {
   title: PropTypes.string.isRequired,
   titleClass: PropTypes.class,
-  children: PropTypes.element,
 }
 
 export default CardTitle;

@@ -5,8 +5,11 @@ import PropTypes from 'prop-types';
 import logger from 'loglevel';
 import fs from 'fs';
 
-import { CardRow, Description, InputBox, Button } from '../../atoms';
-import { CardTitle, SelectGroup } from '../../molecules';
+import {
+  CardRow, Description, InputBox, Button,
+  ModalSummary, ModalSubSummary,
+} from '../../atoms';
+import { CardTitle, RadioButtonGroup } from '../../molecules';
 
 const keystoreType = "KeyStore";
 const wifType = "Wallet Import Format";
@@ -109,10 +112,17 @@ export default class ExportAccountModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardTitle title='Enter password to decrypt private key' />
+              <CardTitle title='Export Account' />
+              <CardRow class='component-card-row-border' />
               <CardRow>
-                <Description description='Export type' />
-                <SelectGroup selected={selected} items={items} onSelect={onSelect} />
+                <ModalSummary content='Are you sure you want to export account?' />
+              </CardRow>
+              <CardRow>
+                <ModalSubSummary content='To export, please configure an import type and password.' />
+              </CardRow>
+              <CardRow>
+                <Description description='Type' />
+                <RadioButtonGroup selected={selected} items={items} name='export_type' onSelect={onSelect} />
               </CardRow>
               <CardRow>
                 <Description description='Password' />
@@ -121,7 +131,7 @@ export default class ExportAccountModal extends React.Component {
               </CardRow>
               <CardRow class='component-card-row-button-modal'>
                 <Button name='Cancel' onClick={close}/>
-                <Button class='component-btn-rightmost' name='Ok' onClick={() => this._onConfirm(close)} />
+                <Button class='component-btn-rightmost' name='Export' onClick={() => this._onConfirm(close)} />
               </CardRow>
             </div>
           </atom-panel>

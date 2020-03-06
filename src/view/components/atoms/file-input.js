@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
 import logger from 'loglevel';
 
 const fileInputClass = 'component-fileinput';
 
-export default class InputBox extends React.Component {
+export default class FileInput extends React.Component {
 
   static get propTypes() {
     return {
-      class: PropTypes.class,
       type: PropTypes.string,
       placeHolder: PropTypes.string,
     };
@@ -35,14 +35,20 @@ export default class InputBox extends React.Component {
   }
 
   render() {
+    const id = uuid();
     const onChange = this._onChange;
+    const current = typeof this.state.current === "undefined" ? "" : this.state.current.name;
+    logger.debug("current", current);
     return (
-      <input
-        type="file"
-        className={ [fileInputClass, this.props.class].join(' ') }
-        ref={this.inputRef}
-        onChange={onChange}
-      />
+      <div className={fileInputClass}>
+        <input
+          type="file"
+          id={id}
+          onChange={onChange}
+        />
+        <label htmlFor={id}>Add File</label>
+        <span>{current}</span>
+      </div>
     );
   }
 

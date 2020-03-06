@@ -4,7 +4,10 @@ import {inject, observer} from 'mobx-react';
 import PropTypes from 'prop-types';
 import logger from 'loglevel';
 
-import { CardRow, Description, InputBox, Button } from '../../atoms';
+import {
+  CardRow, Button, Description, InputBox,
+  ModalSummary, ModalSubSummary,
+} from '../../atoms';
 import { CardTitle } from '../../molecules';
 
 @inject('nodeStore')
@@ -34,7 +37,14 @@ export default class NewNodeModal extends React.Component {
         {close =>
           <atom-panel class='modal'>
             <div>
-              <CardTitle title='Enter node endpoint' />
+              <CardTitle title='New Node' />
+              <CardRow class='component-card-row-border' />
+              <CardRow>
+                <ModalSummary content='Are you sure you want to add node?' />
+              </CardRow>
+              <CardRow>
+                <ModalSubSummary content='To import, enter node information' />
+              </CardRow>
               <CardRow>
                 <Description description='Node' />
               <InputBox ref={this.nodetInputRef} type='text'
