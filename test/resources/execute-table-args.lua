@@ -2,8 +2,7 @@
 -- should get with { key }
 
 function set(key, table)
-  -- system.setItem(key, { v1=table.v1, v2=table.v2 })
-  system.setItem(key, table)
+  system.setItem(key, { v1=table.v1, v2=table.v2 })
 end
 
 function get(key)

@@ -1,3 +1,7 @@
+## 0.5.2 - KeyStore
+
+- Add aergo keystore import/export
+
 ## 0.5.1 - Varargs
 
 - Add vararg processing

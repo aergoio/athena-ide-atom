@@ -9,9 +9,4 @@
 -- should export account with a password
 -- should remove the account
 -- should import with the exported one
-
-function get()
-  return "null"
-end
-
-abi.register_view(get)
+-- should state change on account change

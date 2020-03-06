@@ -431,6 +431,21 @@ let AccountStore = (_class = (_temp = class AccountStore {
     });
   }
 
+  addAccountWithKeyStore(json, password) {
+    logger.debug("Add account with", JSON.parse(json));
+    loadAccount().fromKeyStore(json, password).then(account => {
+      this.address2Account.set(account.address, account);
+      this.changeAccount(account.address);
+      const message = "Successfully imported account " + account.address;
+      this.rootStore.consoleStore.log(message, "info");
+      this.rootStore.notificationStore.notify(message, "success");
+    })["catch"](err => {
+      logger.error(err);
+      this.rootStore.consoleStore.log(err, "error");
+      this.rootStore.notificationStore.notify("Importing account failed", "error");
+    });
+  }
+
   changeAccount(address) {
     this.rootStore.consoleStore.log("Change account to " + address, "info");
     this.currentAddress = address;
@@ -445,23 +460,26 @@ let AccountStore = (_class = (_temp = class AccountStore {
     });
   }
 
-  exportAccount(password) {
+  encryptCurrentAsWif(password) {
     logger.debug("Export current account", this.currentAddress);
 
     if (typeof this.currentAddress === "undefined" || "" === this.currentAddress) {
-      return;
+      throw "Current account is empty";
     }
 
     const account = this.address2Account.get(this.currentAddress);
-    account["export"](password).then(encrypted => {
-      const message = "exported: " + encrypted;
-      this.rootStore.consoleStore.log(message, "info");
-      this.rootStore.notificationStore.notify(message, "success");
-    })["catch"](err => {
-      logger.error(err);
-      this.rootStore.consoleStore.log(err, "error");
-      this.rootStore.notificationStore.notify("Exporting account failed", "error");
-    });
+    return account["export"](password);
+  }
+
+  encryptCurrentAsKeyStore(password) {
+    logger.debug("Export current account as keystore", this.currentAddress);
+
+    if (typeof this.currentAddress === "undefined" || "" === this.currentAddress) {
+      throw "Current account is empty";
+    }
+
+    const account = this.address2Account.get(this.currentAddress);
+    return account.exportAsKeyStore(password);
   }
 
   removeAccount(address) {
@@ -505,7 +523,7 @@ let AccountStore = (_class = (_temp = class AccountStore {
   initializer: function () {
     return new Map();
   }
-}), _applyDecoratedDescriptor(_class.prototype, "currentAccount", [mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, "currentAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "addresses", [mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, "addresses"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "deserialize"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "newAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "newAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "addAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "addAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "changeAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "changeAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "updateAccountState", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "updateAccountState"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "exportAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "exportAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "removeAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "removeAccount"), _class.prototype)), _class);
+}), _applyDecoratedDescriptor(_class.prototype, "currentAccount", [mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, "currentAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "addresses", [mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, "addresses"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "deserialize", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "deserialize"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "newAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "newAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "addAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "addAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "addAccountWithKeyStore", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "addAccountWithKeyStore"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "changeAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "changeAccount"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "updateAccountState", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "updateAccountState"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "removeAccount", [mobx.action], Object.getOwnPropertyDescriptor(_class.prototype, "removeAccount"), _class.prototype)), _class);
 
 var _class$1, _descriptor$1, _temp$1;
 let ConsoleStore = (_class$1 = (_temp$1 = class ConsoleStore {
@@ -2169,13 +2187,13 @@ ArgumentRow.propTypes = {
 };
 
 const buttonClass = 'component-btn';
-const disabledButtonClass = 'component-btn-disabled';
+const disabledButtonClass = 'disabled';
 const Button = props => {
   let classes;
   let onClick;
 
   if (typeof props.disabled === "undefined" || !props.disabled) {
-    classes = ['inline-block', buttonClass, props["class"], buttonClass].join(' ');
+    classes = ['inline-block', buttonClass, props["class"]].join(' ');
     onClick = props.onClick;
   } else {
     classes = ['inline-block', buttonClass, props["class"], disabledButtonClass].join(' ');
@@ -2363,6 +2381,52 @@ Description.propTypes = {
   description: propTypes.string
 };
 
+const fileInputClass = 'component-fileinput';
+class FileInput extends React.Component {
+  static get propTypes() {
+    return {
+      type: propTypes.string,
+      placeHolder: propTypes.string
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      current: undefined
+    };
+    this._onChange = this._onChange.bind(this);
+  }
+
+  get value() {
+    return this.state.current;
+  }
+
+  _onChange(e) {
+    const file = e.target.files[0];
+    logger.debug("Current file", file);
+    this.setState({
+      current: file
+    });
+  }
+
+  render() {
+    const id = v4_1();
+    const onChange = this._onChange;
+    const current = typeof this.state.current === "undefined" ? "" : this.state.current.name;
+    return React.createElement("div", {
+      className: fileInputClass
+    }, React.createElement("input", {
+      type: "file",
+      id: id,
+      onChange: onChange
+    }), React.createElement("label", {
+      htmlFor: id
+    }, "Add File"), React.createElement("span", null, current));
+  }
+
+}
+
 const foldableClass = 'foldable';
 const Foldable = props => {
   const triggerBaseClass = typeof props.triggerBaseClass === "undefined" ? foldableClass : props.triggerBaseClass;
@@ -2471,6 +2535,28 @@ class InputBox extends React.Component {
 
 }
 
+const modalSummaryClass = 'component-modal-summary';
+const ModalSummary = props => {
+  return React.createElement("div", {
+    className: ['inline-block', modalSummaryClass, props["class"]].join(' ')
+  }, props.content);
+};
+ModalSummary.propTypes = {
+  content: propTypes.string,
+  "class": propTypes["class"]
+};
+
+const modalSubSummaryClass = 'component-modal-sub-summary';
+const ModalSubSummary = props => {
+  return React.createElement("div", {
+    className: ['inline-block', modalSubSummaryClass, props["class"]].join(' ')
+  }, props.content);
+};
+ModalSubSummary.propTypes = {
+  content: propTypes.string,
+  "class": propTypes["class"]
+};
+
 const panelClass = 'athena-ide-tab-panel';
 const Panel = props => {
   return React.createElement("div", {
@@ -2479,6 +2565,34 @@ const Panel = props => {
 };
 Panel.propTypes = {
   children: propTypes.element.isRequired
+};
+
+const radioButtonClass = 'component-radio-btn';
+const radioButtonLabelClass = 'component-radio-btn-label';
+const radioButtonInputClass = 'component-radio-btn-input';
+const RadioButton = props => {
+  const checked = props.checked;
+  const onClick = props.onClick;
+  const name = props.name;
+  const text = props.text;
+  return React.createElement("div", {
+    className: ['inline-block', radioButtonClass].join(' ')
+  }, React.createElement("label", {
+    className: [radioButtonLabelClass].join(' ')
+  }, React.createElement("input", {
+    type: "radio",
+    className: [radioButtonInputClass].join(' '),
+    name: name,
+    checked: checked,
+    onClick: onClick
+  }), text));
+};
+RadioButton.propTypes = {
+  "class": propTypes["class"],
+  checked: propTypes.bool,
+  onClick: propTypes.func,
+  name: propTypes.string,
+  text: propTypes.string
 };
 
 const selectBoxClass = 'component-selectbox';
@@ -3167,8 +3281,7 @@ const CardTitle = props => {
 };
 CardTitle.propTypes = {
   title: propTypes.string.isRequired,
-  titleClass: propTypes["class"],
-  children: propTypes.element
+  titleClass: propTypes["class"]
 };
 
 const ConstructorArguments = props => {
@@ -3354,6 +3467,55 @@ Payload.propTypes = {
   payload: propTypes.string
 };
 
+const radioButtonGroupClass = "component-radio-btn-group";
+class RadioButtonGroup extends React.Component {
+  static get propTypes() {
+    return {
+      "class": propTypes["class"],
+      selected: propTypes.string.isRequired,
+      items: propTypes.array.isRequired,
+      name: propTypes.string.isRequired,
+      onSelect: propTypes.func
+    };
+  }
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const checked = this.props.selected;
+    const items = this.props.items;
+    const name = this.props.name;
+    const onSelect = this.props.onSelect;
+    return React.createElement("div", {
+      className: ['inline-block', radioButtonGroupClass, this.props["class"]].join(' ')
+    }, items.map((item, i) => {
+      if (item == checked) {
+        return React.createElement(RadioButton, {
+          checked: true,
+          key: i,
+          name: name,
+          text: item,
+          onClick: () => {
+            if (onSelect) onSelect(item);
+          }
+        });
+      } else {
+        return React.createElement(RadioButton, {
+          key: i,
+          name: name,
+          text: item,
+          onClick: () => {
+            if (onSelect) onSelect(item);
+          }
+        });
+      }
+    }));
+  }
+
+}
+
 const TargetSelect = props => {
   return React.createElement(CardRow, null, React.createElement(CardItem, {
     ratio: 0
@@ -3375,36 +3537,132 @@ TargetSelect.propTypes = {
 };
 
 var _dec, _class$6;
-let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$6 = mobxReact.observer(_class$6 = class ExportAccountModal extends React.Component {
+const keystoreType = "KeyStore";
+const wifType = "Wallet Import Format";
+const types = [keystoreType, wifType];
+const KEYSTORE_POSTFIX = "__keystore.txt";
+let ExportAccountModal = (_dec = mobxReact.inject('accountStore', 'consoleStore', 'notificationStore'), _dec(_class$6 = mobxReact.observer(_class$6 = class ExportAccountModal extends React.Component {
   static get propTypes() {
     return {
-      accountStore: propTypes.any
+      accountStore: propTypes.any,
+      consoleStore: propTypes.any,
+      notificationStore: propTypes.any
     };
   }
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected: keystoreType
+    };
     this.passwordInputRef = React.createRef();
+    this._onSelectType = this._onSelectType.bind(this);
+    this._onConfirm = this._onConfirm.bind(this);
   }
 
-  _onConfirm() {
+  _onSelectType(item) {
+    logger.debug("select", item);
+    this.setState({
+      selected: item
+    });
+  }
+
+  _onConfirm(closeFunc) {
+    const exportType = this.state.selected;
     logger.debug("Export account button clicked");
+    logger.debug("Export type", exportType);
     const password = this.passwordInputRef.current.value;
-    this.props.accountStore.exportAccount(password);
+
+    if (keystoreType === exportType) {
+      this._exportAsKeyStore(password, closeFunc);
+    } else {
+      // default : Wallet import format
+      this._exportAsWif(password, closeFunc);
+    }
+  }
+
+  _exportAsKeyStore(password, closeFunc) {
+    const filename = this.props.accountStore.currentAddress + KEYSTORE_POSTFIX;
+    this.props.accountStore.encryptCurrentAsKeyStore(password).then(json => {
+      const {
+        remote
+      } = require('electron');
+
+      const dialog = remote.dialog;
+      const win = remote.getCurrentWindow();
+      const options = {
+        title: "Save keystore file",
+        defaultPath: filename,
+        buttonLabel: "Save",
+        filters: [{
+          name: 'Keystores',
+          extensions: ['txt']
+        }, {
+          name: 'All Files',
+          extensions: ['*']
+        }]
+      };
+      const savePath = dialog.showSaveDialog(win, options);
+
+      if (savePath) {
+        fs.writeFileSync(savePath, json);
+        this.props.consoleStore.log("Exported:", "info");
+        this.props.consoleStore.log(json, "info");
+        this.props.notificationStore.notify("Exported account successfully", "success");
+        closeFunc();
+      }
+    })["catch"](err => {
+      logger.error(err);
+      this.props.consoleStore.log(err, "error");
+      this.props.notificationStore.notify("Exporting account failed", "error");
+      closeFunc();
+    });
+  }
+
+  _exportAsWif(password, closeFunc) {
+    this.props.accountStore.encryptCurrentAsWif(password).then(encrypted => {
+      this.props.consoleStore.log("Exported:", "info");
+      this.props.consoleStore.log(encrypted, "info");
+      this.props.notificationStore.notify("Exported account successfully", "success");
+      closeFunc();
+    })["catch"](err => {
+      logger.error(err);
+      this.props.consoleStore.log(err, "error");
+      this.props.notificationStore.notify("Exporting account failed", "error");
+      closeFunc();
+    });
   }
 
   render() {
+    const selected = this.state.selected;
+    const items = types;
+    const onSelect = this._onSelectType;
+    const disabled = "" === this.props.accountStore.currentAddress;
     return React.createElement(Popup, {
       modal: true,
       trigger: React.createElement(Button, {
         "class": "component-btn-ocean",
-        name: "Export"
+        name: "Export",
+        disabled: disabled
       })
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Enter password to decrypt private key"
-    }), React.createElement(CardRow, null, React.createElement(Description, {
+      title: "Export Account"
+    }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Are you sure you want to export account?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "To export, please configure an import type and password."
+    })), React.createElement(CardRow, null, React.createElement(Description, {
+      description: "Type"
+    }), React.createElement(RadioButtonGroup, {
+      selected: selected,
+      items: items,
+      name: "export_type",
+      onSelect: onSelect
+    })), React.createElement(CardRow, null, React.createElement(Description, {
       description: "Password"
     }), React.createElement(InputBox, {
       ref: this.passwordInputRef,
@@ -3417,18 +3675,21 @@ let ExportAccountModal = (_dec = mobxReact.inject('accountStore'), _dec(_class$6
       onClick: close
     }), React.createElement(Button, {
       "class": "component-btn-rightmost",
-      name: "Ok",
-      onClick: () => {
-        this._onConfirm();
-
-        close();
-      }
+      name: "Export",
+      onClick: () => this._onConfirm(close)
     })))));
   }
 
 }) || _class$6) || _class$6);
 
+var global$1 = (typeof global !== "undefined" ? global :
+            typeof self !== "undefined" ? self :
+            typeof window !== "undefined" ? window : {});
+
 var _dec$1, _class$7;
+const keystoreType$1 = "KeyStore";
+const wifType$1 = "Wallet Import Format";
+const types$1 = [keystoreType$1, wifType$1];
 let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_class$7 = mobxReact.observer(_class$7 = class ImportAccountModal extends React.Component {
   static get propTypes() {
     return {
@@ -3438,18 +3699,75 @@ let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_cla
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected: keystoreType$1
+    };
+    this.keyStoreInputRef = React.createRef();
     this.privateKeyInputRef = React.createRef();
     this.passwordInputRef = React.createRef();
+    this._onSelectType = this._onSelectType.bind(this);
+    this._onConfirm = this._onConfirm.bind(this);
+  }
+
+  _onSelectType(item) {
+    logger.debug("select type", item);
+    this.setState({
+      selected: item
+    });
   }
 
   _onConfirm() {
-    const encryptedPrivateKey = this.privateKeyInputRef.current.value;
+    const selected = this.state.selected;
     const password = this.passwordInputRef.current.value;
-    logger.debug("Import account confirm button clicked with", encryptedPrivateKey);
-    this.props.accountStore.addAccount(encryptedPrivateKey, password);
+
+    if (selected === keystoreType$1) {
+      const file = this.keyStoreInputRef.current.value;
+
+      this._readFile(file).then(json => {
+        logger.debug("json", json);
+        this.props.accountStore.addAccountWithKeyStore(json, password);
+      });
+    } else {
+      const encryptedPrivateKey = this.privateKeyInputRef.current.value;
+      this.props.accountStore.addAccount(encryptedPrivateKey, password);
+    }
+  }
+
+  _readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new global$1.FileReader();
+
+      reader.onload = () => resolve(reader.result);
+
+      reader.readAsText(file);
+
+      reader.onerror = e => reject(e);
+    });
   }
 
   render() {
+    const selected = this.state.selected;
+    const items = types$1;
+    const onSelect = this._onSelectType;
+    let selectedType;
+
+    if (this.state.selected === keystoreType$1) {
+      selectedType = React.createElement(CardRow, null, React.createElement(Description, {
+        description: "File path"
+      }), React.createElement(FileInput, {
+        ref: this.keyStoreInputRef
+      }));
+    } else {
+      // wif type
+      selectedType = React.createElement(CardRow, null, React.createElement(Description, {
+        description: "Private key"
+      }), React.createElement(InputBox, {
+        ref: this.privateKeyInputRef,
+        type: "text",
+        placeHolder: "encrypted private key"
+      }));
+    }
+
     return React.createElement(Popup, {
       modal: true,
       trigger: React.createElement(Button, {
@@ -3459,14 +3777,21 @@ let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_cla
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Import account with encrypted private key"
-    }), React.createElement(CardRow, null, React.createElement(Description, {
-      description: "Private key"
-    }), React.createElement(InputBox, {
-      ref: this.privateKeyInputRef,
-      type: "text",
-      placeHolder: "encrypted private key"
+      title: "Import Account"
+    }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Are you sure you want to import account?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "To import, please configure an import type and password."
     })), React.createElement(CardRow, null, React.createElement(Description, {
+      description: "Type"
+    }), React.createElement(RadioButtonGroup, {
+      selected: selected,
+      items: items,
+      name: "import_type",
+      onSelect: onSelect
+    })), selectedType, React.createElement(CardRow, null, React.createElement(Description, {
       description: "Password"
     }), React.createElement(InputBox, {
       ref: this.passwordInputRef,
@@ -3479,7 +3804,7 @@ let ImportAccountModal = (_dec$1 = mobxReact.inject('accountStore'), _dec$1(_cla
       onClick: close
     }), React.createElement(Button, {
       "class": "component-btn-rightmost",
-      name: "Ok",
+      name: "Import",
       onClick: () => {
         this._onConfirm();
 
@@ -3518,8 +3843,14 @@ let NewAccountModal = (_dec$2 = mobxReact.inject('accountStore'), _dec$2(_class$
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Do you want to make a new account?"
+      title: "New Account"
     }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Do you want to make a new account?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "WARNING: IDE DOES NOT keep created account."
+    })), React.createElement(CardRow, {
       "class": "component-card-row-button-modal"
     }, React.createElement(Button, {
       name: "Cancel",
@@ -3566,8 +3897,14 @@ let NewNodeModal = (_dec$3 = mobxReact.inject('nodeStore'), _dec$3(_class$9 = mo
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Enter node endpoint"
-    }), React.createElement(CardRow, null, React.createElement(Description, {
+      title: "New Node"
+    }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Are you sure you want to add node?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "To import, enter node information"
+    })), React.createElement(CardRow, null, React.createElement(Description, {
       description: "Node"
     }), React.createElement(InputBox, {
       ref: this.nodetInputRef,
@@ -3621,8 +3958,14 @@ let RemoveAccountModal = (_dec$4 = mobxReact.inject('accountStore'), _dec$4(_cla
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Do you want to remove current account?"
+      title: "Remove Account"
     }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Do you want to remove current account?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "Removed account cannot be recovered"
+    })), React.createElement(CardRow, {
       "class": "component-card-row-button-modal"
     }, React.createElement(Button, {
       name: "Cancel",
@@ -3670,8 +4013,14 @@ let RemoveNodeModal = (_dec$5 = mobxReact.inject('nodeStore'), _dec$5(_class$b =
     }, close => React.createElement("atom-panel", {
       "class": "modal"
     }, React.createElement("div", null, React.createElement(CardTitle, {
-      title: "Do you want to remove current node?"
+      title: "Remove node"
     }), React.createElement(CardRow, {
+      "class": "component-card-row-border"
+    }), React.createElement(CardRow, null, React.createElement(ModalSummary, {
+      content: "Do you want to remove current node?"
+    })), React.createElement(CardRow, null, React.createElement(ModalSubSummary, {
+      content: "Removed node cannot be recovered"
+    })), React.createElement(CardRow, {
       "class": "component-card-row-button-modal"
     }, React.createElement(Button, {
       name: "Cancel",
@@ -4860,10 +5209,6 @@ class Subscriptions {
   }
 
 }
-
-var global$1 = (typeof global !== "undefined" ? global :
-            typeof self !== "undefined" ? self :
-            typeof window !== "undefined" ? window : {});
 
 var lookup = [];
 var revLookup = [];
