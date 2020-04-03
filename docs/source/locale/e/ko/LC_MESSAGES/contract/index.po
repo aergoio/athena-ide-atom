@@ -1,0 +1,72 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, aergo team and contributors
+# This file is distributed under the same license as the athena-ide-atom
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: athena-ide-atom \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-03 15:32+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: ../../source/contract/index.rst:2
+msgid "Contract"
+msgstr ""
+
+#: ../../source/contract/index.rst:5
+msgid "Deploy"
+msgstr ""
+
+#: ../../source/contract/index.rst:8 ../../source/contract/index.rst:32
+msgid "Without args"
+msgstr ""
+
+#: ../../source/contract/index.rst:11 ../../source/contract/index.rst:35
+msgid "With args"
+msgstr ""
+
+#: ../../source/contract/index.rst:14 ../../source/contract/index.rst:41
+msgid "Gas limit"
+msgstr ""
+
+#: ../../source/contract/index.rst:17 ../../source/contract/index.rst:47
+msgid "Amount"
+msgstr ""
+
+#: ../../source/contract/index.rst:20
+msgid "Import & Remove"
+msgstr ""
+
+#: ../../source/contract/index.rst:23 ../../source/contract/index.rst:26
+msgid "Import"
+msgstr ""
+
+#: ../../source/contract/index.rst:29
+msgid "Execute"
+msgstr ""
+
+#: ../../source/contract/index.rst:38
+msgid "Varargs"
+msgstr ""
+
+#: ../../source/contract/index.rst:44
+msgid "Fee delegation"
+msgstr ""
+
+#: ../../source/contract/index.rst:50
+msgid "Query"
+msgstr ""
+
+#: ../../source/contract/index.rst:53
+msgid "Redeploy (private mode only)"
+msgstr ""
+
