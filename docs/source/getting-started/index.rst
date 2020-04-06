@@ -13,7 +13,7 @@ Athena ide atom is available in `apm (atom package manager) <https://atom.io/pac
 
 Atom -> Preferences -> Install
 
-.. image:: ../_static/install-by-ui.png
+.. image:: ../_static/img/install-by-ui.png
 
 You can install using cli. For windows user, you can use `git bash <https://git-scm.com/downloads>`_ on cli environment.
 
@@ -39,25 +39,25 @@ Using shortcut
 - Mac : Option + Shirt + L
 - Windows : Alt + Shirt + L
 
-.. image:: ../_static/opened.png
+.. image:: ../_static/img/opened.png
 
 Using menu bar
 ^^^^^^^^^^^^^^
 
 Packages -> Athena IDE -> Open Athena IDE Panel
 
-.. image:: ../_static/open-with-menubar.png
+.. image:: ../_static/img/open-with-menubar.png
 
 Auto Complete
 -------------
 
 Athena ide atom provides some basic autocomplete for lua.
 
-.. image:: ../_static/autocomplete.png
+.. image:: ../_static/img/autocomplete.png
 
 Lint
 ----
 
 Athena ide atom provides basic lint for lua.
 
-.. image:: ../_static/lint.png
+.. image:: ../_static/img/lint.png

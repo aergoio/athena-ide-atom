@@ -11,8 +11,3 @@ Welcome to the athena ide atom wiki. This is an IDE (Integrated Development Envi
    node/index
    account/index
    contract/index
-
-Indices
--------
-
-* :ref:`search`
