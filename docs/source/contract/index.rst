@@ -80,29 +80,33 @@ Import & Remove
 Import
 ^^^^^^
 
-You can import already deployed contract by clicking import button.
+You can import already deployed contract. 
+
+Type contract address & click import button
 
 .. image:: ../_static/img/import-contract-enter.png
 
-You can see imported one.
+Contract imported
 
 .. image:: ../_static/img/import-contract-result.png
 
 Remove
 ^^^^^^
 
-You can remove contract by clicking trash button.
+You can remove contract.
+
+Click trash button
 
 .. image:: ../_static/img/remove-contract-before.png
 
-Contract removed.
+Contract removed
 
 .. image:: ../_static/img/remove-contract-after.png
 
 Execute
 -------
 
-Contract execution can change status of contract state db. Any function registered as `abi.register` can be executed.
+Contract execution can change status of contract state db. Any function registered as register can be executed.
 
 Without args
 ^^^^^^^^^^^^
@@ -175,7 +179,7 @@ You can execute contract with aergo token. Make sure function is registered as p
 Fee delegation
 ^^^^^^^^^^^^^^
 
-You can execute contract with fee delegation. When contract is executed with fee delegation, the contract pays fee on behalf of contract executor. Make sure function is registered as `fee_delegation` and a contract has enough aergo token.
+You can execute contract with fee delegation. When contract is executed with fee delegation, the contract pays fee on behalf of contract executor. Make sure function is registered as fee_delegation and a contract has enough aergo token.
 
 .. code-block:: lua
 
@@ -195,7 +199,7 @@ You can execute contract with fee delegation. When contract is executed with fee
 Query
 -----
 
-Contract query can check status of contract state db. Any function registered in `abi.register_view` can be invoked as query.
+Contract query can check status of contract state db. Any function registered in register_view can be invoked as query.
 
 Without args
 ^^^^^^^^^^^^
@@ -242,7 +246,7 @@ You can query contract status with arguments.
 Varargs
 -------
 
-Lua supports varargs. The varargs is denoted by `...` in argument.
+Lua supports varargs. The varargs is denoted by ... in argument.
 
 .. code-block:: lua
 
@@ -264,22 +268,22 @@ Lua supports varargs. The varargs is denoted by `...` in argument.
 Add
 ^^^
 
-You can add new varargs by clicking + button.
+Click **+** button
 
 .. image:: ../_static/img/varargs-add-before.png
 
-Argument added.
+Argument added
 
 .. image:: ../_static/img/varargs-add-after.png
 
 Remove
 ^^^^^^
 
-You can remove argument by clicking - button.
+Click **-** button
 
 .. image:: ../_static/img/varargs-remove-before.png
 
-Argument removed.
+Argument removed
 
 .. image:: ../_static/img/varargs-remove-after.png
 

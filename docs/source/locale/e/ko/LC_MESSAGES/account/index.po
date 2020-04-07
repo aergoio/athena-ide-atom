@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: athena-ide-atom \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 15:32+0900\n"
+"POT-Creation-Date: 2020-04-07 21:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,21 +20,117 @@ msgstr ""
 
 #: ../../source/account/index.rst:2
 msgid "Account"
-msgstr ""
+msgstr "계정"
 
-#: ../../source/account/index.rst:5
+#: ../../source/account/index.rst:4
+msgid ""
+"You can configure an account which is deploying, executing and querying "
+"smart contract. An account have to have some aergo token to make "
+"transaction."
+msgstr ""
+"스마트 컨트랙트 배포, 실행, 상태 조회를 위한 계정을 생성할 수 있습니다. transaction을 만들기 위해서는 aergo "
+"토큰이 필요합니다."
+
+#: ../../source/account/index.rst:7
 msgid "New"
-msgstr ""
+msgstr "생성"
 
-#: ../../source/account/index.rst:8
+#: ../../source/account/index.rst:9
+msgid "Click an new button"
+msgstr "New 버튼을 클릭"
+
+#: ../../source/account/index.rst:13 ../../source/account/index.rst:106
+msgid "Click a ok button"
+msgstr "Ok 버튼을 클릭"
+
+#: ../../source/account/index.rst:17
+msgid "Account created"
+msgstr "계정 생성 완료"
+
+#: ../../source/account/index.rst:22
 msgid "Import"
+msgstr "추가"
+
+#: ../../source/account/index.rst:24
+msgid ""
+"You can import account with an aergo specific keystore format or wallet "
+"import format. For details of keystore format, see `aergo keystore "
+"proposal <https://github.com/aergoio/aergo/pull/102>`_."
+msgstr ""
+"Aergo의 keystore format이나 wallet import format으로 계정을 추가할 수 있습니다. Aergo "
+"keystore 형식에 대해 더 알고 싶으시면 다음의 링크를 참고하세요. `aergo keystore proposal "
+"<https://github.com/aergoio/aergo/pull/102>`_."
+
+#: ../../source/account/index.rst:27 ../../source/account/index.rst:70
+msgid "KeyStore"
 msgstr ""
 
-#: ../../source/account/index.rst:11
+#: ../../source/account/index.rst:29 ../../source/account/index.rst:52
+msgid "Click an import button"
+msgstr "Import 버튼을 클릭"
+
+#: ../../source/account/index.rst:33
+msgid "Click an add file button on popup"
+msgstr "Add file 버튼을 클릭"
+
+#: ../../source/account/index.rst:37
+msgid "Select keystore file"
+msgstr "Keystore 파일을 선택"
+
+#: ../../source/account/index.rst:41
+msgid "Enter password to decrypt keystore"
+msgstr "Keystore 파일을 복호화 하기 위한 암호를 입력"
+
+#: ../../source/account/index.rst:45 ../../source/account/index.rst:60
+msgid "Account imported"
+msgstr "계정 추가 완료"
+
+#: ../../source/account/index.rst:50 ../../source/account/index.rst:85
+msgid "Wallet Import Format"
+msgstr ""
+
+#: ../../source/account/index.rst:56
+msgid "Enter wallet import format & password to decrypt it"
+msgstr "Wallet import format을 입력한 후 복호화 하기 위한 암호를 입력"
+
+#: ../../source/account/index.rst:65
 msgid "Export"
-msgstr ""
+msgstr "내보내기"
 
-#: ../../source/account/index.rst:14
+#: ../../source/account/index.rst:67
+msgid ""
+"You can export account with an aergo specific keystore format or wallet "
+"import format. For details of keystore format, see `aergo keystore "
+"proposal <https://github.com/aergoio/aergo/pull/102>`_."
+msgstr ""
+"Aergo의 keystore format이나 wallet import format으로 계정을 내보낼 수 있습니다. Aergo "
+"keystore 형식에 대해 더 알고 싶으시면 다음의 링크를 참고하세요 `aergo keystore proposal "
+"<https://github.com/aergoio/aergo/pull/102>`_."
+
+#: ../../source/account/index.rst:72 ../../source/account/index.rst:87
+msgid "Click an export button"
+msgstr "Export 버튼을 클릭"
+
+#: ../../source/account/index.rst:76 ../../source/account/index.rst:91
+msgid "Enter a password to encrypt"
+msgstr "암호화 하기 위한 암호를 입력"
+
+#: ../../source/account/index.rst:80
+msgid "Choose save location"
+msgstr "파일 저장위치를 선택"
+
+#: ../../source/account/index.rst:95
+msgid "You can see wallet import format in a console"
+msgstr "Wallet import format을 console창에서 확인"
+
+#: ../../source/account/index.rst:100
 msgid "Remove"
-msgstr ""
+msgstr "삭제"
 
+#: ../../source/account/index.rst:102
+msgid "Click an remove button"
+msgstr "Remove 버튼을 클릭"
+
+#: ../../source/account/index.rst:110
+msgid "Account removed from list"
+msgstr "계정 삭제 완료"

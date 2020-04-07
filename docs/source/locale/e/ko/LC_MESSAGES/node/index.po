@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: athena-ide-atom \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 15:32+0900\n"
+"POT-Creation-Date: 2020-04-07 21:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,13 +20,45 @@ msgstr ""
 
 #: ../../source/node/index.rst:2
 msgid "Node"
-msgstr ""
+msgstr "노드"
 
-#: ../../source/node/index.rst:5
+#: ../../source/node/index.rst:4
+msgid ""
+"You can configure an aergo node whose smart contract interacting with. "
+"You can see height and gas price of it. Default configuration is "
+"localhost:7845."
+msgstr ""
+"스마트 컨트랙트가 실행되는 노드를 선택할 수 있습니다. 블록 높이와 gas price를 확인할 수 있습니다. "
+"기본값은 localhost:7845입니다."
+
+#: ../../source/node/index.rst:7
 msgid "New"
-msgstr ""
+msgstr "추가"
 
-#: ../../source/node/index.rst:8
+#: ../../source/node/index.rst:9
+msgid "Click an new button"
+msgstr "New 버튼 클릭"
+
+#: ../../source/node/index.rst:13
+msgid "Enter node endpoint and click ok"
+msgstr "Endpoint를 입력 후 ok버튼을 클릭"
+
+#: ../../source/node/index.rst:17
+msgid "You can see height and gas price of it"
+msgstr "블록 높이와 gas price를 확인"
+
+#: ../../source/node/index.rst:22
 msgid "Remove"
-msgstr ""
+msgstr "삭제"
 
+#: ../../source/node/index.rst:24
+msgid "Click a remove button"
+msgstr "Remove 버튼을 클릭"
+
+#: ../../source/node/index.rst:28
+msgid "Click ok button"
+msgstr "Ok 버튼을 클릭"
+
+#: ../../source/node/index.rst:32
+msgid "Node removed from list"
+msgstr "노드 삭제 완료"
