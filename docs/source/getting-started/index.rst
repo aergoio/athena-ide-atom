@@ -15,7 +15,7 @@ Atom -> Preferences -> Install
 
 .. image:: ../_static/img/install-by-ui.png
 
-You can install using cli. For windows user, you can use `git bash <https://git-scm.com/downloads>`_ on cli environment.
+You can install using cli. For windows user, you can use `git bash <https://git-scm.com/downloads>`_ for cli environment.
 
 .. code-block:: bash
 
@@ -24,7 +24,7 @@ You can install using cli. For windows user, you can use `git bash <https://git-
 By installer
 ^^^^^^^^^^^^
 
-Installing with apm may be slow on slow network status. So we provide custom installer in releases. Download athena-ide-atom-x.x.x-installer.bin from `releases <https://github.com/aergoio/athena-ide-atom/releases>`_ and run in cli. For windows user, you can use `git bash <https://git-scm.com/downloads>`_ on cli environment.
+Installing with apm may be slow on slow network status. So we provide custom installer in releases. Download athena-ide-atom-x.x.x-installer.bin from `releases <https://github.com/aergoio/athena-ide-atom/releases>`_ and run in cli. For windows user, you can use `git bash <https://git-scm.com/downloads>`_ for cli environment.
 
 .. code-block:: bash
 
