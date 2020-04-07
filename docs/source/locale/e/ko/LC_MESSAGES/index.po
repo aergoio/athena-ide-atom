@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: athena-ide-atom \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-03 15:32+0900\n"
+"POT-Creation-Date: 2020-04-07 20:44+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,21 +20,21 @@ msgstr ""
 
 #: ../../source/index.rst:6
 msgid "Tutorial"
-msgstr ""
+msgstr "가이드"
 
 #: ../../source/index.rst:2
 msgid "Welcome"
-msgstr ""
+msgstr "환영합니다"
 
 #: ../../source/index.rst:4
-msgid "Welcome to the athena ide atom wiki."
+msgid ""
+"Welcome to the athena ide atom wiki. This is an IDE (Integrated "
+"Development Environment) for `aergo smart contract "
+"<https://docs.aergo.io/en/latest/smart-contracts/index.html>`_. It can "
+"compile, deploy and execute smart contract with an account. It also can "
+"create, import and export account."
 msgstr ""
-
-#: ../../source/index.rst:16
-msgid "Indices"
-msgstr ""
-
-#: ../../source/index.rst:18
-msgid ":ref:`search`"
-msgstr ""
-
+"athena ide atom wiki에 오신 것을 환영합니다. "
+"이것은 `aergo smart contract <https://docs.aergo.io/en/latest/smart-contracts/index.html>`_ "
+"에 대한 IDE (Integrated Development Environment)로써 스마트 컨트랙트 컴파일, 배포, 실행을 할 수 있습니다. "
+"스마트 컨트랙트 실행을 위한 계정 생성, 추가, 내보내기 기능을 제공합니다."
