@@ -10,7 +10,7 @@ A package for writing smart contract in aergo using atom
 ## Compatibility
 
 - Atom: v1.28 or higher
-- Aergo: v2.2.x
+- Aergo: v2.2.x or higher
 
 Need to rebuild for atom compatible electron version for grpc native modules in a herajs
 
@@ -65,4 +65,6 @@ Check [release notes of atom](https://github.com/atom/atom/releases)
 2. Since atom is electron-based, make sure external library is build on electron target.\
    Do not use `electron-rebuild` because of grpc [see also](https://www.npmjs.com/package/grpc#about-electron).
 
-Following these rules, feel free to make any pull requests.
+3. Adding new features should add it to `CHANGELOG.md`.
+
+Following these rules, feel free to make any pull requests
