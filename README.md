@@ -46,10 +46,6 @@ Check [release notes of atom](https://github.com/atom/atom/releases)
 - Build dist: `npm run build`
 - Make installer: `npm run archive`
 
-## Tutorial
-
-[readthedocs](https://athena-ide-atom.readthedocs.io/)
-
 ## Contribution
 
 1. Do not write custom scripts as external file like
